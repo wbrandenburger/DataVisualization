@@ -20,7 +20,7 @@ else:
     data_files = []
 
 included_packages = ["rsvis"] + ["rsvis." + p for p in setuptools.find_packages("rsvis")]
-print(included_packages)
+
 setuptools.setup(
     name="rsvis",
     version=rsvis.__version__,

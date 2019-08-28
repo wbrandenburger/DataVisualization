@@ -24,7 +24,7 @@ def get_config_dirs():
 
 def get_config_folder():
     """Get folder where the configuration files are stored,
-    e.g. ``~/.rsvis``. It is XDG compatible, which means that if the
+    e.g. ``~/rsvis``. It is XDG compatible, which means that if the
     environment variable ``XDG_CONFIG_HOME`` is defined it will use the
     configuration folder ``XDG_CONFIG_HOME/rsvis`` instead.
 
@@ -36,7 +36,7 @@ def get_config_folder():
         if os.path.exists(config_dir):
             return config_dir
     # If no folder is found, then get the config home
-    return os.path.join(get_config_home(), ".rsvis")
+    return os.path.join(get_config_home(), "rsvis")
 
 def get_config_home():
     """Get the base directory relative to which user specific configuration
