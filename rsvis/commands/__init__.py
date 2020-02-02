@@ -1,3 +1,9 @@
+# ===========================================================================
+#   __init__.py -------------------------------------------------------------
+# ===========================================================================
+
+#   import ------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 import rsvis.config.utils
 import rsvis.plugin
 
@@ -5,11 +11,14 @@ import glob
 import logging
 import os
 import re
-
 import stevedore
 
+#   settings ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 commands_mgr = None
 
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def _create_commands_mgr():
     global commands_mgr
 
@@ -23,27 +32,9 @@ def _create_commands_mgr():
         propagate_map_exceptions=True,
         on_load_failure_callback=rsvis.plugin.stevedore_error_handler
     )
-
-
-def get_external_scripts():
-    regex = re.compile('.*rsvis-([^ .]+)$')
-    paths = []
-    scripts = {}
-    paths.append(rsvis.config.utils.get_scripts_folder())
-    paths += os.environ["PATH"].split(":")
-    for path in paths:
-        for script in glob.glob(os.path.join(path, "rsvis-*")):
-            m = regex.match(script)
-            if m is not None:
-                name = m.group(1)
-                scripts[name] = dict(
-                    command_name=name,
-                    path=script,
-                    plugin=None
-                )
-    return scripts
-
-
+    
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def get_scripts():
     global commands_mgr
     _create_commands_mgr()

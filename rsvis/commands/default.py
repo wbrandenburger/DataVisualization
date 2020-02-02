@@ -1,3 +1,6 @@
+# ===========================================================================
+#   default.py --------------------------------------------------------------
+# ===========================================================================
 """
 
 Examples
@@ -27,6 +30,8 @@ Cli
 
 """
 
+#   import ------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 import rsvis.commands
 
 import difflib
@@ -36,13 +41,23 @@ import sys
 
 import click
 import colorama
+import difflib
+import logging
+import os
+import sys
 
+#   class -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 class MultiCommand(click.MultiCommand):
 
+    #   settings ------------------------------------------------------------
+    # -----------------------------------------------------------------------
     scripts = rsvis.commands.get_scripts()
     scripts.update(rsvis.commands.get_external_scripts())
     logger = logging.getLogger('multicommand')
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def list_commands(self, ctx):
         """List all matched commands in the command folder and in path
 
@@ -55,6 +70,8 @@ class MultiCommand(click.MultiCommand):
         rv.sort()
         return rv
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def get_command(self, ctx, name):
         """Get the command to be run
 
@@ -76,26 +93,25 @@ class MultiCommand(click.MultiCommand):
                     ' or '.join(
                         difflib.get_close_matches(name, self.scripts, n=2)),
                     c=colorama
-                ))
+                )
+            ) # @log
             return None
         if script['plugin']:
             return script['plugin']
-        # # If it gets here, it means that it is an external script
-        # from rsvis.commands.external import external_cli as cli
-        # from rsvis.commands.external import get_command_help
-        # cli.context_settings['obj'] = script
-        # cli.help = get_command_help(script['path'])
-        # cli.name = script["command_name"]
-        # cli.short_help = cli.help
-        # return cli
 
-
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 @click.group(
     cls=MultiCommand,
     invoke_without_command=True
 )
-@click.help_option("-h", "--help")
-@click.version_option(version=rsvis.__version__)
+@click.help_option(
+    "-h",
+    "--help" 
+)
+@click.version_option(
+    version=rsvis.__version__
+)
 @click.option(
     "-v",
     "--verbose",
@@ -147,7 +163,8 @@ def run(
         level=getattr(logging, log),
         format=log_format
     )
+
     logger = logging.getLogger('default')
-    logger.debug("Plattform '{0}' detected.".format(sys.platform))
+    logger.debug("Plattform '{0}' detected.".format(sys.platform)) # @log
 
     print("HURRA")
