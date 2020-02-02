@@ -24,20 +24,16 @@ Examples
 
 Cli
 ^^^
-.. click:: rsvis.commands.default:run
+.. click:: rsvis.rsvis.commands.default:run
     :prog: rsvis
-    :commands: []
+    :rsvis.commands: []
 
 """
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
+import rsvis.__init__
 import rsvis.commands
-
-import difflib
-import logging
-import os
-import sys
 
 import click
 import colorama

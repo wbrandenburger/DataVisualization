@@ -4,14 +4,14 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import __init__
-import config.settings
-import utils.format
+import rsvis.__init__
+import rsvis.config.settings
+import rsvis.utils.format
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def main():
 
     # print user defined settings
-    __init__._logger.debug("Print user defined settings")
-    utils.format.print_data(config.settings._SETTINGS)
+    rsvis.__init__._logger.debug("Print user defined settings")
+    rsvis.utils.format.print_data(rsvis.config.settings._SETTINGS)

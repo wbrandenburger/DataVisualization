@@ -4,8 +4,8 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import __init__
-import commands.run
+import rsvis.__init__
+import rsvis.commands.run
 
 import sys
 
@@ -15,8 +15,8 @@ if __name__ == "__main__":
     """Main"""
     
     # log all retrieved arguments
-    __init__._logger.debug("Number of arguments {0}:".format(len(sys.argv)))
-    __init__._logger.debug("CLI-Arguments are: {0}".format(str(sys.argv)))
+    rsvis.__init__._logger.debug("Number of arguments {0}:".format(len(sys.argv)))
+    rsvis.__init__._logger.debug("CLI-Arguments are: {0}".format(str(sys.argv)))
 
     # call default command line interface
-    commands.run.cli()
+    rsvis.commands.run.cli()

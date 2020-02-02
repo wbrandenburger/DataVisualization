@@ -71,11 +71,6 @@ setuptools.setup(
         optional=[
         ],
         develop=[
-            # "sphinx",
-            # "sphinx-click",
-            # "sphinx_rtd_theme",
-            # "pytest",
-            # "pytest-cov==2.5.0",
         ]
     ),
     description=(
@@ -94,6 +89,10 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "rsvis=rsvis.commands.default:run",
+        ],
+        "expmgmt.command": [
+            "list=expmgmt.commands.list:cli",
+            "run=expmgmt.commands.run:cli"
         ],
     },
     platforms=["linux", "osx", "windows"],

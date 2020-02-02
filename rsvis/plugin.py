@@ -4,8 +4,8 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import __init__
-import config.settings
+import rsvis.__init__
+import rsvis.config.settings
 
 import importlib
 import logging
@@ -15,15 +15,15 @@ import re
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def stevedore_error_handler(manager, entrypoint, exception):
-    logger.error(
+    rsvis.__init__.logger.error(
         "Error while loading entrypoint [{0}]".format(entrypoint)
     ) # @log
-    __init__.logger.error(exception) # @log
+    rsvis.__init__.logger.error(exception) # @log
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_tasks():
-    module = importlib.import_module(config.settings._TASK_DIR)
+    module = importlib.import_module(rsvis.config.settings._TASK_DIR)
     path = os.path.dirname(module.__file__)
     file_list = [os.path.splitext(f)[0] for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and re.compile("[^__.+__$]").match(f)]
 
@@ -35,8 +35,8 @@ def get_tasks():
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_task_module(task):
-    module_name = "{0}.{1}".format(config.settings._TASK_DIR, task)
-    __init__._logger.debug("Import task module '{0}'".format(module_name))
+    module_name = "{0}.{1}".format(rsvis.config.settings._TASK_DIR, task)
+    rsvis.__init__._logger.debug("Import task module '{0}'".format(module_name))
     
     return (importlib.import_module(module_name), module_name)
 
