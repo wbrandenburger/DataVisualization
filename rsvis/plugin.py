@@ -12,17 +12,13 @@ import logging
 import os
 import re
 
-#   settings ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-logger = logging.getLogger("plugin")
-
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def stevedore_error_handler(manager, entrypoint, exception):
     logger.error(
         "Error while loading entrypoint [{0}]".format(entrypoint)
     ) # @log
-    logger.error(exception) # @log
+    __init__.logger.error(exception) # @log
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

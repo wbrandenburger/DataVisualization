@@ -37,15 +37,13 @@ setuptools.setup(
         "stevedore>=1.30",
         "configparser>=3.0.0",
         "PyYAML>=3.12",
-        # "requests>=2.11.1",
-        # "filetype>=1.0.1",
-        # "pyparsing>=2.2.0",
-        # "chardet>=3.0.2",
-        # "beautifulsoup4>=4.4.1",
-        # "python-slugify>=1.2.6",
-        # "prompt_toolkit>=2.0.5",
-        # "pygments>=2.2.0",
-        # "validators>=0.13.0"
+        # - python image processing packages -
+        "1opencv-python",
+        "pillow",
+        "tifffile",
+        # - python numerical analysis packages -
+        "matplotlib",
+        "numpy"
     ],
     python_requires=">=3",
     classifiers=[
