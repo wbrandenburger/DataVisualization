@@ -90,9 +90,8 @@ setuptools.setup(
         "console_scripts": [
             "rsvis=rsvis.commands.default:run",
         ],
-        "expmgmt.command": [
-            "list=expmgmt.commands.list:cli",
-            "run=expmgmt.commands.run:cli"
+        "rsvis.command": [
+            "run=rsvis.commands.run:cli"
         ],
     },
     platforms=["linux", "osx", "windows"],
