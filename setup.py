@@ -38,7 +38,7 @@ setuptools.setup(
         "configparser>=3.0.0",
         "PyYAML>=3.12",
         # - python image processing packages -
-        "1opencv-python",
+        "opencv-python",
         "pillow",
         "tifffile",
         # - python numerical analysis packages -
