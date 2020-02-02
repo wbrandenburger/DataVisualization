@@ -53,7 +53,6 @@ class MultiCommand(click.MultiCommand):
     #   settings ------------------------------------------------------------
     # -----------------------------------------------------------------------
     scripts = rsvis.commands.get_scripts()
-    scripts.update(rsvis.commands.get_external_scripts())
     logger = logging.getLogger('multicommand')
 
     #   method --------------------------------------------------------------
