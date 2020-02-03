@@ -17,6 +17,10 @@ def main():
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def test_rsshow():
+    rsvis.tools.rsshow.rsshow(rsvis.config.settings._DATA, rsvis.config.settings._SETTINGS["data-tensor-types"])
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def test_user_settings():
     """Print the user settings"""
     

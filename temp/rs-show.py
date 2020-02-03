@@ -20,40 +20,13 @@ from configobj import ConfigObj
 import math
 
 import tifffile as tiff
-import numpy as np
+import numpy as np as np
 import cv2
 
-# import training_user_interface as tui
-
-#   definitions ----------------------------------------------------------------
-# ==============================================================================
-
-#   global variables -----------------------------------------------------------
-LABELS = {}
-LABELS_COLOR = {}
-FILES = []
-TASKS = ['height', 'label', 'msi', 'rgb']
-
-# @uri[reference][bands-world-view-2]: https://dg-cms-uploads-production.s3.amazonaws.com/uploads/document/file/35/DG-8SPECTRAL-WP_0.pdf
-# @uri[reference][bands-world-view-3]: http://content.satimagingcorp.com.s3.amazonaws.com/media/pdf/WorldView-3-PDF-Download.pdf
-MSI_BAND_FLAG = True
-MSI_BAND_IDX = 0
-# MSI_BAND_X = []
-MSI_BANDS_IDX = 0
-MSI_BANDS = [[1, 2, 3], [7, 6, 5], [1, 4, 7], [6, 1, 2], [0, 7, 3], [5, 6, 7]]
-
-#    files and folders ---------------------------------------------------------
-FILE_CLOUD_TEMP = os.environ.get('TEMP') + r'\sci-lib\file_cloud_temp.ply'
-CCVIEWER = r'C:\Program Files\ccViewer\ccViewer.exe'
+CCVIEWER = r'C:\\Program Files\\ccViewer\\ccViewer.exe'
 
 #   functions ------------------------------------------------------------------
-# ==============================================================================
-@multimethod
-def show_height(file_path: str):
-    img = tiff.imread(file_path)
-    img = img/np.max(img[~np.isnan(img)])
-
-    return img
+# =============================================================================
 
 @multimethod
 def show_label(file_path: str):
@@ -63,69 +36,53 @@ def show_label(file_path: str):
     return img
 
 @multimethod
-def show_rgb(file_path: str):
-    img = cv2.imread(file_path)
+def prepare_labels_color(file_path: str):
 
-    return img
+    file_object = open(file_path, 'r')
+    labels_color_temp = file_object.read().splitlines()
+    file_object.close()
 
-@multimethod
-def show_msi(file_path: str):   
-    img = tiff.imread(file_path).astype(float) 
-    # img = img / np.max(img[~np.isnan(img)])
-    for i in range(0, img.shape[2]):
-        img_band = img[:, :, i]
-        img[:, :, i] = img_band / np.max(img_band[~np.isnan(img_band)])
+    for i in labels_color_temp:
+        labels_config = i.split()
+
+        label_color_old = [int(labels_config[1]), int(labels_config[1]), int(labels_config[1])]
+        label_color_new = [int(labels_config[2][1:3], 16), int(labels_config[2][3:5], 16), int(labels_config[2][5:7], 16)]
+        LABELS_COLOR[labels_config[0]] = [label_color_old, label_color_new]
+
+    return 1 
     
-    if MSI_BAND_FLAG:
-        img_bands = img[:, :, MSI_BAND_IDX]
-        print('Band: ', MSI_BAND_IDX)
-    else:  
-        img_bands = img[:, :, MSI_BANDS[MSI_BANDS_IDX]]
-        print('Bands: ', MSI_BANDS[MSI_BANDS_IDX])
+def get_img_overview(files, dir_rgb):
 
-    return img_bands 
+    number_row = math.floor(math.sqrt(len(files)))
+    number_col = math.ceil(math.sqrt(len(files)))
 
-@multimethod
-def rs_show(file_idx: int, task: str):
+    number_row = number_col
 
-    if task == 'height':
-        img = show_height(FILES[LABELS[task]][file_idx])
-    elif task == 'label':
-        img = show_label(FILES[LABELS[task]][file_idx])
-    elif task == 'rgb':
-        img = show_rgb(FILES[LABELS[task]][file_idx])
-    elif task == 'msi':
-        img = show_msi(FILES[LABELS[task]][file_idx])
-    else:
-        return 1
+    img = cv2.imread(dir_rgb + files[0])
+    img_shape = img.shape
+    img_shape = (int(img_shape[0] * 1.0), int(img_shape[0] * 1.0), 3)
 
-    cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-    cv2.imshow('image', img)
+    img_out = np.zeros(shape=[img_shape[0]*number_row, img_shape[1]*number_col, img_shape[2]], dtype=np.uint8 )
+    idx = 0
+    for col in range(0, img_out.shape[1], img_shape[1]):
+        for row in range(0, img_out.shape[0], img_shape[0]):
+            if idx < len(files):
+                img_tmp = cv2.imread(dir_rgb + files[idx])
+                img_tmp = cv2.resize(img_tmp, (img_shape[0], img_shape[1]),interpolation=cv2.INTER_LINEAR)
+                img_out[row : row + img_shape[0], col : col + img_shape[1], :] = img_tmp
+                idx = idx + 1
 
-            # cv2.setMouseCallback('overview', click_and_crop)
-    return 1
+    return img_out, number_col
 
-@multimethod
-def show_cloud(file_idx: int, task: str):
-    if task == 'label':
-        img = show_label(FILES[LABELS['label']][file_idx]).astype(float)/256.0
-    else:
-        img = show_rgb(FILES[LABELS['rgb']][file_idx]).astype(float)/256.0
-    
-    if 'height' in LABELS:
-        height = show_height(FILES[LABELS['height']][file_idx])
-        height = height * img.shape[0] / 8
-    else:
-        height = np.zeros(shape=[img.shape[0], img.shape[1]], dtype=float)       
+    def show_cloud(image,height):
+    img = image.astype(float)/256.0
+    #height = height * img.shape[0] / 8
+    f = tempfile.mkstemp(suffix = '.ply')
+    write_cloud(img, height, f[1])
 
-    write_cloud(img, height, FILE_CLOUD_TEMP)
+    subprocess.Popen(['C:\\Program Files\\ccViewer\\ccViewer.exe', f[1]])
 
-    subprocess.Popen([CCVIEWER, FILE_CLOUD_TEMP])
-
-    return 1
-    
-@multimethod
-def write_cloud(img: np.ndarray, height: np.ndarray, file_path: str):
+def write_cloud(img, height, file_path: str):
     
     point_number = img.shape[0]*img.shape[1]
 
@@ -160,186 +117,3 @@ def write_cloud(img: np.ndarray, height: np.ndarray, file_path: str):
 
     return 1
 
-@multimethod
-def prepare_labels_color(file_path: str):
-
-    file_object = open(file_path, 'r')
-    labels_color_temp = file_object.read().splitlines()
-    file_object.close()
-
-    for i in labels_color_temp:
-        labels_config = i.split()
-
-        label_color_old = [int(labels_config[1]), int(labels_config[1]), int(labels_config[1])]
-        label_color_new = [int(labels_config[2][1:3], 16), int(labels_config[2][3:5], 16), int(labels_config[2][5:7], 16)]
-        LABELS_COLOR[labels_config[0]] = [label_color_old, label_color_new]
-
-    return 1 
-
-@multimethod
-def prepare_data_structures(file_path: str, label: str):
-
-    LABELS[label] = len(LABELS)
-
-    file_object = open(file_path, 'r')
-    FILES.append(file_object.read().splitlines())
-    file_object.close()
-    return 1 
-
-def get_img_overview(files, dir_rgb):
-
-    number_row = math.floor(math.sqrt(len(files)))
-    number_col = math.ceil(math.sqrt(len(files)))
-
-    number_row = number_col
-
-    img = cv2.imread(dir_rgb + files[0])
-    img_shape = img.shape
-    img_shape = (int(img_shape[0] * 1.0), int(img_shape[0] * 1.0), 3)
-
-    img_out = np.zeros(shape=[img_shape[0]*number_row, img_shape[1]*number_col, img_shape[2]], dtype=np.uint8 )
-    idx = 0
-    for col in range(0, img_out.shape[1], img_shape[1]):
-        for row in range(0, img_out.shape[0], img_shape[0]):
-            if idx < len(files):
-                img_tmp = cv2.imread(dir_rgb + files[idx])
-                img_tmp = cv2.resize(img_tmp, (img_shape[0], img_shape[1]),interpolation=cv2.INTER_LINEAR)
-                img_out[row : row + img_shape[0], col : col + img_shape[1], :] = img_tmp
-                idx = idx + 1
-
-    return img_out, number_col
-
-#   main -----------------------------------------------------------------------
-# ==============================================================================
-@click.command()
-
-@click.option('--rgb', default="", type=str, help='RGB')
-@click.option('--label', default="", type=str, help='Label')
-@click.option('--height', default="", type=str, help='Height')
-@click.option('--msi', default="", type=str, help='Msi')
-
-@click.option('--labels_color', default="", type=str, help='Label conversion')
-def main(rgb, label, height, msi, labels_color):
-    
-    global MSI_BAND_IDX, MSI_BANDS_IDX, MSI_BAND_FLAG
-
-    dir_rgb = 'D:/Datasets/2019-le-2019/train/rgb/'
-    config_file = 'D:/Datasets/2019-le-2019/.config/settings.training.data.ini'
-
-    # config['directories']['file-temp'] = 'A:/OneDrive/SciLib/repositories/ip/.temp/hist.png'
-    
-    files = os.listdir('D:/Datasets/2019-le-2019/train/rgb')
-    regex = re.compile(r'^([A-Z]{3}_[0-9]{3}).*')
-    files_dict = {}
-    for idx, f in enumerate(files): 
-        file_prefix = regex.sub(r'\g<1>', f)
-        files_dict[file_prefix] = True
-
-    
-    all_files = [k for k in files_dict]
-    index = 0
-    code = 1
-    while code == 1:
-    
-        files_subset = [f for f in files if re.match(all_files[index], f)]
-        img_out, number = get_img_overview(files_subset, dir_rgb)
-        config = ConfigObj(config_file)
-        config['directories']['file-img'] = 'A:/OneDrive/SciLib/repositories/ip/.temp/' + 'overview.tif'
-        print(number)
-        config['settings']['tiles-index'] = [number - 1, 9] 
-        config.write()
-        cv2.imwrite('A:/OneDrive/SciLib/repositories/ip/.temp/' + 'overview.tif', img_out)
-
-        code = tui.main_user_interface(config_file)
-        index = index + 1
-
-    # for f in enumerate(files_subset):
-    #     img
-
-
-    # print(files)
-
-    # if rgb:
-    #     prepare_data_structures(rgb, 'rgb')
-    # if label:
-    #     prepare_data_structures(label, 'label')
-    # if labels_color:
-    #     prepare_labels_color(labels_color)
-    # if height:
-    #     prepare_data_structures(height, 'height')
-    # if msi:
-    #     prepare_data_structures(msi, 'msi')        
-    # labels = [k for k in LABELS]
-
-    # idx = 0
-    # task = 'rgb'
-    # rs_show(idx, task)
-
-    # while True:
-    #     key = cv2.waitKeyEx(1) & 0xFF
-    #     # if key != 255:
-    #     #     print(key)
-    #     if key == ord("q"):
-    #         print('exit')
-    #         cv2.destroyAllWindows()
-    #         return 1
-    #     elif key == ord("d") or key == 32:
-    #         if idx != len(FILES[0]) - 1:
-    #             idx = idx + 1
-    #         rs_show(idx, task)
-    #     elif key == ord("a"):
-    #         if idx != 0:
-    #             idx = idx - 1
-    #         rs_show(idx, task)
-    #     elif key == ord("1"):
-    #         task = labels[0]
-    #         rs_show(idx, task)
-    #     elif key == ord("2"):
-    #         if len(LABELS) > 1:
-    #             task = labels[1]
-    #             rs_show(idx, task)
-    #     elif key == ord("3"):
-    #         if len(LABELS) > 2:
-    #             task = labels[2]
-    #             rs_show(idx, task)
-    #     elif key == ord("4"):
-    #         if len(LABELS) > 3:
-    #             task = labels[3]
-    #             rs_show(idx, task)
-    #     elif key == ord("y"):
-    #         if msi:
-    #             if MSI_BAND_FLAG:
-    #                 if MSI_BAND_IDX > 0:
-    #                     MSI_BAND_IDX = MSI_BAND_IDX - 1
-    #             else:                    
-    #                 if MSI_BANDS_IDX > 0:
-    #                     MSI_BANDS_IDX = MSI_BANDS_IDX - 1
-    #             task = 'msi'
-    #             rs_show(idx, task)
-    #     elif key == ord("x"):
-    #         if msi:
-    #             if MSI_BAND_FLAG:
-    #                 if MSI_BAND_IDX < 6:
-    #                     MSI_BAND_IDX = MSI_BAND_IDX + 1
-    #             else:                    
-    #                 if MSI_BANDS_IDX < len(MSI_BANDS) - 1:
-    #                     MSI_BANDS_IDX = MSI_BANDS_IDX + 1
-    #             task = 'msi'
-    #             rs_show(idx, task)       
-    #     elif key == ord("c"):
-    #         show_cloud(idx, task)
-    #     elif key == 60:
-    #         if msi:            
-    #             if MSI_BAND_FLAG:
-    #                 MSI_BAND_FLAG = False
-    #             else:
-    #                 MSI_BAND_FLAG = True
-    #             task = 'msi'
-    #             rs_show(idx, task)    
-    #     elif key == 32:
-    #         print('Iterate')
-                                       
-    return 1
-
-if __name__ == '__main__':
-    main()

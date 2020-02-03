@@ -1,10 +1,11 @@
-import argparse
+import argparse # Example of argparser --------------------------------------
 import glob
 import os
 from osgeo import gdal
 import tifffile
 
-
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # read TIF image using TIFFFILE and write again using GDAL
 def update_msi(input_file_name, output_file_name):
     img = tifffile.imread(input_file_name)
@@ -20,7 +21,9 @@ def update_msi(input_file_name, output_file_name):
 
 # main
 if __name__ == "__main__":
-    # parse arguments
+
+#   example -----------------------------------------------------------------
+# ---------------------------------------------------------------------------
     parser = argparse.ArgumentParser()
     parser.add_argument('input_folder', type=str)
     parser.add_argument('output_folder', type=str)
@@ -31,6 +34,8 @@ if __name__ == "__main__":
     files = glob.glob(args.input_folder + '*MSI*.tif')
     number_files = len(files)
     print('Number of files = ', number_files)
+
+    # loop over list of files and write msi to output folder
     for i in range(number_files):
         basename = os.path.basename(files[i])
         output_name = args.output_folder + basename

@@ -161,5 +161,3 @@ def run(
 
     logger = logging.getLogger('default')
     logger.debug("Plattform '{0}' detected.".format(sys.platform)) # @log
-
-    print("HURRA")
