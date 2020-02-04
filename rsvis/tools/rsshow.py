@@ -5,26 +5,52 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 import rsvis.__init__
+import rsvis.tools.image
+import rsvis.tools.rsshowui
 
 import cv2
 import numpy as np
 import tifffile
+import tempfile
+from matplotlib import pyplot as plt
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_image(image_path: str, image_type: str):
     image = tifffile.imread(image_path)
     
+    if image_type == "height":
+        return normalize_image(image)
     if image_type == "msi":
-        return show_msi(image)
+        image = get_msi(image)
+        image_type = "image"
 
     image = convert_image_to_color(image)
-    if image_type == 'height':
-        return correct_image(image)
-    elif image_type == 'label':
+    if image_type == "label":
         return label_to_image(image)
-    elif image_type == 'image':
+    if image_type == "image":
         return image
+
+    return image
+
+def get_histogram(img):
+
+    hist,bins = np.histogram(img.flatten(),256,[0,256])
+
+    cdf = hist.cumsum()
+    cdf_normalized = cdf * hist.max()/ cdf.max()
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(cdf_normalized, color = 'b')
+    ax.hist(img.flatten(),256,[0,256], color = 'r')
+    ax.set_xlim([0,256])
+    ax.legend(('cdf','histogram'), loc = 'upper left')
+
+    fig.canvas.draw()
+    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+    return data
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -36,18 +62,39 @@ def convert_image_to_color(image):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def show_msi(image):   
-    image = image.astype(float) 
-    index_list = [2,5,7]
+def normalization(image):
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    image = clahe.apply(image)
+    return image
+
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def normalize_image(image):
+    image = image.astype(float)
+    min_img = np.min(image)
+    max_img = np.max(image)
+    image = (image - min_img)/(max_img - min_img) * 256
+    image = image.astype("uint8")
+    return image
+    
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_msi(image):   
+    index_list = [2,3,4]
     for i in index_list:
-        image[:, :, i] = correct_image(image[:, :, i])
-    return image[:, :, np.array(index_list)]
+        image[:, :, i] = image[:, :, i]
+    image = image[:, :, np.array(index_list)]
+    image = correct_image(image)
+    return image
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def correct_image(image):
+    image = image.astype(float) 
     image_corr = image[~np.isnan(image)]
-    image = (image - np.min(image_corr)) / np.max(image_corr)
+    image = image / np.max(image_corr) * 256
+    image = image.astype("uint8")
     return image
 
 #   function ----------------------------------------------------------------
@@ -55,108 +102,32 @@ def correct_image(image):
 def label_to_image(image):
     return image
 
-#   class -------------------------------------------------------------------
-# ---------------------------------------------------------------------------
-class RSShowUI():
-    
-    _file_index = 0
-    _image_index = 0
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def __init__(self, files, types):
-        self._files = files
-        self._types = types
-
-        self.load_image()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def load_image(self):
-        self._images = [get_image(f, t) for f, t in zip(self._files[self._file_index], self._types)]
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def event(self, argument):
-        # Get the method from 'self'. Default to a lambda.
-        method = getattr(self, self.get_method_name(argument), lambda: "Invalid key")
-        # rsvis.__init__._logger.debug("Class RSShowUI, method '{0}'".format(self.get_method_name(argument)))
-        # Call the method as we return it
-        return method()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def start_ui(self):
-        self.show_image() 
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def show_image(self):
-        cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-        cv2.imshow('image',
-            self._images[self._image_index]
-        )
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_method_name(self, argument):
-        return 'key_' + str(argument)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def has_method(self, argument):
-        return hasattr(self, self.get_method_name(argument))
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_s(self):
-        self._image_index -= 1
-        if self._image_index == -1:
-            self._image_index = len(self._images)-1
-        self.show_image()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_w(self):
-        self._image_index += 1
-        if self._image_index == len(self._images):
-            self._image_index = 0
-        self.show_image()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_a(self):
-        self._file_index -= 1
-        if self._file_index == -1:
-            self._file_index = len(self._files)-1
-        self.load_image()
-        self.show_image()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_d(self):
-        self._file_index += 1
-        if self._file_index == len(self._files):
-            self._file_index = 0
-        self.load_image()
-        self.show_image()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_q(self):
-        cv2.destroyAllWindows()
-        return 1
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def rsshow(files, types):
 
-    ui = RSShowUI(files, types)
-    ui.start_ui()
+    load = lambda index: [rsvis.tools.rsshow.get_image(f, t) for f, t in zip(files[index], types)]
+    ui = rsvis.tools.rsshowui.RSShowUI(len(files), load) 
+
+    ui.set_keys( 
+        {
+            "h": lambda image: rsvis.tools.rsshow.get_histogram(image),
+            "n": lambda image: rsvis.tools.rsshow.normalization(image)
+        }
+    )
+
+
+    cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+    cv2.imshow('image', ui.start())
 
     while True:
         key = chr(cv2.waitKeyEx(1) & 0xFF)
-        if ui.has_method(key):
-            if ui.event(key):
+        if ui.has_key(key):
+            image = ui.event(key)
+            if image is not None: 
+                cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+                cv2.imshow('image',image)
+            else:
                 return 1
-            
+    cv2.destroyAllWindows()    
