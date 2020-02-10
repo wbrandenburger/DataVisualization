@@ -8,7 +8,7 @@ import rsvis.__init__
 import rsvis.config.settings
 import rsvis.utils.format
 import rsvis.tools.rsshow
-
+import rsvis.tools.lecture
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def main():
@@ -18,7 +18,23 @@ def main():
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def test_rsshow():
-    rsvis.tools.rsshow.rsshow(rsvis.config.settings._DATA, rsvis.config.settings._SETTINGS["data-tensor-types"])
+    rsvis.tools.rsshow.rsshow(
+        rsvis.config.settings._DATA, 
+        rsvis.config.settings._SETTINGS["data-tensor-types"], 
+        cat=rsvis.config.settings._SETTINGS["label"],
+        resize=rsvis.config.settings._SETTINGS["resize"]
+    )
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def test_lecture():
+    rsvis.tools.lecture.test(
+        rsvis.config.settings._DATA, 
+        rsvis.config.settings._SETTINGS["data-tensor-types"], 
+        cat=rsvis.config.settings._SETTINGS["label"],
+        resize=rsvis.config.settings._SETTINGS["resize"]
+    )
+    
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def test_user_settings():

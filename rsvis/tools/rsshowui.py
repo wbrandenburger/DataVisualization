@@ -12,15 +12,18 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, files, loads, keys = dict()):
+    def __init__(self, files, loads, keys = dict(), cat=list()):
         self._files = files
         self._load = loads
+        self._cat = cat
 
         self._image_index = 0
         self._file_index = 0
+        self._cat_index = 0
         self.load()
-
+    
         self._ref_point = []
+        self._label_flag = False
         
         self.set_keys(keys)
 
@@ -37,14 +40,13 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def key_event(self, argument):
+    def key_event(self, argument, **kwargs):
         # Get the method from 'self'. Default to a lambda.
         if hasattr(self, self.get_method_name(argument)):
             method = getattr(self, self.get_method_name(argument), lambda: "Invalid key")
             # Call the method as we return it
             return method()
         elif argument in self._keys:
-
 
             param = [self.show(index=p) for p in self._keys[argument]["param"]]
             # if isinstance(self._keys[argument]["param"], list):
@@ -53,7 +55,8 @@ class RSShowUI():
             # else:
             return self._keys[argument]["func"](
                 *param, 
-                ref_point =self._ref_point 
+                ref_point =self._ref_point,
+                **kwargs 
             )
 
     #   method --------------------------------------------------------------
@@ -108,7 +111,8 @@ class RSShowUI():
     # -----------------------------------------------------------------------
     def key_c(self, **kwargs):
         self._ref_point = []
-
+        self._label_flag
+    
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, **kwargs):
@@ -141,6 +145,31 @@ class RSShowUI():
         if self._file_index == self._files:
             self._file_index = 0
         self.load()
+        return self.show()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_v(self, **kwargs):
+        self._label_flag = False if self._label_flag else True
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_y(self, **kwargs):
+        if self._cat: 
+            self._cat_index -= 1
+            if self._cat_index == -1:
+                self._cat_index = len(self._cat)-1
+            return self.key_event("l", value=self._cat_index, equal=self._label_flag)
+        return self.show()            
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_x(self, **kwargs):
+        if self._cat:
+            self._cat_index += 1
+            if self._cat_index == len(self._cat):
+                self._cat_index = 0
+            return self.key_event("l", value=self._cat_index, equal=self._label_flag)    
         return self.show()
 
     #   method --------------------------------------------------------------
