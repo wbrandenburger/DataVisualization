@@ -27,6 +27,12 @@ def test_rsshow():
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def test_code():
+    rsvis.tools.rsshow.test_code( rsvis.config.settings._DATA, 
+        rsvis.config.settings._SETTINGS["data-tensor-types"])
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def test_lecture():
     rsvis.tools.lecture.test(
         rsvis.config.settings._DATA, 
