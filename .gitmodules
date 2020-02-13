@@ -1,0 +1,6 @@
+[submodule ".\\shadow\\2018-Shadow-Detection\\"]
+	path = .\\shadow\\2018-Shadow-Detection\\
+	url = https://github.com/ThomasWangWeiHong/Shadow-Detection-Algorithm-for-Aerial-and-Satellite-Images
+[submodule ".\\shadow\\2017-Shadow-Detection\\"]
+	path = .\\shadow\\2017-Shadow-Detection\\
+	url = https://github.com/vanderfreitas/shadowdetection
