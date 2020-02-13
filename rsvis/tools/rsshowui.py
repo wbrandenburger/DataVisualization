@@ -41,7 +41,7 @@ class RSShowUI():
     def imshow(self, wait=False):
         self.window = Tk()
         self.window.title("HURRA")
-        self.window.geometry("800x750")
+        self.window.geometry("1000x850")
         self.initialize_window()
         self.window.mainloop()
 
@@ -54,15 +54,16 @@ class RSShowUI():
         for i in range(len(self._data)):
             self.lists.insert(END, i)
 
-        self.set_img_from_index()
-        self.img_width, self.img_height, _ = self._data[0][0].data.shape
         
+        self.set_img_from_index()
+        self.img_width, self.img_height , _ = self._data[0][0].data.shape
+
         # https://solarianprogrammer.com/2018/04/20/python-opencv-show-image-tkinter-window/
         self.bg_img = ImageTk.PhotoImage(image = self.img)
-        self.bg = Label(self.window, image=self.bg_img, width=800)
+        self.bg = Label(self.window, image=self.bg_img)
 
-        self.bg.pack(side="left", fill="both", expand="y")
-        self.bg.bind("<Configure>", self._resize_image)
+        self.bg.pack(side="right", fill="both", expand="y")
+        self.bg.bind("<Configure>", self.resize_image)
         self.window.bind("<Key>", self.key_event)
         self.bg.bind("<Button-1>", self.mouse_button_pressed)
         self.bg.bind("<ButtonRelease-1>", self.mouse_button_released)
@@ -71,14 +72,21 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def _resize_image(self,event):
-        self.height = event.height
-        #self.height = event.height
-        self.width = int(float(self.img_width)/float(self.img_height)*float(self.height))
-
+    def resize_image(self,event):
+        self.get_geometry(event.width, event.height)
         self.img = self.img_copy.resize((self.width, self.height))
         self.bg_img = ImageTk.PhotoImage(self.img)
         self.bg.configure(image = self.bg_img)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_geometry(self, width, height):
+        if height < width:
+            self.height = height
+            self.width = int(float(self.img_width)/float(self.img_height)*float(self.height))
+        else:
+            self.width = width
+            self.height = int(float(self.width)*float(self.img_height)/float(self.img_width))
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -86,6 +94,15 @@ class RSShowUI():
         index = self._index() if not index else index
         return self._data[index][self._index_spec()].data
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_img_from_spec(self, spec):
+        if spec:
+            index_spec = self._data[self._index()].index(spec)
+            return self._data[self._index()][index_spec].data
+        else:
+            raise ValueError("Spec is none.")
+        
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img_from_index(self, index=None, show=False):

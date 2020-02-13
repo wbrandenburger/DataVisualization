@@ -51,10 +51,21 @@ def raise_contrast(img):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def labels_to_image(img, labels):
-    img = expand_image_dim(img)
+    img = expand_image_dim(img).astype(int)
     dim = img.shape
-    img = img.reshape(-1,dim[-1] )
-    img = np.apply_along_axis(lambda x, labels: labels[str(x.tolist())], -1, img, labels)
-    img = img.reshape( dim[0], dim[1])
 
-    return img    
+    label = np.zeros((img.shape[0], img.shape[1]), dtype=int)
+    for c in range(img.shape[-1]):
+        label += img[:, :, c]*int(pow(2, c))
+
+    lut = lambda x: labels[str(x)]
+    np_lut = np.vectorize(lut, otypes=[np.uint8])
+    label = np_lut(label.astype(int))
+    
+    # img = expand_image_dim(img)
+    # dim = img.shape
+    # img = img.reshape(-1,dim[-1] )
+    # img = np.apply_along_axis(lambda x, labels: labels[str(x.tolist())], -1, img, labels)
+    # img = img.reshape( dim[0], dim[1])
+
+    return label    

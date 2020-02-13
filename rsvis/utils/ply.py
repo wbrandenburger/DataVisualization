@@ -202,6 +202,7 @@ def write_ply(filename, points=None, mesh=None, as_text=False):
                         encoding='ascii')
 
     else:
+        # points.to_hdf(ply,'points',mode="a")
         with open(filename, 'ab') as ply:
             if points is not None:
                 points.to_records(index=False).tofile(ply)
@@ -221,7 +222,16 @@ def describe_element(name, df):
     -------
     element: list[str]
     """
-    property_formats = {'f': 'float', 'u': 'uchar', 'i': 'int'}
+    property_formats = {
+        'int8': 'char', # 1
+        'uint8': 'uchar', # 1
+        'int16': 'short', # 2
+        'uint16': 'ushort', # 2
+        'int32': 'int', # 4
+        'uint32': 'uint', # 4
+        'float32': 'float', # 4 
+        'float64': 'double' # 8
+    }
     element = ['element ' + name + ' ' + str(len(df))]
 
     if name == 'face':
@@ -230,7 +240,7 @@ def describe_element(name, df):
     else:
         for i in range(len(df.columns)):
             # get first letter of dtype to infer format
-            f = property_formats[str(df.dtypes[i])[0]]
+            f = property_formats[str(df.dtypes[i])]
             element.append('property ' + f + ' ' + df.columns.values[i])
 
     return element

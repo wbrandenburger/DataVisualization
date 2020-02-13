@@ -21,7 +21,7 @@ def test_rsshow():
     rsvis.tools.rsshow.rsshow(
         rsvis.config.settings._DATA, 
         rsvis.config.settings._SETTINGS["data-tensor-types"], 
-        cat=rsvis.config.settings._SETTINGS["label"],
+        labels=rsvis.config.settings._SETTINGS["label"],
         resize=rsvis.config.settings._SETTINGS["resize"]
     )
 

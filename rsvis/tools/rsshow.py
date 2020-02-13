@@ -7,12 +7,13 @@
 import rsvis.__init__
 import rsvis.tools.rsshowui
 import rsvis.tools.imagestats
+import rsvis.tools.imgcontainer
+import rsvis.tools.heightmap
+import rsvis.tools.imgtools
 
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-import pathlib
-import rsvis.tools.imgtools
 import tifffile
 
 # @todo[change]: msi channels a = [2,1,6], b = [1,2,4], c = [1,5,4]
@@ -93,10 +94,11 @@ def get_masked_image(img, ref_point=None):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_label_image(img, label, cat, value=0, equal=True, **kwargs):
+def get_label_image(img, label, value=204, equal=True):
     label_list = list()
     img_label = img.copy()
     for c in range(img.shape[-1]):
+        print(label)
 
         if equal:
             mask = np.ma.masked_where(label[...,-1] != value, img[...,c])
@@ -105,7 +107,7 @@ def get_label_image(img, label, cat, value=0, equal=True, **kwargs):
                     
         np.ma.set_fill_value(mask, 255)
         img_label[:,:,c] = mask.filled()
-        label_list.append(mask.compressed())
+        #label_list.append(mask.compressed())
     return img_label
 
 #   function ----------------------------------------------------------------
@@ -139,9 +141,9 @@ def get_image(path, spec, labels=dict(), scale=100):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def rsshow(files, specs, cat=dict(), resize=100):
+def rsshow(files, specs, labels=dict(), resize=100):
 
-    load = lambda path, spec: get_image(path, spec, labels=cat, scale=resize)
+    load = lambda path, spec: get_image(path, spec, labels=labels, scale=resize)
 
     import rsvis.tools.imgcontainer
     img_set = list()
@@ -153,18 +155,14 @@ def rsshow(files, specs, cat=dict(), resize=100):
         img_set.append(img)
     
     keys = {
-        "key_n" : lambda obj: obj.set_img(rsvis.tools.imgtools.raise_contrast(obj.get_img()), show=True)
+        "key_n" : lambda obj: obj.set_img(rsvis.tools.imgtools.raise_contrast(obj.get_img()), show=True),
+        "key_c": lambda obj: rsvis.tools.heightmap.open_height_map(obj.get_img_from_spec("image"), obj.get_img_from_spec("height"), obj.get_img_from_spec("label")),
+        "key_g": lambda obj: rsvis.tools.heightmap.open_height_map(obj.get_img_from_spec("image"), obj.get_img_from_spec("height"), obj.get_img_from_spec("label"), ccviewer=False),
+        "key_l": lambda obj: obj.set_img(rsvis.tools.rsshow.get_label_image(obj.get_img_from_spec("image"), obj.get_img_from_spec("label"), value=204, equal=False), show=True)
     }
 
     ui = rsvis.tools.rsshowui.RSShowUI(img_set, keys=keys)
     ui.imshow(wait=True)
-
-    # ui.set_keys( 
-    #     {   
-    #         # "g": { "func" : lambda image, **kwargs: rsvis.tools.rsshow.blubb(image, **kwargs),  "param" :  [types.index("msi")]}
-    #         # "r": { "func" : lambda image, height: rsvis.tools.rsshow.get_pointcloud(image, height), "param" : [-1,types.index("height")]}
-    #     }
-    # )
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
