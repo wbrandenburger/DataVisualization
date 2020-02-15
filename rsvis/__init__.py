@@ -4,7 +4,6 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import colorama
 import logging
 import os
 
@@ -17,23 +16,27 @@ __email__ = "wolfgang.brandenburger@outlook.com"
 
 #   script ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-colorama.init()
+try:
+    import colorama
+    colorama.init()
 
-log_format = (
-    'File "%(pathname)s", line %(lineno)s:\n' +
-    colorama.Fore.YELLOW +
-    '%(levelname)s' +
-    ':' +
-    colorama.Fore.GREEN +
-    '%(name)s' +
-    colorama.Fore.CYAN +
-    ':' +
-    '%(message)s' +
-    colorama.Style.RESET_ALL
-)
+    log_format = (
+        'File "%(pathname)s", line %(lineno)s:\n' +
+        colorama.Fore.YELLOW +
+        '%(levelname)s' +
+        ':' +
+        colorama.Fore.GREEN +
+        '%(name)s' +
+        colorama.Fore.CYAN +
+        ':' +
+        '%(message)s' +
+        colorama.Style.RESET_ALL
+    )
 
-logging.basicConfig(format=log_format)
+    logging.basicConfig(format=log_format)
 
-_logger = logging.getLogger("rsvis")
-if os.environ.get("RSVIS_DEBUG"):
-    _logger.setLevel(logging.DEBUG)
+    _logger = logging.getLogger("rsvis")
+    if os.environ.get("RSVIS_DEBUG"):
+        _logger.setLevel(logging.DEBUG)
+else:
+    pass
