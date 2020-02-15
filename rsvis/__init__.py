@@ -38,5 +38,5 @@ try:
     _logger = logging.getLogger("rsvis")
     if os.environ.get("RSVIS_DEBUG"):
         _logger.setLevel(logging.DEBUG)
-else:
+except ImportError:
     pass
