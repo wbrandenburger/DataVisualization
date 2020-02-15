@@ -4,3 +4,9 @@
 [submodule ".\\shadow\\2017-Shadow-Detection\\"]
 	path = .\\shadow\\2017-Shadow-Detection\\
 	url = https://github.com/vanderfreitas/shadowdetection
+[submodule ".\\shadow\\outsddec\\"]
+	path = .\\shadow\\outsddec\\
+	url = https://github.com/vanderfreitas/shadowdetection
+[submodule ".\\shadow\\rsddec\\"]
+	path = .\\shadow\\rsddec\\
+	url = https://github.com/ThomasWangWeiHong/Shadow-Detection-Algorithm-for-Aerial-and-Satellite-Images
