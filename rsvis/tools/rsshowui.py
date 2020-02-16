@@ -47,12 +47,12 @@ class RSShowUI():
 
     def initialize_window(self):
         self.scrollbar = Scrollbar(self.window, orient="vertical")
-        self.lists = Listbox(self.window, yscrollcommand=self.scrollbar.set)
-        self.scrollbar.config(command=self.lists.yview)
+        self.listbox = Listbox(self.window, yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.listbox.yview)
         self.scrollbar.pack(side="left", fill="y")
-        self.lists.pack(side="left", fill="y")
+        self.listbox.pack(side="left", fill="y")
         for i in range(len(self._data)):
-            self.lists.insert(END, i)
+           self.listbox.insert(END, i)
 
         
         self.set_img_from_index()
@@ -68,7 +68,7 @@ class RSShowUI():
         self.bg.bind("<Button-1>", self.mouse_button_pressed)
         self.bg.bind("<ButtonRelease-1>", self.mouse_button_released)
         # https://effbot.org/tkinterbook/tkinter-events-and-bindings.htm
-        self.lists.bind("<<ListboxSelect>>", self.listbox_event)
+        self.listbox.bind("<<ListboxSelect>>", self.listbox_event)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -98,11 +98,22 @@ class RSShowUI():
     # -----------------------------------------------------------------------
     def get_img_from_spec(self, spec):
         if spec:
-            index_spec = self._data[self._index()].index(spec)
-            return self._data[self._index()][index_spec].data
-        else:
-            raise ValueError("Spec is none.")
-        
+            try:
+                index_spec = self._data[self._index()].index(spec)
+                return self._data[self._index()][index_spec].data
+            except ValueError:
+                return None
+                
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_img_path_from_spec(self, spec):
+        if spec:
+            try:
+                index_spec = self._data[self._index()].index(spec)
+                return self._data[self._index()][index_spec].path
+            except ValueError:
+                return None
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img_from_index(self, index=None, show=False):
@@ -119,7 +130,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def listbox_event(self,event):
-        self._index(index=self.lists.curselection()[0])
+        self._index(index=self.listbox.curselection()[0])
         self.set_img_from_index(show=True)
 
     #   method --------------------------------------------------------------
@@ -156,13 +167,15 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_d(self, **kwargs):
-        self._index.next()
+        index = self._index.next()
+        self.listbox.activate(index)
         self.set_img_from_index(show=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_a(self, **kwargs):
-        self._index.last()
+        index = self._index.last()
+        self.listbox.activate(index)
         self.set_img_from_index(show=True)
 
     #   method --------------------------------------------------------------

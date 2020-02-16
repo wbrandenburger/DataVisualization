@@ -58,14 +58,17 @@ def add_intensity_to_height_map(img):
 
     global height_map
 
-    img_width, img_height, _ = img.shape
-    dim_new =(img_width*img_height)
+    try:
+        img_width, img_height, _ = img.shape
+        dim_new =(img_width*img_height)
 
-    height_map.update(
-        {
-            'intensity': img[:,:,1].reshape((img.shape[0]*img.shape[1])).T
-        }
-    )
+        height_map.update(
+            {
+                'intensity': img[:,:,1].reshape((img.shape[0]*img.shape[1])).T
+            }
+        )
+    except AttributeError:
+        pass
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

@@ -36,7 +36,8 @@ setuptools.setup(
         "click>=7.0.0",
         "stevedore>=1.30",
         "configparser>=3.0.0",
-        "PyYAML>=3.12",
+        "pyyaml>=3.12",
+        "pandas",
         # - python image processing packages -
         # "opencv-python",
         # "pillow",
