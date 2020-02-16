@@ -28,7 +28,7 @@ def test(files, types, cat=dict(), resize=100):
     # print(path)
 
     foo = rsvis.tools.imagestats.ImageStats(
-            path="A:\\VirtualEnv\\dev-rsvis\\src\\rsvis\\tmpchlgw4dk.json" 
+            path="A:\\VirtualEnv\\dev-rsvis\\src\\rsvis\\temp\\tmpchlgw4dk.json" 
         )
     # foo.plot_stats(2)
     img = img_list[types.index("msi")]
