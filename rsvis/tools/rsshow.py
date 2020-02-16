@@ -151,8 +151,8 @@ def rsshow(files, specs, labels=dict(), resize=100):
     for f_set in files:
         img = rsvis.tools.imgcontainer.ImgListContainer(load=load)
         for f, s  in zip(f_set, specs):
-            # live = False if s == "label" else True
-            img.append(path = f, spec=s)
+            live = False if s == "label" else True
+            img.append(path = f, spec=s, live=live)
         img_set.append(img)
 
     keys = {
@@ -183,7 +183,7 @@ def get_shadow_path(file_old, path_new=""):
         path_replace = "sd_{}.tif"
         pattern = "area[0-9]+"
         group = 0
-        
+
     return pathlib.Path(path_new) / path_replace.format(re.compile(pattern).search(pathlib.Path(file_old).stem).group(group))
 
 #   function ----------------------------------------------------------------
