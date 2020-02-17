@@ -21,7 +21,10 @@ def main():
 def test_rsshow():
     rsvis.tools.rsshow.rsshow(
         rsvis.config.settings._DATA, 
-        rsvis.config.settings._SETTINGS["data-tensor-types"], 
+        rsvis.config.settings._SETTINGS["data-tensor-types"],
+        rsvis.config.settings._SETTINGS["io"]["dest-dir"],
+        rsvis.config.settings._SETTINGS["io"]["dest-basename"],
+        rsvis.config.settings._SETTINGS["io"]["regex"],
         labels=rsvis.config.settings._SETTINGS["label"],
         resize=rsvis.config.settings._SETTINGS["resize"]
     )

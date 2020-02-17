@@ -15,6 +15,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import tifffile
+import pathlib
 
 
 # @todo[change]: msi channels a = [2,1,6], b = [1,2,4], c = [1,5,4]
@@ -140,11 +141,29 @@ def get_image(path, spec, labels=dict(), scale=100):
 
     return img
 
+#   class -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+class PathCreator():
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def __init__(self, dest_dir, dest_basename, regex=".*", group=0):
+        self._dest_dir = pathlib.Path(dest_dir)
+        self._dest_basename = dest_basename
+        self._research = rsvis.utils.regex.ReSearch(regex, group)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def __call__(self, path):
+        return self._dest_dir / self._dest_basename.format(self._research(pathlib.Path(path).stem))
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def rsshow(files, specs, labels=dict(), resize=100):
+def rsshow(files, specs, dest_dir, dest_basename, io, labels=dict(), resize=100):
     
     load = lambda path, spec: get_image(path, spec, labels=labels, scale=resize)
+    get_path = PathCreator(dest_dir, dest_basename, *io)
+    save = lambda path, img:  tifffile.imwrite(get_path(path), img)
 
     import rsvis.tools.imgcontainer
     img_set = list()
@@ -160,31 +179,11 @@ def rsshow(files, specs, labels=dict(), resize=100):
         "key_c": lambda obj: rsvis.tools.heightmap.open_height_map(obj.get_img_from_spec("image"), obj.get_img_from_spec("height"), obj.get_img_from_spec("label")),
         "key_g": lambda obj: rsvis.tools.heightmap.open_height_map(obj.get_img_from_spec("image"), obj.get_img_from_spec("height"), obj.get_img_from_spec("label"), ccviewer=False),
         "key_l": lambda obj: obj.set_img(rsvis.tools.rsshow.get_label_image(obj.get_img_from_spec("image"), obj.get_img_from_spec("label"), value=204, equal=False), show=True),
-        "key_r": lambda obj: tifffile.imwrite(get_shadow_path(obj.get_img_path_from_spec("image")), obj.get_img_from_spec("image"))
+        "key_r": lambda obj: save(obj.get_img_path_from_spec("image"), obj.get_img_from_spec("image"))
     }
 
     ui = rsvis.tools.rsshowui.RSShowUI(img_set, keys=keys)
     ui.imshow(wait=True)
-
-def get_shadow_path(file_old, path_new=""):
-    import pathlib
-    import re
-
-    _DATA_FUSION_CONTEST = False
-    _VAIHINGEN = True
-
-    if _DATA_FUSION_CONTEST:
-        path_new = "A:\\Datasets\\Data-Fusion-Contest-2019\\Train-Track1-SD\\Track1-SD"
-        path_replace = "{}_SD.tif"
-        pattern = "([^\\\\]+)_RGB"
-        group = 1
-    if _VAIHINGEN:
-        path_new = "A:\\Datasets\\Vaihingen\\sd"
-        path_replace = "sd_{}.tif"
-        pattern = "area[0-9]+"
-        group = 0
-
-    return pathlib.Path(path_new) / path_replace.format(re.compile(pattern).search(pathlib.Path(file_old).stem).group(group))
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
