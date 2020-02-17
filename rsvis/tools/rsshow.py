@@ -16,7 +16,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import tifffile
 import pathlib
-
+import shutil
 
 # @todo[change]: msi channels a = [2,1,6], b = [1,2,4], c = [1,5,4]
 
@@ -126,7 +126,7 @@ def blubb(img, **kwargs):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_image(path, spec, labels=dict(), scale=100):
+def get_image(path, spec, labels=dict(), msi=list(), scale=100):
     
     img = tifffile.imread(path)
     img = rsvis.tools.imgtools.resize_img(img, scale)
@@ -136,6 +136,9 @@ def get_image(path, spec, labels=dict(), scale=100):
         
     if spec in ["label", "height", "msi"]:
         img = rsvis.tools.imgtools.project_data_to_img(img)
+
+    if spec == "msi" and msi:
+        img = np.stack((img[:,:,msi[0][0]], img[:,:,msi[0][1]], img[:,:,msi[0][2]]), axis=2)
 
     img =  rsvis.tools.imgtools.stack_image_dim(img)
 
@@ -159,11 +162,12 @@ class PathCreator():
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def rsshow(files, specs, dest_dir, dest_basename, io, labels=dict(), resize=100):
+def rsshow(files, specs, dest_dir, dest_basename, io, labels=dict(), msi=list(), resize=100):
     
-    load = lambda path, spec: get_image(path, spec, labels=labels, scale=resize)
+    load = lambda path, spec: get_image(path, spec, labels=labels, msi=msi, scale=resize)
     get_path = PathCreator(dest_dir, dest_basename, *io)
     save = lambda path, img:  tifffile.imwrite(get_path(path), img)
+    copy = lambda path: shutil.copy2(path, get_path(path))
 
     import rsvis.tools.imgcontainer
     img_set = list()
@@ -176,10 +180,20 @@ def rsshow(files, specs, dest_dir, dest_basename, io, labels=dict(), resize=100)
 
     keys = {
         "key_n" : lambda obj: obj.set_img(rsvis.tools.imgtools.raise_contrast(obj.get_img()), show=True),
-        "key_c": lambda obj: rsvis.tools.heightmap.open_height_map(obj.get_img_from_spec("image"), obj.get_img_from_spec("height"), obj.get_img_from_spec("label")),
-        "key_g": lambda obj: rsvis.tools.heightmap.open_height_map(obj.get_img_from_spec("image"), obj.get_img_from_spec("height"), obj.get_img_from_spec("label"), ccviewer=False),
+        "key_c": lambda obj: rsvis.tools.heightmap.open_height_map(
+            obj.get_img(), 
+            obj.get_img_from_spec("height"), 
+            obj.get_img_from_spec("label")
+        ),
+        "key_g": lambda obj: rsvis.tools.heightmap.open_height_map(
+            obj.get_img(), 
+            obj.get_img_from_spec("height"), 
+            obj.get_img_from_spec("label"), 
+            ccviewer=False
+        ),
         "key_l": lambda obj: obj.set_img(rsvis.tools.rsshow.get_label_image(obj.get_img_from_spec("image"), obj.get_img_from_spec("label"), value=204, equal=False), show=True),
-        "key_r": lambda obj: save(obj.get_img_path_from_spec("image"), obj.get_img_from_spec("image"))
+        "key_p": lambda obj: save(obj.get_img(path=True), obj.get_img()),
+        "key_o": lambda obj: copy(obj.get_img(path=True))
     }
 
     ui = rsvis.tools.rsshowui.RSShowUI(img_set, keys=keys)

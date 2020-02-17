@@ -26,12 +26,14 @@ def get_height_map(img):
     dim_new =(img_width*img_height)
     height_factor = float(np.max(img))/(float(np.max([img_width, img_height])) / 10)
 
+    print(height_factor)
+
     grid = np.indices((img_width, img_height), dtype="float")
     height_map.update( 
         {
             'x': grid[0,...].reshape(dim_new).T, 
             'y': grid[1,...].reshape(dim_new).T, 
-            'z': img[...,0].reshape(dim_new).T/height_factor
+            'z': img[...,0].astype(float).reshape(dim_new).T/height_factor
         }
     )
 
@@ -85,15 +87,17 @@ def open_height_map(img, height, label=None, ccviewer=True, mesh=True):
 
     path = tempfile.mkstemp(suffix=".ply")[1]
     rsvis.utils.ply.write_ply(path, points=data)
+     
+     
     if mesh:
+        args = rsvis.config.settings._SETTINGS["cloud_delaunay_args"]
         process = subprocess.Popen(
             get_args(
-                list(rsvis.config.settings._SETTINGS["cloud_process"].split(",")), 
-                list(rsvis.config.settings._SETTINGS["cloud_delaunay_args"].format(**{"obj": { "path": path}}).split(','))
+                rsvis.config.settings._SETTINGS["cloud_process"], 
+                [item.format(**{"obj": { "path": path}}) for item in args]
             )
         )
         process.wait()
-
     if ccviewer:
         subprocess.Popen(
             get_args( rsvis.config.settings._SETTINGS["cloud_viewer"], path)
@@ -108,9 +112,10 @@ def open_height_map(img, height, label=None, ccviewer=True, mesh=True):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------   
 def get_args(cmd, *args):
-    cmd = cmd if isinstance(cmd, list) else [cmd]
+    cmd = cmd.copy() if isinstance(cmd, list) else [cmd]
     for a in args:
         cmd.extend(*to_list(a))
+    
     return " ".join(cmd)
 
 #   function ----------------------------------------------------------------

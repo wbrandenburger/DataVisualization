@@ -19,6 +19,10 @@ def main():
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+get_value = lambda obj, key, default: obj[key] if key in obj.keys() else default
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def test_rsshow():
     rsvis.tools.rsshow.rsshow(
         rsvis.config.settings._DATA, 
@@ -26,8 +30,9 @@ def test_rsshow():
         rsvis.config.settings._SETTINGS["io"]["dest-dir"],
         rsvis.config.settings._SETTINGS["io"]["dest-basename"],
         rsvis.config.settings._SETTINGS["io"]["regex"],
-        labels=rsvis.config.settings._SETTINGS["label"],
-        resize=rsvis.config.settings._SETTINGS["resize"]
+        labels=get_value(rsvis.config.settings._SETTINGS,"label", dict()),
+        msi=get_value(rsvis.config.settings._SETTINGS,"msi", list()),
+        resize=get_value(rsvis.config.settings._SETTINGS,"resize", 100)
     )
 
 #   function ----------------------------------------------------------------
@@ -43,7 +48,7 @@ def test_lecture():
         rsvis.config.settings._DATA, 
         rsvis.config.settings._SETTINGS["data-tensor-types"], 
         cat=rsvis.config.settings._SETTINGS["label"],
-        resize=rsvis.config.settings._SETTINGS["resize"]
+        resize=get_value(rsvis.config.settings._SETTINGS,"resize", 100)
     )
     
 #   function ----------------------------------------------------------------

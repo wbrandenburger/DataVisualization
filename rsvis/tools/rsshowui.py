@@ -90,29 +90,23 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img(self, index=None):
-        index = self._index() if not index else index
-        return self._data[index][self._index_spec()].data
+    def get_img(self, index=None, path=False):
+        index = self._index_spec() if not index else index
+        img_container = self._data[self._index()][index]
+        if path:
+            return img_container.path
+        else:
+            return img_container.data
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img_from_spec(self, spec):
+    def get_img_from_spec(self, spec, path=False):
         if spec:
             try:
-                index_spec = self._data[self._index()].index(spec)
-                return self._data[self._index()][index_spec].data
+                index = self._data[self._index()].index(spec)
+                return self.get_img(index=index, path=path)
             except ValueError:
-                return None
-                
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_img_path_from_spec(self, spec):
-        if spec:
-            try:
-                index_spec = self._data[self._index()].index(spec)
-                return self._data[self._index()][index_spec].path
-            except ValueError:
-                return None
+                return None 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
