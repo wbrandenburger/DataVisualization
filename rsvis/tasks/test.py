@@ -9,6 +9,7 @@ import rsvis.config.settings
 import rsvis.utils.format
 import rsvis.tools.rsshow
 import rsvis.tools.lecture
+import rsvis.utils.regex
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
