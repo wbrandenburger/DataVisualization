@@ -27,13 +27,14 @@ def get_height_map(img):
     height_factor = float(np.max(img))/(float(np.max([img_width, img_height])) / 10)
 
     print(height_factor)
+    img = img.astype(float)/height_factor
 
     grid = np.indices((img_width, img_height), dtype="float")
     height_map.update( 
         {
             'x': grid[0,...].reshape(dim_new).T, 
             'y': grid[1,...].reshape(dim_new).T, 
-            'z': img[...,0].astype(float).reshape(dim_new).T/height_factor
+            'z': img[...,0].reshape(dim_new).T
         }
     )
 
@@ -84,8 +85,10 @@ def open_height_map(img, height, label=None, ccviewer=True, mesh=True):
         add_intensity_to_height_map(label)
 
     data = pandas.DataFrame(height_map, index=range(img.shape[0]*img.shape[1]))
+    
+    # create a temporary file
+    path = tempfile.mkstemp(prefix="rsvis-", suffix=".ply")[1]
 
-    path = tempfile.mkstemp(suffix=".ply")[1]
     rsvis.utils.ply.write_ply(path, points=data)
      
      

@@ -39,6 +39,10 @@ def project_data_to_img(img):
     img = img.astype("uint8")
     return img
 
+def project_dict_to_img(obj):
+    img = np.fromiter(obj.values(), dtype=np.uint8)
+    return project_data_to_img(img)
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def raise_contrast(img):
@@ -53,19 +57,11 @@ def raise_contrast(img):
 def labels_to_image(img, labels):
     img = expand_image_dim(img).astype(int)
     dim = img.shape
-
     label = np.zeros((img.shape[0], img.shape[1]), dtype=int)
     for c in range(img.shape[-1]):
         label += img[:, :, c]*int(pow(2, c))
-
+    
     lut = lambda x: labels[str(x)]
     np_lut = np.vectorize(lut, otypes=[np.uint8])
     label = np_lut(label.astype(int))
-    
-    # img = expand_image_dim(img)
-    # dim = img.shape
-    # img = img.reshape(-1,dim[-1] )
-    # img = np.apply_along_axis(lambda x, labels: labels[str(x.tolist())], -1, img, labels)
-    # img = img.reshape( dim[0], dim[1])
-
     return label    

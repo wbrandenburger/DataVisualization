@@ -15,6 +15,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import tifffile
+import PIL
 import pathlib
 import shutil
 
@@ -100,14 +101,12 @@ def get_label_image(img, label, value=204, equal=True):
     label_list = list()
     img_label = img.copy()
     for c in range(img.shape[-1]):
-        print(label)
-
         if equal:
             mask = np.ma.masked_where(label[...,-1] != value, img[...,c])
         else:
             mask = np.ma.masked_where(label[...,-1] == value, img[...,c])
                     
-        np.ma.set_fill_value(mask, 255)
+        np.ma.set_fill_value(mask, 0)
         img_label[:,:,c] = mask.filled()
         #label_list.append(mask.compressed())
     return img_label
@@ -128,12 +127,16 @@ def blubb(img, **kwargs):
 # ---------------------------------------------------------------------------
 def get_image(path, spec, labels=dict(), msi=list(), scale=100):
     
-    img = tifffile.imread(path)
+    if path.endswith(".tif"):
+        img = tifffile.imread(path)
+    else:
+        img = np.asarray(PIL.Image.open(path))
+
     img = rsvis.tools.imgtools.resize_img(img, scale)
 
     if spec == "label":
         img = rsvis.tools.imgtools.labels_to_image(img, labels)
-        
+
     if spec in ["label", "height", "msi"]:
         img = rsvis.tools.imgtools.project_data_to_img(img)
 
@@ -160,14 +163,44 @@ class PathCreator():
     def __call__(self, path):
         return self._dest_dir / self._dest_basename.format(self._research(pathlib.Path(path).stem))
 
+# inheritance index ?
+class ObjIndex(object):
+
+    def __init__(self, obj):
+        self._obj = obj
+
+        try:
+            self._index = rsvis.tools.index.Index(len(obj))
+        except AttributeError:
+            print("Object does not have a iterator.")
+            raise
+
+    def __call__(self):
+        index = self._index()
+        self._index.next()
+        return self._obj[index]
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def save_image(dest,  img):
+    rsvis.__init__._logger.debug("Save img to '{}'".format(dest))
+    tifffile.imwrite(dest, img)
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def copy_image(path,  dest):
+    rsvis.__init__._logger.debug("Save img to '{}'".format(dest))
+    shutil.copy2(path, dest)    
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def rsshow(files, specs, dest_dir, dest_basename, io, labels=dict(), msi=list(), resize=100):
     
     load = lambda path, spec: get_image(path, spec, labels=labels, msi=msi, scale=resize)
+
     get_path = PathCreator(dest_dir, dest_basename, *io)
-    save = lambda path, img:  tifffile.imwrite(get_path(path), img)
-    copy = lambda path: shutil.copy2(path, get_path(path))
+    save = lambda path, img: save_image(get_path(path), img)
+    copy = lambda path: copy_image(path, get_path(path))
 
     import rsvis.tools.imgcontainer
     img_set = list()
@@ -178,21 +211,31 @@ def rsshow(files, specs, dest_dir, dest_basename, io, labels=dict(), msi=list(),
             img.append(path = f, spec=s, live=live)
         img_set.append(img)
 
+    label_index = ObjIndex(rsvis.tools.imgtools.project_dict_to_img(labels.copy())) 
+   
     keys = {
-        "key_n" : lambda obj: obj.set_img(rsvis.tools.imgtools.raise_contrast(obj.get_img()), show=True),
+        "key_n" : lambda obj: obj.set_img(
+            rsvis.tools.imgtools.raise_contrast( np.array(obj.get_window_img())), 
+            show=True),
         "key_c": lambda obj: rsvis.tools.heightmap.open_height_map(
-            obj.get_img(), 
+            np.array(obj.get_window_img()), 
             obj.get_img_from_spec("height"), 
             obj.get_img_from_spec("label")
         ),
         "key_g": lambda obj: rsvis.tools.heightmap.open_height_map(
-            obj.get_img(), 
+            np.array(obj.get_window_img()),
             obj.get_img_from_spec("height"), 
             obj.get_img_from_spec("label"), 
             ccviewer=False
         ),
-        "key_l": lambda obj: obj.set_img(rsvis.tools.rsshow.get_label_image(obj.get_img_from_spec("image"), obj.get_img_from_spec("label"), value=204, equal=False), show=True),
-        "key_p": lambda obj: save(obj.get_img(path=True), obj.get_img()),
+        "key_l": lambda obj: obj.set_img(
+            rsvis.tools.rsshow.get_label_image(
+                obj.get_img(), 
+                obj.get_img_from_spec("label"), 
+                value=label_index(),
+                equal=True),                 
+            show=True),
+        "key_p": lambda obj: save(obj.get_img(path=True), np.array(obj.get_window_img())),
         "key_o": lambda obj: copy(obj.get_img(path=True))
     }
 
