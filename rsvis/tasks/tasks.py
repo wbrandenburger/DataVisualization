@@ -8,7 +8,6 @@ import rsvis.__init__
 import rsvis.config.settings
 import rsvis.utils.format
 import rsvis.tools.rsshow
-import rsvis.tools.lecture
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
