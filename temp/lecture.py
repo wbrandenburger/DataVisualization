@@ -11,6 +11,15 @@ import timeit
 import tifffile
 import matplotlib.pyplot as plt
 
+# #   function ----------------------------------------------------------------
+# # ---------------------------------------------------------------------------
+# def task_test_lecture():
+#     rsvis.tools.lecture.test(
+#         rsvis.config.settings._DATA, 
+#         rsvis.config.settings._SETTINGS["data-tensor-types"], 
+#         cat=rsvis.config.settings._SETTINGS["label"],
+#         scale=get_value(rsvis.config.settings._SETTINGS,"scale", 100)
+#     )
 
 # #   function ----------------------------------------------------------------
 # # ---------------------------------------------------------------------------
@@ -27,8 +36,8 @@ import matplotlib.pyplot as plt
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def test(files, types, cat=dict(), resize=100):
-    img_load = lambda index: [get_image(f, t, cat, resize=resize) for f, t in zip(files[index], types)]
+def test(files, types, cat=dict(), scale=100):
+    img_load = lambda index: [get_image(f, t, cat, scale=scale) for f, t in zip(files[index], types)]
     
     
 
@@ -49,11 +58,11 @@ def test(files, types, cat=dict(), resize=100):
     a = foo.get_probability(img[50,30,:])
     print(a)
     
-def get_image(img_path, img_type, cat, resize=100):
+def get_image(img_path, img_type, cat, scale=100):
     
     img = tifffile.imread(img_path)
 
-    scale_percent = resize
+    scale_percent = scale
     width = int(img.shape[1] * scale_percent / 100)
     height = int(img.shape[0] * scale_percent / 100)
     dim = (width, height) 

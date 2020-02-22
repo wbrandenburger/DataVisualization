@@ -28,7 +28,7 @@ def task_rsshow():
         **rsvis.config.settings._SETTINGS["output"],
         labels=get_value(rsvis.config.settings._SETTINGS,"label", dict()),
         msi=get_value(rsvis.config.settings._SETTINGS,"msi", list()),
-        resize=get_value(rsvis.config.settings._SETTINGS,"resize", 100)
+        scale=get_value(rsvis.config.settings._SETTINGS,"scale", 100)
     )
 
 # #   function ----------------------------------------------------------------
@@ -72,16 +72,6 @@ def task_rsshow():
 #     f = f + 2
 #     print(f)
 
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-def task_test_lecture():
-    rsvis.tools.lecture.test(
-        rsvis.config.settings._DATA, 
-        rsvis.config.settings._SETTINGS["data-tensor-types"], 
-        cat=rsvis.config.settings._SETTINGS["label"],
-        resize=get_value(rsvis.config.settings._SETTINGS,"resize", 100)
-    )
-    
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def task_print_user_settings():

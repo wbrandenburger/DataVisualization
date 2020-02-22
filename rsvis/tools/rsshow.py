@@ -18,9 +18,9 @@ import os
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=[".*",0], labels=dict(), msi=list(), resize=100):
+def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=[".*",0], labels=dict(), msi=list(), scale=100):
     
-    load = lambda path, spec: rsvis.tools.imgio.get_image(path, spec, labels=labels, msi=msi, scale=resize)
+    load = lambda path, spec: rsvis.tools.imgio.get_image(path, spec=spec, labels=labels, msi=msi, scale=scale)
 
     get_path = rsvis.utils.general.PathCreator(path_dir, path_name, *regex)
     save = lambda path, img: rsvis.tools.imgio.save_image(get_path(path), img)
