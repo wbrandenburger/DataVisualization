@@ -7,6 +7,7 @@
 import rsvis.__init__
 import rsvis.config.settings
 import rsvis.plugin
+import rsvis.debug.exceptions
 
 import click
 import logging
@@ -30,23 +31,22 @@ import sys
     nargs=1
 )
 @click.option(
-    "-t",
-    "--task",
-    help="Execute the specified task (default: {0})".format(rsvis.config.settings._DEFAULT_TASK),
-    type=click.Choice([*rsvis.plugin.get_tasks()]), # @todo[to change]: folder "tasks"
-    default=rsvis.config.settings._DEFAULT_TASK # @todo[to change]: default task "default"
+    "--task_set",
+    help="Execute a task from specified task set(default: {0})".format(rsvis.config.settings._TASK_SPEC_NAME),
+    type=click.Choice([*rsvis.plugin.get_tasks()]),
+    default=rsvis.config.settings._TASK_SPEC_NAME
 )
 @click.option(
-    "-f",
-    "--func",
-    help="Execute the specified function (default: {0})".format(""),
+    "-t",
+    "--task",
+    help="Execute the specified task (default: {0})".format(""),
     type=str,
-    default= ""
+    default= rsvis.config.settings._DEFAULT_TASK 
 )
 def cli(
         file,
+        task_set,
         task,
-        func,
     ):
     """Read general settings file and execute specified task."""
 
@@ -54,22 +54,20 @@ def cli(
     rsvis.config.settings.get_settings(file)
 
     # get the specified task and imort it as module
-    task_module = rsvis.plugin.get_task_module(task)
+    task_module = rsvis.plugin.get_task_module(task_set)
 
     # call task's main routine
-    if not func:
-        rsvis.__init__._logger.debug("Call the main routine from task module '{0}'".format(task_module[0]))
+    if not task:
+        rsvis.__init__._logger.debug("Call the default routine from task set '{0}'".format(task_module[0]))
         task_module[0].main()
     else:
-        rsvis.__init__._logger.debug("Call '{0}' from task module '{1}'".format(task_module[0], func))
+        rsvis.__init__._logger.debug("Call task '{0}' from set '{1}'".format(task_module[0], task))
 
-        task_funcs = rsvis.plugin.get_module_functions(task_module[0], "^test")
-        if not func in task_funcs:
-            raise ValueError("Error: Invalid value for '-f' / '--func': invalid choice: {0}. (choose from {1})".format(
-                func, 
-                task_funcs
-                )
-            ) # @todo[generalize]: also in expmgmt
+        task_funcs = rsvis.plugin.get_module_functions(task_module[0])
+        if not task in task_funcs:
+            raise rsvis.debug.exceptions.ArgumentError(task, task_funcs) 
 
-        task_func = getattr(task_module[0], func)
+        task_func = getattr(task_module[0], 
+            "{}{}".format(rsvis.config.settings._TASK_PREFIX, task)
+        )
         task_func()

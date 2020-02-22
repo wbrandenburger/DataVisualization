@@ -214,28 +214,45 @@ def rsshow(files, specs, dest_dir, dest_basename, io, labels=dict(), msi=list(),
     label_index = ObjIndex(rsvis.tools.imgtools.project_dict_to_img(labels.copy())) 
    
     keys = {
+        "key_e" : lambda obj: obj.set_img(
+            obj.get_img(),
+            show=True
+        ),
         "key_n" : lambda obj: obj.set_img(
             rsvis.tools.imgtools.raise_contrast( np.array(obj.get_window_img())), 
-            show=True),
-        "key_c": lambda obj: rsvis.tools.heightmap.open_height_map(
-            np.array(obj.get_window_img()), 
-            obj.get_img_from_spec("height"), 
-            obj.get_img_from_spec("label")
+            show=True
         ),
-        "key_g": lambda obj: rsvis.tools.heightmap.open_height_map(
+        "key_c": lambda obj: rsvis.tools.heightmap.main(
+            np.array(obj.get_window_img()), 
+            obj.get_img_from_spec("height"),
+            normals=True,
+            mesh=True
+        ),       
+        "key_v": lambda obj: rsvis.tools.heightmap.main(
             np.array(obj.get_window_img()),
             obj.get_img_from_spec("height"), 
-            obj.get_img_from_spec("label"), 
+            obj.get_img_from_spec("label"),
+            normals=True,
+            mesh=True,
             ccviewer=False
         ),
+        "key_b": lambda obj: obj.set_img(
+            rsvis.tools.heightmap.get_normal_image(
+                np.array(obj.get_window_img()), 
+                obj.get_img_from_spec("height")
+            ),
+            show=True
+        ), 
         "key_l": lambda obj: obj.set_img(
             rsvis.tools.rsshow.get_label_image(
                 obj.get_img(), 
                 obj.get_img_from_spec("label"), 
                 value=label_index(),
                 equal=True),                 
-            show=True),
-        "key_p": lambda obj: save(obj.get_img(path=True), np.array(obj.get_window_img())),
+            show=True
+        ),
+        "key_p": lambda obj: save(obj.get_img(path=True), np.array(obj.get_window_img())
+        ),
         "key_o": lambda obj: copy(obj.get_img(path=True))
     }
 

@@ -42,6 +42,10 @@ def get_task_module(task):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_module_functions(module, regex):
-    return [ f for f in dir(module) if re.compile(regex).match(f) ] 
+def get_module_functions(module):
+    task_list = list()
+    for task in dir(module):
+        if re.compile(rsvis.config.settings._TASK_PREFIX).match(task):
+            task_list.append(task.replace(rsvis.config.settings._TASK_PREFIX ,"",1))
+    return task_list
 
