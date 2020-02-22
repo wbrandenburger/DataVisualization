@@ -39,7 +39,7 @@ def copy_image(path,  dest):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_image(path, spec, labels=dict(), msi=list(), scale=100):
+def get_image(path, spec="image", labels=dict(), msi=list(), scale=100):
     
     img = rsvis.tools.imgtools.resize_img(read_image(path), scale)
 
