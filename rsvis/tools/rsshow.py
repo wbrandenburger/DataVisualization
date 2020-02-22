@@ -10,6 +10,7 @@ import rsvis.tools.imagestats
 import rsvis.tools.imgcontainer
 import rsvis.tools.heightmap
 import rsvis.tools.imgtools
+import rsvis.utils.general
 
 import cv2
 import numpy as np
@@ -18,6 +19,7 @@ import tifffile
 import PIL
 import pathlib
 import shutil
+import os
 
 # @todo[change]: msi channels a = [2,1,6], b = [1,2,4], c = [1,5,4]
 
@@ -146,24 +148,6 @@ def get_image(path, spec, labels=dict(), msi=list(), scale=100):
     img =  rsvis.tools.imgtools.stack_image_dim(img)
 
     return img
-
-#   class -------------------------------------------------------------------
-# ---------------------------------------------------------------------------
-class PathCreator():
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def __init__(self, dest_dir, dest_basename, regex=".*", group=0):
-        self._dest_dir = pathlib.Path(dest_dir)
-        self._dest_basename = dest_basename
-        self._research = rsvis.utils.regex.ReSearch(regex, group)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def __call__(self, path):
-        return self._dest_dir / self._dest_basename.format(self._research(pathlib.Path(path).stem))
-
-# inheritance index ?
 class ObjIndex(object):
 
     def __init__(self, obj):
@@ -189,16 +173,17 @@ def save_image(dest,  img):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def copy_image(path,  dest):
-    rsvis.__init__._logger.debug("Save img to '{}'".format(dest))
+    rsvis.__init__._logger.debug("Copy img to '{}'".format(dest))
     shutil.copy2(path, dest)    
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def rsshow(files, specs, dest_dir, dest_basename, io, labels=dict(), msi=list(), resize=100):
+def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=[".*",0], labels=dict(), msi=list(), resize=100):
     
     load = lambda path, spec: get_image(path, spec, labels=labels, msi=msi, scale=resize)
 
-    get_path = PathCreator(dest_dir, dest_basename, *io)
+    import rsvis.utils.general
+    get_path = rsvis.utils.general.PathCreator(path_dir, path_name, *regex)
     save = lambda path, img: save_image(get_path(path), img)
     copy = lambda path: copy_image(path, get_path(path))
 

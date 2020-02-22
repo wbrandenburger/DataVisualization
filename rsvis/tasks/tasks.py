@@ -9,7 +9,6 @@ import rsvis.config.settings
 import rsvis.utils.format
 import rsvis.tools.rsshow
 import rsvis.tools.lecture
-import rsvis.utils.regex
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -26,9 +25,7 @@ def task_rsshow():
     rsvis.tools.rsshow.rsshow(
         rsvis.config.settings._DATA, 
         rsvis.config.settings._SETTINGS["data-tensor-types"],
-        rsvis.config.settings._SETTINGS["io"]["dest-dir"],
-        rsvis.config.settings._SETTINGS["io"]["dest-basename"],
-        rsvis.config.settings._SETTINGS["io"]["regex"],
+        **rsvis.config.settings._SETTINGS["output"],
         labels=get_value(rsvis.config.settings._SETTINGS,"label", dict()),
         msi=get_value(rsvis.config.settings._SETTINGS,"msi", list()),
         resize=get_value(rsvis.config.settings._SETTINGS,"resize", 100)
