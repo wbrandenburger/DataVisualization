@@ -40,17 +40,17 @@ def copy_image(path,  dest):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_image(path, spec="image", labels=dict(), msi=list(), scale=100):
+def get_image(path, spec="image", labels=dict(), msi=[0,1,2], scale=100, show=False):
     
     img = rsvis.tools.imgtools.resize_img(read_image(path), scale)
 
-    if spec == "label":
+    if labels and spec == "label":
         img = rsvis.tools.imgtools.labels_to_image(img, labels)
 
-    if spec in ["label", "height", "msi"]:
+    if show and spec in ["label", "height", "msi"]:
         img = rsvis.tools.imgtools.project_data_to_img(img)
 
-    if spec == "msi" and msi:
+    if msi and spec == "msi":
         img = np.stack((img[:,:,msi[0][0]], img[:,:,msi[0][1]], img[:,:,msi[0][2]]), axis=2)
 
     img =  rsvis.tools.imgtools.stack_image_dim(img)
