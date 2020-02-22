@@ -64,4 +64,18 @@ def labels_to_image(img, labels):
     lut = lambda x: labels[str(x)]
     np_lut = np.vectorize(lut, otypes=[np.uint8])
     label = np_lut(label.astype(int))
-    return label    
+    return label
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_label_image(img, label, value, equal=True):
+    img_label = img.copy()
+    for c in range(img.shape[-1]):
+        if equal:
+            mask = np.ma.masked_where(label[...,-1] != value, img[...,c])
+        else:
+            mask = np.ma.masked_where(label[...,-1] == value, img[...,c])
+                    
+        np.ma.set_fill_value(mask, 0)
+        img_label[:,:,c] = mask.filled()
+    return img_label

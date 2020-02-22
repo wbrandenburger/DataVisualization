@@ -11,6 +11,20 @@ import timeit
 import tifffile
 import matplotlib.pyplot as plt
 
+
+# #   function ----------------------------------------------------------------
+# # ---------------------------------------------------------------------------
+# def blubb(img, **kwargs): 
+#     import rsvis.tools.imagestats   
+#     foo = rsvis.tools.imagestats.ImageStats(
+#             path="A:\\VirtualEnv\\dev-rsvis\\src\\rsvis\\tmpchlgw4dk.json" 
+#         )
+#     dim = img.shape
+#     img = img.reshape(-1, dim[-1])
+#     img = np.apply_along_axis(foo.get_probability_c, -1, img)
+#     img = img.reshape( dim[0], dim[1], 1)
+#     return img
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def test(files, types, cat=dict(), resize=100):
