@@ -13,31 +13,35 @@ import tifffile
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def read_image(path):
+    rsvis.__init__._logger.debug("Read image '{}'".format(path))
+    
+    if path.endswith(".tif"):
+        return tifffile.imread(path)
+    else:
+        return np.asarray(PIL.Image.open(path))
+    
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def save_image(dest,  img):
     rsvis.__init__._logger.debug("Save img to '{}'".format(dest))
+
     if dest.endswith(".tif"):
         tifffile.imwrite(dest, img)
     else:
-        img = PIL.Image.fromarray(img)
-        img = img.write(dest)
-    
+        PIL.Image.fromarray(img).write(dest)
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def copy_image(path,  dest):
     rsvis.__init__._logger.debug("Copy img to '{}'".format(dest))
     shutil.copy2(path, dest)
 
-
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_image(path, spec, labels=dict(), msi=list(), scale=100):
     
-    if path.endswith(".tif"):
-        img = tifffile.imread(path)
-    else:
-        img = np.asarray(PIL.Image.open(path))
-
-    img = rsvis.tools.imgtools.resize_img(img, scale)
+    img = rsvis.tools.imgtools.resize_img(read_image(path), scale)
 
     if spec == "label":
         img = rsvis.tools.imgtools.labels_to_image(img, labels)
