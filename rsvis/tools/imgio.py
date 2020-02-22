@@ -16,7 +16,7 @@ import tifffile
 def read_image(path):
     rsvis.__init__._logger.debug("Read image '{}'".format(path))
     
-    if path.endswith(".tif"):
+    if str(path).endswith(".tif"):
         return tifffile.imread(path)
     else:
         return np.asarray(PIL.Image.open(path))
@@ -26,7 +26,7 @@ def read_image(path):
 def save_image(dest,  img):
     rsvis.__init__._logger.debug("Save img to '{}'".format(dest))
 
-    if dest.endswith(".tif"):
+    if str(dest).endswith(".tif"):
         tifffile.imwrite(dest, img)
     else:
         PIL.Image.fromarray(img).write(dest)
