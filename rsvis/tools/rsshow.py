@@ -71,7 +71,7 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
                 obj.get_img(), 
                 obj.get_img_from_spec("label"), 
                 value=label_index(),
-                equal=True),                 
+                equal=False),                 
             show=True
         ),
         "key_p": lambda obj: save(obj.get_img(path=True), np.array(obj.get_window_img())
