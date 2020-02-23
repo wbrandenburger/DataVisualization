@@ -28,7 +28,8 @@ def task_rsshow():
             **rsvis.config.settings._SETTINGS["output"],
             labels=get_value(rsvis.config.settings._SETTINGS,"label", dict()),
             msi=get_value(rsvis.config.settings._SETTINGS,"msi", list()),
-            scale=get_value(rsvis.config.settings._SETTINGS,"scale", 100)
+            scale=get_value(rsvis.config.settings._SETTINGS,"scale", 100),
+            param_dist=get_value(rsvis.config.settings._SETTINGS,"param_dist", dict())
         )
     except KeyError:
         pass

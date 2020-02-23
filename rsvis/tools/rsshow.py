@@ -18,7 +18,7 @@ import os
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=[".*",0], labels=dict(), msi=list(), scale=100):
+def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=[".*",0], labels=dict(), msi=list(), scale=100, param_dist=dict()):
     
     load = lambda path, spec: rsvis.tools.imgio.get_image(path, spec=spec, labels=labels, msi=msi, scale=scale, show=True)
 
@@ -42,7 +42,17 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             show=True
         ),
         "key_n" : lambda obj: obj.set_img(
-            rsvis.tools.imgtools.raise_contrast( np.array(obj.get_window_img())), 
+            rsvis.tools.imgtools.raise_contrast(
+                np.array(obj.get_window_img()
+                )
+            ), 
+            show=True
+        ),
+        "key_m" : lambda obj: obj.set_img(
+            rsvis.tools.imgtools.et_distance_transform(
+                obj.get_img_from_spec("label"),
+                **param_dist
+            ), 
             show=True
         ),
         "key_c": lambda obj: rsvis.tools.heightmap.main(
