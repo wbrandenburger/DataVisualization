@@ -16,78 +16,72 @@ import pathlib
 import cv2
 import numpy as np
 
-height_map = dict()
-
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_height_map(img):
-    global height_map
-
+def get_height_map(img, height=dict()):
     img_width, img_height, _ = img.shape
     dim_new =(img_width*img_height)
     height_factor = float(np.max(img))/(float(np.max([img_width, img_height])) / 10)
 
-    print(height_factor)
+    #print(height_factor)
     img = img.astype(float)/height_factor
 
     grid = np.indices((img_width, img_height), dtype="float")
-    height_map.update( 
+    height.update( 
         {
             'x': grid[0,...].reshape(dim_new).T, 
             'y': grid[1,...].reshape(dim_new).T, 
             'z': img[...,0].reshape(dim_new).T
         }
     )
+    return height
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def colorize_height_map(img):
-    global height_map
-
+def colorize_height_map(img, height=dict()):
     img_width, img_height, _ = img.shape
     dim_new =(img_width*img_height)
 
-    height_map.update(
+    height.update(
         {
             'red': img[:,:,0].reshape((img.shape[0]*img.shape[1])).T, 
             'green': img[:,:,1].reshape((img.shape[0]*img.shape[1])).T, 
             'blue': img[:,:,2].reshape((img.shape[0]*img.shape[1])).T
         }
     )
+    return height
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def add_intensity_to_height_map(img):
-    global height_map
-
+def add_intensity_to_height_map(img, height=dict()):
     try:
         img_width, img_height, _ = img.shape
         dim_new =(img_width*img_height)
 
-        height_map.update(
+        height.update(
             {
                 'intensity': img[:,:,1].reshape((img.shape[0]*img.shape[1])).T
             }
         )
     except AttributeError:
         pass
+    return height
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_colorized_height_map(img, height, label=None):
-    global height_map
-
-    get_height_map(height)
-    colorize_height_map(img)
+    data = get_height_map(height)
+    data = colorize_height_map(img, data)
     try:
-        add_intensity_to_height_map(label)
+        data = add_intensity_to_height_map(label, data)
     except ValueError:
         pass
+    return data
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def write_height_map(img, path):
-    data = pandas.DataFrame(height_map, index=range(img.shape[0]*img.shape[1]))
+def write_height_map(img, height, path):
+    data = pandas.DataFrame(height, index=range(img.shape[0]*img.shape[1]))
 
     # write to temporary file
     rsvis.__init__._logger.debug("Write point information to file {}".format(path))
@@ -98,33 +92,21 @@ def write_height_map(img, path):
 def read_height_map(path):
     return rsvis.utils.ply.read_ply(path)["points"]
 
-
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_normal_image(img, height, verbose=False):
-    clear_height_map()
-    get_colorized_height_map(img, height)
+    data = get_colorized_height_map(img, height)
 
     # create a temporary file
     path = tempfile.mkstemp(prefix="rsvis-", suffix=".ply")[1]
-    write_height_map(img, path)
-    
+    write_height_map(img, data, path)
 
     compute_normals(path, verbose=verbose)
     data = read_height_map(path)[["nx", "ny", "nz"]].to_numpy() 
     
     data[:,0:1] = (127.5*(data[:,0:1] + 1))
     data[:,2] = 255*(data[:,2])
-    #data= np.stack(( 127.5*(data[:,0] + 1), 127.5*(data[:,1] + 1), 255*data[:,2]))
-    print(data.shape)
-    # print(np.min(data[:,0]), np.max(data[:,0]))
-    # print(np.min(data[:,1]), np.max(data[:,1]))
-    # print(np.min(data[:,2]), np.max(data[:,2]))
-
     return data.reshape(img.shape).astype(np.uint8)
-
-
-    
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -168,19 +150,13 @@ def open_height_map(path, ccviewer=False):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def clear_height_map():
-    global height_map
-    heigth_map = dict()
-
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
 def main(img, height, label=None, verbose=False, normals=False, mesh=False, ccviewer=True, attempt=False):
-    clear_height_map()
-    get_colorized_height_map(img, height, label=label)
+
+    data = get_colorized_height_map(img, height, label=label)
 
     # create a temporary file
     path = tempfile.mkstemp(prefix="rsvis-", suffix=".ply")[1]
-    write_height_map(img, path)
+    write_height_map(img, data, path)
 
     if normals:
         compute_normals(path, verbose=verbose)
