@@ -82,6 +82,6 @@ class DictParser(MutableMapping):
                 try:
                     value = value.replace("%({})s".format(result.group(1)),self.mapping[result.group(1)])
                 except KeyError:
-                    raise shdw.debug.exceptions.KeyErrorJson(result.group(1))
+                    raise rsvis.debug.exceptions.KeyErrorJson(result.group(1))
         
         return value
