@@ -49,7 +49,7 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             show=True
         ),
         "key_m" : lambda obj: obj.set_img(
-            rsvis.tools.imgtools.et_distance_transform(
+            rsvis.tools.imgtools.get_distance_transform(
                 obj.get_img_from_spec("label"),
                 **param_dist
             ), 
