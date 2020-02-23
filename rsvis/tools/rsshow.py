@@ -49,10 +49,12 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             show=True
         ),
         "key_m" : lambda obj: obj.set_img(
-            rsvis.tools.imgtools.get_distance_transform(
-                obj.get_img_from_spec("label"),
-                **param_dist
-            ), 
+            rsvis.tools.imgtools.project_and_stack(
+                rsvis.tools.imgtools.get_distance_transform(
+                    obj.get_img_from_spec("label")[...,0],
+                    **param_dist
+                )
+            ),            
             show=True
         ),
         "key_c": lambda obj: rsvis.tools.heightmap.main(
@@ -86,7 +88,8 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
         ),
         "key_p": lambda obj: save(obj.get_img(path=True), np.array(obj.get_window_img())
         ),
-        "key_o": lambda obj: copy(obj.get_img(path=True))
+        "key_o": lambda obj: copy(obj.get_img(path=True)),
+        "key_u": lambda obj: print(np.unique(obj.get_img_from_spec("label")))
     }
 
     ui = rsvis.tools.rsshowui.RSShowUI(img_set, keys=keys)
