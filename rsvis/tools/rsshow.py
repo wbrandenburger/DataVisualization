@@ -34,7 +34,7 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             img.append(path = f, spec=s, live=live)
         img_set.append(img)
 
-    label_index = rsvis.tools.objindex.ObjIndex(rsvis.tools.imgtools.project_dict_to_img(labels.copy())) 
+    label_index = rsvis.tools.objindex.ObjIndex(rsvis.tools.imgtools.project_dict_to_img(labels.copy()))
    
     keys = {
         "key_e" : lambda obj: obj.set_img(
@@ -52,7 +52,8 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             rsvis.tools.imgtools.project_and_stack(
                 rsvis.tools.imgtools.get_distance_transform(
                     obj.get_img_from_spec("label")[...,0],
-                    **param_dist
+                    label=label_index(),
+                    threshold=param_dist["threshold"]
                 )
             ),            
             show=True
