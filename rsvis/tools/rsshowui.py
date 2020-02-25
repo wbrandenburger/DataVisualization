@@ -53,7 +53,7 @@ class RSShowUI():
         self.scrollbar.pack(side="left", fill="y")
         self.listbox.pack(side="left", fill="y")
         for count, item in enumerate(self._data):
-           self.listbox.insert(END, count)
+           self.listbox.insert(END, item[0].path)
 
         
         self.set_img_from_index()
