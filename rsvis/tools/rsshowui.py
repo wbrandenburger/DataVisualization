@@ -109,6 +109,14 @@ class RSShowUI():
 
         if path:
             return img_container.path
+        return img_container.data
+
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_img_channel(self, index=None):
+        index = self._index_spec() if not index else index
+        img_container = self._data[self._index()][index]
 
         img = img_container.data
         if not isinstance(self._index_channel, rsvis.tools.index.Index):
@@ -217,7 +225,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_x(self, **kwargs):
-        self.set_img(self.get_img(), show=True)
+        self.set_img(self.get_img_channel(), show=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
