@@ -117,6 +117,7 @@ class RSShowUI():
         else:
             img = img_container.get_data(self._index_channel())
             self._index_channel.next()
+            print(self._index_channel())
 
         return img
 
