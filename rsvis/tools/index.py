@@ -19,7 +19,13 @@ class Index:
         if index:
             self._index=index
         return self.index
-
+  
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def __eq__(self, obj):
+        if isinstance(obj, Index):
+            return self.index == obj.index and self.limit == self.limit and self.__len__ == len(obj) 
+        return False
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __len__(self):
