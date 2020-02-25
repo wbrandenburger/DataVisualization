@@ -5,11 +5,20 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 import rsvis.tools.index
+import rsvis.tools.imgtools
 
 from tkinter import *
 from PIL import Image, ImageTk
 import numpy as np
 import pathlib 
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_number_of_channel(img):
+    if len(img.shape) == 2:
+        return 1
+
+    return img.shape[2]
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -20,8 +29,11 @@ class RSShowUI():
     def __init__(self, data, keys=dict()):
         self._data = data
         self.set_keys(keys)
+
         self._index = rsvis.tools.index.Index(len(self._data))
         self._index_spec = rsvis.tools.index.Index(len(self._data[0]))
+        self._index_channel = None
+
         self.clear()
  
     #   method --------------------------------------------------------------
@@ -95,10 +107,18 @@ class RSShowUI():
     def get_img(self, index=None, path=False):
         index = self._index_spec() if not index else index
         img_container = self._data[self._index()][index]
+
         if path:
             return img_container.path
+
+        if not self._index_channel:
+            img = img_container.data
+            self._img_cahnnel = rsvis.tools.index.Index(get_number_of_channel(img))
         else:
-            return img_container.data
+            img = img_container.get_data(self._index_channel())
+            self._index_channel.next()
+      
+        return img
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -183,13 +203,20 @@ class RSShowUI():
     # -----------------------------------------------------------------------
     def key_w(self, **kwargs):
         self._index_spec.next()
+        self._index_channel = None
         self.set_img_from_index(show=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, **kwargs):
         self._index_spec.last()
+        self._index_channel = None
         self.set_img_from_index(show=True)     
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_x(self, **kwargs):
+        self.set_img(self.get_img(), show=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
