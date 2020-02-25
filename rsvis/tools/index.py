@@ -24,7 +24,11 @@ class Index:
     # -----------------------------------------------------------------------
     def __eq__(self, obj):
         if isinstance(obj, Index):
+            print(self.index == obj.index)
+            print(self.limit == self.limit)
+            print(self.__len__ == len(obj))
             return self.index == obj.index and self.limit == self.limit and self.__len__ == len(obj) 
+
         return False
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
