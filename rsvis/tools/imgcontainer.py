@@ -120,7 +120,7 @@ class ImgContainer(rsvis.tools.objcontainer.ObjContainer):
     # -----------------------------------------------------------------------
     def get_data(self, channel=None):
         data = self.data
-        if channel:
+        if isinstance(channel,int):
             number_channel = get_number_of_channel(data)
             if number_channel:
                 return data[..., channel]
