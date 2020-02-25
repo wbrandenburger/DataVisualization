@@ -110,6 +110,7 @@ class RSShowUI():
 
         if path:
             return img_container.path
+            
         print(self._index_channel == None)
         if self._index_channel == None:
             img = img_container.data
