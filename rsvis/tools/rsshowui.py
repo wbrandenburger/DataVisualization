@@ -111,8 +111,8 @@ class RSShowUI():
         if path:
             return img_container.path
 
-        print(self._index_channel == None)
         if self._index_channel:
+            print("Huhu")
             img = img_container.get_data(self._index_channel())
             self._index_channel.next()
             print(self._index_channel())
