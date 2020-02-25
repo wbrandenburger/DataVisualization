@@ -50,8 +50,8 @@ def get_image(path, spec="image", labels=dict(), msi=[0,1,2], scale=100, show=Fa
     if show and spec in ["label", "height", "msi"]:
         img = rsvis.tools.imgtools.project_data_to_img(img)
 
-    if msi and spec == "msi":
-        img = np.stack((img[:,:,msi[0][0]], img[:,:,msi[0][1]], img[:,:,msi[0][2]]), axis=2)
+    # if msi and spec == "msi":
+    #     img = np.stack((img[:,:,msi[0][0]], img[:,:,msi[0][1]], img[:,:,msi[0][2]]), axis=2)
 
     img =  rsvis.tools.imgtools.stack_image_dim(img)
 

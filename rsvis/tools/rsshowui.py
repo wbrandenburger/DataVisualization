@@ -109,7 +109,11 @@ class RSShowUI():
 
         if path:
             return img_container.path
-        return img_container.data
+        else:
+            img = img_container.data
+            if get_number_of_channel(img) > 3:
+                img = self.get_img_channel(self, index=None)
+        return img
 
 
     #   method --------------------------------------------------------------
