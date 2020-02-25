@@ -13,10 +13,9 @@ import numpy as np
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_number_of_channel(img):
-    if len(img.shape) == 2:
-        return 1
-
-    return img.shape[2]
+    if len(img.shape) == 3:
+        return img.shape[2]
+    return None
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -123,7 +122,7 @@ class ImgContainer(rsvis.tools.objcontainer.ObjContainer):
         data = self.data
         if channel:
             number_channel = get_number_of_channel(data)
-            if number_channel != 1:
+            if number_channel:
                 return data[..., channel]
         return data
 
