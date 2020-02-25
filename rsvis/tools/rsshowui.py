@@ -52,8 +52,8 @@ class RSShowUI():
         self.scrollbar.config(command=self.listbox.yview)
         self.scrollbar.pack(side="left", fill="y")
         self.listbox.pack(side="left", fill="y")
-        for i in range(len(self._data)):
-           self.listbox.insert(END, i)
+        for count, item in enumerate(self._data):
+           self.listbox.insert(END, count)
 
         
         self.set_img_from_index()
