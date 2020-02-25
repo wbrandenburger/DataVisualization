@@ -10,13 +10,6 @@ import pathlib
 import tifffile
 import numpy as np
 
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-def get_number_of_channel(img):
-    if len(img.shape) == 3:
-        return img.shape[2]
-    return None
-
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 class ImgListContainer(list):
@@ -115,16 +108,6 @@ class ImgContainer(rsvis.tools.objcontainer.ObjContainer):
                 self.obj = self.imread() 
 
         return super(ImgContainer, self).data
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_data(self, channel=None):
-        data = self.data
-        if isinstance(channel,int):
-            number_channel = get_number_of_channel(data)
-            if number_channel:
-                return data[..., channel]
-        return data
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
