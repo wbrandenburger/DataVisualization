@@ -119,7 +119,7 @@ class RSShowUI():
         else:
             img = img_container.data
             self._img_channel = rsvis.tools.index.Index(get_number_of_channel(img))
-            print(type(self._index_channel)
+            print(type(self._index_channel))
 
         return img
 
