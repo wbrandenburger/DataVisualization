@@ -111,7 +111,9 @@ class RSShowUI():
         if path:
             return img_container.path
 
-        if not isinstance(self._index_channel, rsvis.tools.index.Index):
+        print(type(rsvis.tools.index.Index))
+        print(type(self._index_channel))
+        if isinstance(self._index_channel, rsvis.tools.index.Index):
             print("Huhu")
             img = img_container.get_data(self._index_channel())
             self._index_channel.next()
