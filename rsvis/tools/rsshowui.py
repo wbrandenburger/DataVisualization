@@ -9,6 +9,7 @@ import rsvis.tools.index
 from tkinter import *
 from PIL import Image, ImageTk
 import numpy as np
+import pathlib 
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -53,7 +54,7 @@ class RSShowUI():
         self.scrollbar.pack(side="left", fill="y")
         self.listbox.pack(side="left", fill="y")
         for count, item in enumerate(self._data):
-           self.listbox.insert(END, item[0].path)
+           self.listbox.insert(END, pathlib.Path(item[0].path).stem)
 
         
         self.set_img_from_index()
