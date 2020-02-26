@@ -130,7 +130,7 @@ class RSShowUI():
         if isinstance(self._index_channel, rsvis.tools.index.Index):
             number_channel = get_number_of_channel(img)
             if number_channel:
-                img = img[..., self._index_channel()]
+                img = np.stack([img[..., self._index_channel()]]*3, axis=2)
                 self._index_channel.next()
                 return img
 
