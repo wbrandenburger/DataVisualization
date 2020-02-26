@@ -231,13 +231,15 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_y(self, **kwargs):
-        self._index_channel.last()
+        if isinstance(self._index_channel, rsvis.tools.index.Index):
+            self._index_channel.last()
         self.set_img(self.get_img_channel(), show=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_x(self, **kwargs):
-        self._index_channel.next()
+        if isinstance(self._index_channel, rsvis.tools.index.Index):
+            self._index_channel.next()
         self.set_img(self.get_img_channel(), show=True)
 
     #   method --------------------------------------------------------------
