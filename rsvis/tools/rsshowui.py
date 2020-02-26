@@ -231,14 +231,14 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_y(self, **kwargs):
-        self.set_img(self.get_img_channel(), show=True)
         self._index_channel.last()
+        self.set_img(self.get_img_channel(), show=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_x(self, **kwargs):
-        self.set_img(self.get_img_channel(), show=True)
         self._index_channel.next()
+        self.set_img(self.get_img_channel(), show=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
