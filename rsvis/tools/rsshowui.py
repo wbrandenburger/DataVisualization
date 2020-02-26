@@ -131,7 +131,6 @@ class RSShowUI():
             number_channel = get_number_of_channel(img)
             if number_channel:
                 img = rsvis.tools.imgtools.project_and_stack(img[..., self._index_channel()])
-                self._index_channel.next()
                 return img
 
         return img
@@ -231,8 +230,15 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def key_y(self, **kwargs):
+        self.set_img(self.get_img_channel(), show=True)
+        self._index_channel.last()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def key_x(self, **kwargs):
         self.set_img(self.get_img_channel(), show=True)
+        self._index_channel.next()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
