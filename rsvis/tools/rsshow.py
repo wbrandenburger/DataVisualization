@@ -34,6 +34,7 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             img.append(path = f, spec=s, live=live)
         img_set.append(img)
 
+    print(param_label)
     label_index = rsvis.tools.objindex.ObjIndex(rsvis.tools.imgtools.project_dict_to_img(param_label.copy()))
    
     keys = {
