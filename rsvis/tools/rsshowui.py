@@ -146,11 +146,11 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img_from_spec(self, spec, path=False):
+    def get_img_from_spec(self, spec, path=False, show=True):
         if spec:
             try:
                 index = self._data[self._index()].index(spec)
-                return self.get_img(index=index, path=path)
+                return self.get_img(index=index, path=path, show=show)
             except ValueError:
                 return None 
 

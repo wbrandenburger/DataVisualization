@@ -93,7 +93,7 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
         ),
         "key_r": lambda obj: obj.set_img(
                 rsvis.tools.imgtools.get_sub_img(
-                    obj.get_img_from_spec("msi"), 
+                    obj.get_img_from_spec("msi", show=False), 
                     msi_index()
             ),
             show=True
