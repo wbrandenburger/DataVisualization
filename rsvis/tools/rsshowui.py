@@ -112,17 +112,19 @@ class RSShowUI():
         else:
             img = img_container.data
             if get_number_of_channel(img) > 3:
-                img = self.get_img_channel()
+                img = self.get_img_channel(img=img)
         return img
 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img_channel(self, index=None):
+    def get_img_channel(self, index=None, img=np.ndarray(0)):
         index = self._index_spec() if not index else index
         img_container = self._data[self._index()][index]
-
-        img = img_container.data
+        
+        if not len(img):
+            img = img_container.data
+            
         if not isinstance(self._index_channel, rsvis.tools.index.Index):
             if get_number_of_channel(img):
                 self._index_channel = rsvis.tools.index.Index(get_number_of_channel(img))
