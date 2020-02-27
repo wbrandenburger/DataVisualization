@@ -35,6 +35,8 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
         img_set.append(img)
 
     label_index = rsvis.tools.objindex.ObjIndex(rsvis.tools.imgtools.project_dict_to_img(param_label.copy()))
+    if param_msi:
+        msi_index = rsvis.tools.objindex.ObjIndex(param_msi.copy())
    
     keys = {
         "key_e" : lambda obj: obj.set_img(
@@ -88,6 +90,13 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             show=True
         ),
         "key_p": lambda obj: save(obj.get_img(path=True), np.array(obj.get_window_img())
+        ),
+        "key_r": lambda obj: obj.set_img(
+                rsvis.tools.imgtools.get_sub_img(
+                    obj.get_img_from_spec("msi"), 
+                    msi_index()
+            ),
+            show=True
         ),
         "key_o": lambda obj: copy(obj.get_img(path=True)),
         "key_u": lambda obj: print(np.unique(obj.get_img_from_spec("label")))
