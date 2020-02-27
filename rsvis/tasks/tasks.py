@@ -26,8 +26,8 @@ def task_rsshow():
             rsvis.config.settings._DATA, 
             rsvis.config.settings._SETTINGS["data-tensor-types"],
             **rsvis.config.settings._SETTINGS["output"],
-            labels=get_value(rsvis.config.settings._SETTINGS,"label", dict()),
-            msi=get_value(rsvis.config.settings._SETTINGS,"msi", list()),
+            param_label=get_value(rsvis.config.settings._SETTINGS,"param_label", dict()),
+            param_msi=get_value(rsvis.config.settings._SETTINGS,"param_msi", list()),
             scale=get_value(rsvis.config.settings._SETTINGS,"scale", 100),
             param_dist=get_value(rsvis.config.settings._SETTINGS,"param_dist", dict())
         )
