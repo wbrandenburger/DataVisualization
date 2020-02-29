@@ -20,7 +20,7 @@ get_value = lambda obj, key, default: obj[key] if key in obj.keys() else default
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def task_rsshow(setting):
+def task_rsshow(setting="training"):
     try:
         rsvis.tools.rsshow.rsshow(
             rsvis.config.settings.get_data(setting),
