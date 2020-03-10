@@ -7,6 +7,7 @@
 import rsvis.__init__
 import rsvis.utils.ply
 import rsvis.config.settings
+import rsvis.tools.imgtools
 
 import tempfile
 import subprocess
@@ -19,16 +20,16 @@ import numpy as np
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_height_map(img, height=dict(), show=False):
-    img_width, img_height, _ = img.shape
-    dim_new =(img_width*img_height)
+    dim_new = (img.shape[0]*img.shape[1])
+    img = rsvis.tools.imgtools.expand_image_dim(img.astype(float))
     
     img = img.astype(float)
 
     if show:
-        height_factor = float(np.max(img))/(float(np.max([img_width, img_height])) / 10)
+        height_factor = float(np.max(img))/(float(np.max([img.shape[0], img.shape[1]])) / 10)
         img = img/height_factor
 
-    grid = np.indices((img_width, img_height), dtype="float")
+    grid = np.indices((img.shape[0], img.shape[1]), dtype="float")
     height.update( 
         {
             'x': grid[0,...].reshape(dim_new).T, 
