@@ -107,9 +107,28 @@ def get_normal_image(img, height, verbose=False, show=False):
     compute_normals(path, verbose=verbose)
     data = read_height_map(path)[["nx", "ny", "nz"]].to_numpy() 
     
-    data[:,0:1] = (127.5*(data[:,0:1] + 1))
-    data[:,2] = 255*(data[:,2])
-    return data.reshape(img.shape).astype(np.uint8)
+    # data[:,0:1] = (127.5*(data[:,0:1] + 1))
+    # data[:,2] = 255*(data[:,2])
+    # return data.reshape(img.shape).astype(np.uint8)
+
+    # data[:,0:2] = (data[:,0:2] + 1.0)*0.5
+    # print(np.min(data[...,0]), np.max(data[...,0]))
+    # print(np.min(data[...,1]), np.max(data[...,1]))
+    # print(np.min(data[...,2]), np.max(data[...,2]))
+    # return (data.reshape(img.shape) * 255).astype(np.uint8)
+
+    # hm =  ((data[:,2].reshape(height.shape[0:2])*(-1)+1)*255).astype(np.uint8)
+    # oh = np.array(
+    #     [0,1,2,3,4,5,6,7,8,9,12,15,18,21,24,29,36,42,47,52,62,72,82,92,102,124,144,166,186,206, 226])
+    # return ((np.digitize(hm, oh).astype("float")/31)*255).astype("uint8")
+
+    hm = data[:,2].reshape(height.shape[0:2])*(-1)+1
+    hm = hm + np.min(hm[hm>0])
+    hm = -np.log(hm)
+    print(np.max(hm[hm<np.inf]))
+    y = np.max(hm[hm<np.inf])
+    hm = (hm / y * 255).astype(np.uint8)
+    return hm
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
