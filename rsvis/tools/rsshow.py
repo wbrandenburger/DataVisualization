@@ -64,7 +64,8 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             np.array(obj.get_window_img()), 
             obj.get_img_from_spec("height"),
             normals=True,
-            mesh=True
+            mesh=True,
+            show=True
         ),       
         "key_v": lambda obj: rsvis.tools.heightmap.main(
             np.array(obj.get_window_img()),
@@ -72,12 +73,14 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             obj.get_img_from_spec("label"),
             normals=True,
             mesh=True,
-            ccviewer=False
+            ccviewer=False,
+            show=True
         ),
         "key_b": lambda obj: obj.set_img(
             rsvis.tools.heightmap.get_normal_image(
                 np.array(obj.get_window_img()), 
-                obj.get_img_from_spec("height")
+                obj.get_img_from_spec("height"),
+                show=True
             ),
             show=True
         ), 

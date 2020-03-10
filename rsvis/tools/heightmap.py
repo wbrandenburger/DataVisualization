@@ -1,5 +1,5 @@
 # ===========================================================================
-#   pctools.py --------------------------------------------------------------
+#   heightmap.py ------------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -18,13 +18,15 @@ import numpy as np
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_height_map(img, height=dict()):
+def get_height_map(img, height=dict(), show=False):
     img_width, img_height, _ = img.shape
     dim_new =(img_width*img_height)
-    height_factor = float(np.max(img))/(float(np.max([img_width, img_height])) / 10)
+    
+    img = img.astype(float)
 
-    #print(height_factor)
-    img = img.astype(float)/height_factor
+    if show:
+        height_factor = float(np.max(img))/(float(np.max([img_width, img_height])) / 10)
+        img = img/height_factor
 
     grid = np.indices((img_width, img_height), dtype="float")
     height.update( 
@@ -69,8 +71,8 @@ def add_intensity_to_height_map(img, height=dict()):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_colorized_height_map(img, height, label=None):
-    data = get_height_map(height)
+def get_colorized_height_map(img, height, label=None, show=False):
+    data = get_height_map(height, show=show)
     data = colorize_height_map(img, data)
     try:
         data = add_intensity_to_height_map(label, data)
@@ -94,8 +96,8 @@ def read_height_map(path):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_normal_image(img, height, verbose=False):
-    data = get_colorized_height_map(img, height)
+def get_normal_image(img, height, verbose=False, show=False):
+    data = get_colorized_height_map(img, height, show=show)
 
     # create a temporary file
     path = tempfile.mkstemp(prefix="rsvis-", suffix=".ply")[1]
@@ -150,9 +152,9 @@ def open_height_map(path, ccviewer=False):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def main(img, height, label=None, verbose=False, normals=False, mesh=False, ccviewer=True, attempt=False):
+def main(img, height, label=None, verbose=False, normals=False, mesh=False, ccviewer=True, attempt=False, show=False):
 
-    data = get_colorized_height_map(img, height, label=label)
+    data = get_colorized_height_map(img, height, label=label, show=show)
 
     # create a temporary file
     path = tempfile.mkstemp(prefix="rsvis-", suffix=".ply")[1]
