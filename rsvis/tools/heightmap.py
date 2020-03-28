@@ -97,38 +97,24 @@ def read_height_map(path):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_normal_image(img, height, verbose=False, show=False):
+def get_normal_image(img, height, bins=None, verbose=False, show=False):
     data = get_colorized_height_map(img, height, show=show)
 
     # create a temporary file
-    path = tempfile.mkstemp(prefix="rsvis-", suffix=".ply")[1]
+    path = tempfile.mkstemp(prefix="shdw-", suffix=".ply")[1]
     write_height_map(img, data, path)
 
     compute_normals(path, verbose=verbose)
-    data = read_height_map(path)[["nx", "ny", "nz"]].to_numpy() 
-    
-    # data[:,0:1] = (127.5*(data[:,0:1] + 1))
-    # data[:,2] = 255*(data[:,2])
-    # return data.reshape(img.shape).astype(np.uint8)
 
-    # data[:,0:2] = (data[:,0:2] + 1.0)*0.5
-    # print(np.min(data[...,0]), np.max(data[...,0]))
-    # print(np.min(data[...,1]), np.max(data[...,1]))
-    # print(np.min(data[...,2]), np.max(data[...,2]))
-    # return (data.reshape(img.shape) * 255).astype(np.uint8)
+    normals = read_height_map(path)["nz"].to_numpy().reshape(height.shape)*(-1.)+1. 
+    normals = np.where(normals>0., normals, np.min(normals[normals>0.]))
+    normals = rsvis.tools.imgtools.project_data_to_img(-np.log(normals))
 
-    # hm =  ((data[:,2].reshape(height.shape[0:2])*(-1)+1)*255).astype(np.uint8)
-    # oh = np.array(
-    #     [0,1,2,3,4,5,6,7,8,9,12,15,18,21,24,29,36,42,47,52,62,72,82,92,102,124,144,166,186,206, 226])
-    # return ((np.digitize(hm, oh).astype("float")/31)*255).astype("uint8")
+    if bins:
+        normals = np.ceil(normals*bins)
+        normals = (np.where(normals==0., 1., normals) - 1.)/(bins-1.)
 
-    hm = data[:,2].reshape(height.shape[0:2])*(-1)+1
-    hm = hm + np.min(hm[hm>0])
-    hm = -np.log(hm)
-    print(np.max(hm[hm<np.inf]))
-    y = np.max(hm[hm<np.inf])
-    hm = (hm / y * 255).astype(np.uint8)
-    return hm
+    return normals
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

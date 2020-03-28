@@ -33,8 +33,8 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             live = False if s == "label" else True
             img.append(path = f, spec=s, live=live)
         img_set.append(img)
-
-    label_index = rsvis.tools.objindex.ObjIndex(rsvis.tools.imgtools.project_dict_to_img(param_label.copy()))
+    
+    label_index = rsvis.tools.objindex.ObjIndex(rsvis.tools.imgtools.project_dict_to_img(param_label.copy(), dtype=np.uint8, factor=255))
     if param_msi:
         msi_index = rsvis.tools.objindex.ObjIndex(param_msi.copy())
    
@@ -80,7 +80,7 @@ def rsshow(files, specs, path_dir=os.environ.get("TEMP"), path_name="{}", regex=
             rsvis.tools.heightmap.get_normal_image(
                 np.array(obj.get_window_img()), 
                 obj.get_img_from_spec("height"),
-                show=True
+                show=True,
             ),
             show=True
         ), 

@@ -44,9 +44,9 @@ def get_image(path, spec="image", param_label=dict(), scale=100, show=False):
     img = rsvis.tools.imgtools.resize_img(read_image(path), scale)
     if param_label and spec == "label":
         img = rsvis.tools.imgtools.labels_to_image(img, param_label)
-    if show and spec in ["label", "height", "msi"]:
-        img = rsvis.tools.imgtools.project_data_to_img(img)
     if show:
-        img =  rsvis.tools.imgtools.stack_image_dim(img)
+        img = rsvis.tools.imgtools.project_data_to_img(img, dtype=np.uint8, factor=255)
+    if show:
+        img = rsvis.tools.imgtools.stack_image_dim(img)
     return img
     
