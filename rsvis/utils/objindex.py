@@ -4,11 +4,11 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.tools.index
+import rsvis.utils.index
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class ObjIndex(rsvis.tools.index.Index):
+class ObjIndex(rsvis.utils.index.Index):
 
     def __init__(self, obj):
         self._obj = obj

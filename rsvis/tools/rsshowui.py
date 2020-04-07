@@ -4,8 +4,8 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.tools.index
-import rsvis.tools.imgtools
+import rsvis.utils.index
+from rsvis.utils import imgtools
 
 from tkinter import *
 from PIL import Image, ImageTk
@@ -29,8 +29,8 @@ class RSShowUI():
         self._data = data
         self.set_keys(keys)
 
-        self._index = rsvis.tools.index.Index(len(self._data))
-        self._index_spec = rsvis.tools.index.Index(len(self._data[0]))
+        self._index = rsvis.utils.index.Index(len(self._data))
+        self._index_spec = rsvis.utils.index.Index(len(self._data[0]))
         self._index_channel = None
 
         self.clear()
@@ -111,12 +111,25 @@ class RSShowUI():
             return img_container.path
         else:
             img = img_container.data
+            self.get_log(img_container)
             if show:
                 if get_number_of_channel(img) > 3:
                     img = self.get_img_channel(img=img)
 
         return img
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_log(self, img_container):
+        try: 
+            import pathlib
+            log = img_container.log
+            if pathlib.Path(log).is_file():
+                with open(log, "r") as f:
+                    print(f.read())
+            # print("Log: {}, File: {}".format(log,pathlib.Path(log).is_file()))
+        except TypeError:
+            pass
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -127,14 +140,14 @@ class RSShowUI():
         if not len(img):
             img = img_container.data
 
-        if not isinstance(self._index_channel, rsvis.tools.index.Index):
+        if not isinstance(self._index_channel, rsvis.utils.index.Index):
             if get_number_of_channel(img):
-                self._index_channel = rsvis.tools.index.Index(get_number_of_channel(img))
+                self._index_channel = rsvis.utils.index.Index(get_number_of_channel(img))
         
-        if isinstance(self._index_channel, rsvis.tools.index.Index):
+        if isinstance(self._index_channel, rsvis.utils.index.Index):
             number_channel = get_number_of_channel(img)
             if number_channel:
-                img = rsvis.tools.imgtools.project_and_stack(img[..., self._index_channel()])
+                img = imgtools.project_and_stack(img[..., self._index_channel()])
                 return img
 
         return img
@@ -235,14 +248,14 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_y(self, **kwargs):
-        if isinstance(self._index_channel, rsvis.tools.index.Index):
+        if isinstance(self._index_channel, rsvis.utils.index.Index):
             self._index_channel.last()
         self.set_img(self.get_img_channel(), show=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_x(self, **kwargs):
-        if isinstance(self._index_channel, rsvis.tools.index.Index):
+        if isinstance(self._index_channel, rsvis.utils.index.Index):
             self._index_channel.next()
         self.set_img(self.get_img_channel(), show=True)
 

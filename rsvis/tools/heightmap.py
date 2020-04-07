@@ -7,7 +7,7 @@
 import rsvis.__init__
 import rsvis.utils.ply
 import rsvis.config.settings
-import rsvis.tools.imgtools
+from rsvis.utils import imgtools
 
 import tempfile
 import subprocess
@@ -21,7 +21,7 @@ import numpy as np
 # ---------------------------------------------------------------------------
 def get_height_map(img, height=dict(), show=False):
     dim_new = (img.shape[0]*img.shape[1])
-    img = rsvis.tools.imgtools.expand_image_dim(img.astype(float))
+    img = imgtools.expand_image_dim(img.astype(float))
     
     img = img.astype(float)
 
@@ -108,7 +108,7 @@ def get_normal_image(img, height, bins=None, verbose=False, show=False):
 
     normals = read_height_map(path)["nz"].to_numpy().reshape(height.shape)*(-1.)+1. 
     normals = np.where(normals>0., normals, np.min(normals[normals>0.]))
-    normals = rsvis.tools.imgtools.project_data_to_img(-np.log(normals))
+    normals = imgtools.project_data_to_img(-np.log(normals))
 
     if bins:
         normals = np.ceil(normals*bins)
