@@ -9,10 +9,18 @@ import rsvis.utils.general as glu
 import rsvis.utils.imgcontainer
 
 import numpy as np
+import pathlib
 import PIL
 import shutil
 import tifffile
 
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def read_log(path):
+    _logger.debug("[READ] '{}'".format(path))
+    with open(path, "r") as f:
+        return f.read()
+        
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def read_image(path):

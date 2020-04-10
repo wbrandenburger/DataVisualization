@@ -6,6 +6,7 @@
 # ---------------------------------------------------------------------------
 import rsvis.utils.index
 from rsvis.utils import imgtools
+import rsvis.utils.imgio
 
 from tkinter import *
 from PIL import Image, ImageTk
@@ -125,11 +126,10 @@ class RSShowUI():
             import pathlib
             log = img_container.log
             if pathlib.Path(log).is_file():
-                with open(log, "r") as f:
-                    print(f.read())
-            # print("Log: {}, File: {}".format(log,pathlib.Path(log).is_file()))
+                print(rsvis.utils.imgio.read_log(log))
         except TypeError:
             pass
+
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
