@@ -30,7 +30,7 @@ def task_test_code():
     import numpy as np
 
     files = rsvis.config.settings._DATA, 
-    types = rsvis.config.settings._SETTINGS["data-tensor-types"]
+    types = rsvis.config.settings._SETTINGS["param_specs"]
 
     a = rsvis.utils.objcontainer.ObjContainer(np.ones((2,3)))
     print(a)

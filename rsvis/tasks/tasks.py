@@ -22,7 +22,7 @@ def task_default():
 def task_rsshow(setting="training"):
     rsvis.tools.rsshow.rsshow(
         rsvis.config.settings.get_data(setting),
-        rsvis.config.settings._SETTINGS["data-tensor-types"],
+        rsvis.config.settings._SETTINGS["param_specs"],
         rsvis.config.settings._SETTINGS["param_io"],
         param_log=glu.get_value(
             rsvis.config.settings._SETTINGS,"param_log", dict()),
