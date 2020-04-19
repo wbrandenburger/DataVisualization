@@ -17,14 +17,14 @@ import tifffile
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def read_log(path):
-    _logger.debug("[READ] '{}'".format(path))
+    _logger.info("[READ] '{}'".format(path))
     with open(path, "r") as f:
         return f.read()
         
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def read_image(path):
-    _logger.debug("[READ] '{}'".format(path))
+    _logger.info("[READ] '{}'".format(path))
     
     if str(path).endswith(".tif"):
         img = tifffile.imread(path)
@@ -36,7 +36,7 @@ def read_image(path):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def save_image(dest, img):
-    _logger.debug("[SAVE] '{}'".format(dest))
+    _logger.info("[SAVE] '{}'".format(dest))
 
     if str(dest).endswith(".tif"):
         tifffile.imwrite(dest, img)
@@ -46,7 +46,7 @@ def save_image(dest, img):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def copy_image(path, dest):
-    _logger.debug("[COPY] '{}'".format(dest))
+    _logger.info("[COPY] '{}'".format(dest))
     shutil.copy2(path, dest)
 
 #   function ----------------------------------------------------------------
@@ -59,16 +59,19 @@ def get_image(
         show=False, 
         **kwargs
     ):
+    img = read_image(path)
 
-    img = imgtools.resize_img(read_image(path), scale)
+    if show:
+        _logger.info(imgtools.get_array_info(img))
+
+    if scale < 100:
+        img = imgtools.resize_img(img, scale)
 
     if param_label and spec == "label":
         img = imgtools.labels_to_image(img, param_label)
 
     if show:
-        img = imgtools.project_data_to_img(img, dtype=np.uint8, factor=255)
-    if show:
-        img =  imgtools.stack_image_dim(img)
+        img = imgtools.project_data_to_img(imgtools.stack_image_dim(img), dtype=np.uint8, factor=255)
 
     return img
     

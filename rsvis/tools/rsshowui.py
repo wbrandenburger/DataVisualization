@@ -155,7 +155,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_window_img(self):
-        return self.img_copy
+        return np.asarray(self.img_copy)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -276,4 +276,12 @@ class RSShowUI():
         self.bg.focus_set()
         self._mouse_area.append((event.x, event.y))
         self._mouse_point = (event.x, event.y)
-        print("point: {}, area: {}".format(self._mouse_point, self._mouse_area))
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    # def get_window_img_value(self):
+    #     # self.width, self.height
+    #     print(self.width, self.height, np.asarray(self.img_copy).shape)
+    #     # print("point: {}, area: {}".format(self._mouse_point, self._mouse_area))
+    #     # print("Point: {}, Value: {}".format(self._mouse_point, self.get_window_img_value()))
+    #     # return np.asarray(self.img)[self._mouse_point[1], self._mouse_point[0], :]

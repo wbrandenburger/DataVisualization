@@ -4,7 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.__init__
+from rsvis.__init__ import _logger
 import rsvis.utils.ply
 import rsvis.config.settings
 from rsvis.utils import imgtools
@@ -87,7 +87,7 @@ def write_height_map(img, height, path):
     data = pandas.DataFrame(height, index=range(img.shape[0]*img.shape[1]))
 
     # write to temporary file
-    rsvis.__init__._logger.debug("Write point information to file {}".format(path))
+    _logger.info("[SAVE] '{}'".format(path))
     rsvis.utils.ply.write_ply(path, points=data)
 
 #   function ----------------------------------------------------------------
