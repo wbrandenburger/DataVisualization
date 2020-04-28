@@ -31,7 +31,7 @@ class TopWindow(Toplevel):
         self.rowconfigure(1, pad=3)
 
         button = ttk.Button(self, text="OK", 
-            command=lambda toplevel=self: command(toplevel)
+            command=lambda toplevel=self, title=title: command(toplevel, title)
         )
         button.grid(row=1, column=0, columnspan=2)
 

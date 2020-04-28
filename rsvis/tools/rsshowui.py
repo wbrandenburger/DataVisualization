@@ -29,7 +29,7 @@ def get_number_of_channel(img):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def quit_window(window):
+def quit_window(window, **kwargs):
     """Exit Window."""   
     # window.quit()
     window.destroy()
@@ -159,7 +159,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def new_popup(self, title="Box", dtype="msg", value=""):
-        t = rsvis.tools.topwindow.TopWindow(title=title, dtype=dtype, value=value, command=quit_window)
+        t = rsvis.tools.topwindow.TopWindow(title=title, dtype=dtype, value=value, command=self.quit_window)
         t.wm_deiconify()
         t.mainloop()
 
@@ -174,10 +174,16 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def quit(self, window, title=None, **kwargs):
-        """Exit RSVis."""
+    def quit_window(self, window, title=None, **kwargs):
+        """Exit Window."""
         if title=="Help":
             self._popup_help = 0       
+        window.destroy()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def quit(self, window, **kwargs):
+        """Exit RSVis."""   
         window.quit()
         window.destroy()
 
