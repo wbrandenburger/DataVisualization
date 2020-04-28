@@ -60,13 +60,14 @@ class Patches():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_patch(self, patch):
-        return self._img[patch[0]:patch[1], patch[0]:patch[1], :]
+        return self._img[patch[0]:patch[1], patch[2]:patch[3], :]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_patch_from_point(self, point):
         for patch in self._patch:
             if point[0] >= patch[0] and point[0] < patch[1] and point[1] >= patch[2] and point[1] < patch[3]:
+
                 return self.get_patch(patch)
 
     #   method --------------------------------------------------------------

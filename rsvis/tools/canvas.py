@@ -158,6 +158,7 @@ class ImageCanvas(Canvas):
             self.mouse_point = [event.x, event.y]
 
             idx = self.get_img_value()
-
+            
             patch = self.patches.get_patch_from_point(idx)
+
             self.double_button(title="Histogram", dtype="img", value=[patch,imgtools.get_histogram(patch)])
