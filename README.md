@@ -1,9 +1,5 @@
 # README
 
-## Repository
-
-The source code can be found under the following [link](https://github.com/wbrandenburger/DataVisualization).
-
 ## Install
 
 If `git` is installed on your personal computer, start a virtual environment in `python` and run the following installation command
