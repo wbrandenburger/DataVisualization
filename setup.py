@@ -34,7 +34,7 @@ setuptools.setup(
         # - python project packages - 
         "colorama==0.4.3",
         "click==7.1.2",
-        "stevedore==1.33.0",
+        "stevedore==1.32.0",
         "configparser==5.0.0",
         "pyyaml==5.3.1",
         "pandas==1.0.3",
