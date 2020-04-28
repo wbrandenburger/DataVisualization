@@ -11,8 +11,6 @@ from rsvis.utils import imgtools
 import rsvis.utils.imgio
 import rsvis.utils.objindex
 
-import numpy as np
-
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def rsshow(
@@ -22,7 +20,7 @@ def rsshow(
         param_log=dict(),
         param_label=dict(), 
         param_msi=list(), 
-        param_dist=dict(),
+        param_dist=dict(), # param?
         param_show=dict()
     ):
         
@@ -32,10 +30,7 @@ def rsshow(
     # -----------------------------------------------------------------------
     img_in, img_out, _ , get_path = rsvis.utils.imgio.get_data(files, param_specs, param_io, param_log=param_log, param_label=param_label, param_show=param_show)
     
-    img_cpy = lambda path: rsvis.utils.imgio.copy_image(path, get_path(path))
-    label_index = rsvis.utils.objindex.ObjIndex(imgtools.project_dict_to_img(param_label.copy(), dtype=np.uint8, factor=255))
+    keys, keys_description = rsvis.tools.keys.get_keys(param_specs, img_out, param_label=param_label)
 
-    keys = rsvis.tools.keys.get_keys(label_index, img_out, img_cpy, param_dist, param_msi)
-
-    ui = rsvis.tools.rsshowui.RSShowUI(img_in, keys=keys)
+    ui = rsvis.tools.rsshowui.RSShowUI(img_in, keys=keys, description=keys_description, logger=_logger, **param_show)
     ui.imshow(wait=True)

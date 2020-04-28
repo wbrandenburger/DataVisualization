@@ -5,11 +5,15 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 import rsvis.__init__
+import rsvis.utils.patches
 
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import ndimage
+import matplotlib.pyplot as plt
+from PIL import Image
+from io import BytesIO
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -61,8 +65,9 @@ def resize_img(img, scale):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def project_and_stack(img):
-    return stack_image_dim(project_data_to_img(img))
+def project_and_stack(img, dtype=np.float32, factor=1.0):
+    img = stack_image_dim(project_data_to_img(img, dtype=dtype, factor=factor))
+    return img
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -81,6 +86,25 @@ def project_data_to_img(img, dtype=np.float32, factor=1.0):
 def project_dict_to_img(obj, dtype=np.float32, factor=1.0):
     img = np.fromiter(obj.values(), dtype=dtype)
     return project_data_to_img(img, dtype=dtype, factor=factor)
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_histogram(img,alpha=0.7):    
+    fig = plt.figure(dpi=64)
+    color = ('b','g','r')
+    for channel, col in enumerate(color):
+        histr = cv2.calcHist([img], [channel], None, [256], [0,256])
+        plt.plot(histr, color = col)
+        plt.xlim([0,256])
+    plt.title('Histogram for color scale picture')
+
+    png1 = BytesIO()
+    fig.savefig(png1, format='png')
+    hist = np.asarray(Image.open(png1))
+    png1.close()
+    plt.close()
+    
+    return hist
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -160,3 +184,27 @@ def get_distance_transform(img, label=0, threshold=10):
 # ---------------------------------------------------------------------------
 def get_sub_img(img, channels):
     return img[...,channels]
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_grid_image(shape, patches, color=[255, 0 ,0]):
+    grid_img = np.zeros(shape, dtype=np.uint8)
+    for patch in patches:
+        for i in range(len(patch)):
+            patch[i] = patch[i]-1 if patch[i] else patch[i]
+        grid_img[patch[0]:patch[1] + 1, patch[2], :] = np.array(color)
+        grid_img[patch[0]:patch[1] + 1, patch[3], :] = np.array(color)
+        grid_img[patch[0], patch[2]:patch[3] + 1, :] = np.array(color)
+        grid_img[patch[1], patch[2]:patch[3] + 1, :] = np.array(color)
+    return grid_img
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_transparent_image(img, method="any"):
+    # Creating RGBA images
+    # https://pythoninformer.com/python-libraries/numpy/numpy-and-images/
+    alpha_img = np.zeros((img.shape[0], img.shape[1], 4), dtype=np.uint8)
+    alpha_img[:, :, 0:3] = img
+    if method=="any":
+        alpha_img[:,:,3] = np.where(np.sum(img, axis=2)>0, 255, 0)
+    return alpha_img
