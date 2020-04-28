@@ -187,7 +187,7 @@ class RSShowUI():
         """Show help."""
         if not self._popup_help:
             self._popup_help = 1
-            self.new_popup(title="Help", dtype="msg", msg=self.get_key_description())
+            self.new_popup(title="Help", dtype="msg", value=self.get_key_description())
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
