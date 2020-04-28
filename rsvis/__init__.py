@@ -36,7 +36,6 @@ try:
     logging.basicConfig(format=log_format)
 
     _logger = logging.getLogger("rsvis")
-    _logger.setLevel(logging.INFO)
     if os.environ.get("RSVIS_DEBUG"):
         _logger.setLevel(logging.DEBUG)
 except ImportError:
