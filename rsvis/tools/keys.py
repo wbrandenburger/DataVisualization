@@ -31,7 +31,7 @@ def get_general_keys():
         "key_e" : lambda obj: obj.set_img(obj.get_img(), show=True),
         
         # Raise the contrast of the currently displayed image.
-        "key_t" : lambda obj: obj.set_img(imgtools.raise_contrast(obj.get_window_img()), show=True),
+        "key_r" : lambda obj: obj.set_img(imgtools.raise_contrast(obj.get_window_img()), show=True),
 
         # # Show the histogram of the displayed image.
         # "key_1" : lambda obj:  obj.set_pop_up_img(imgtools.get_histogram(obj.get_window_img())),
@@ -39,7 +39,7 @@ def get_general_keys():
 
     keys_description = {
         "e" : "Return to the current original image.",
-        "t" : "Raise the contrast of the currently displayed image."
+        "r" : "Raise the contrast of the currently displayed image."
     }
 
     return keys, keys_description
