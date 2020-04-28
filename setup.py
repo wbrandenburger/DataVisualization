@@ -43,8 +43,8 @@ setuptools.setup(
         "pillow",
         "tifffile",
         # - python numerical analysis packages -
-        "matplotlib"
-        "numpy"
+        "matplotlib",
+        "numpy",
     ],
     python_requires=">=3",
     classifiers=[
