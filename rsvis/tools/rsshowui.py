@@ -14,8 +14,6 @@ import rsvis.tools.settingsbox
 import rsvis.tools.topwindow
 
 from tkinter import *
-from tkinter import ttk
-from PIL import Image, ImageTk
 import numpy as np
 import pandas as pd
 import pathlib 
@@ -33,8 +31,9 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, data, keys=dict(), description=dict(), grid=list(), logger=None, **kwargs):
+    def __init__(self, data, img_out, keys=dict(), description=dict(), grid=list(),  logger=None, **kwargs):
         self._data = data
+        self._img_out = img_out
         self.set_keys(keys, description=description)
 
         self._index = rsvis.utils.index.Index(len(self._data))
@@ -101,7 +100,8 @@ class RSShowUI():
         self.menubar = Menu(self.window)
         filemenu = Menu(self.menubar, tearoff=0)
         filemenu.add_command(label="Open")
-        filemenu.add_command(label="Save")
+        # Save the currently displayed image to a given folder.
+        filemenu.add_command(label="Save", command=lambda obj=self: obj._img_out(obj.get_img(path=True), obj.get_window_img()))
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.window.quit)
         self.menubar.add_cascade(label="File", menu=filemenu)

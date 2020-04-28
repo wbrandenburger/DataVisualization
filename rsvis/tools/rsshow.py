@@ -30,7 +30,7 @@ def rsshow(
     # -----------------------------------------------------------------------
     img_in, img_out, _ , get_path = rsvis.utils.imgio.get_data(files, param_specs, param_io, param_log=param_log, param_label=param_label, param_show=param_show)
     
-    keys, keys_description = rsvis.tools.keys.get_keys(param_specs, img_out, param_label=param_label)
+    keys, keys_description = rsvis.tools.keys.get_keys(param_specs, param_label=param_label)
 
-    ui = rsvis.tools.rsshowui.RSShowUI(img_in, keys=keys, description=keys_description, logger=_logger, **param_show)
+    ui = rsvis.tools.rsshowui.RSShowUI(img_in, img_out, keys=keys, description=keys_description, logger=_logger, **param_show)
     ui.imshow(wait=True)

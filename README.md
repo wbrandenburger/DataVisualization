@@ -6,18 +6,30 @@ The source code can be found under the following [link](https://github.com/wbran
 
 ## Install
 
-Start a virtual environment in `Python` and run the following installation command
+If `git` is installed on your personal computer, start a virtual environment in `python` and run the following installation command
 
 ```PowerShell
 pip install -e git+http://github.com/wbrandenburger/DataVisualization.git#egg=rsvis
 ```
 
-## Dataset
+Otherwise, download the source code of the repository to an arbitrary path and install the package via
+
+```PowerShell
+pip install -e git+file:///path/to/your/git/repo#egg=rsvis
+```
+
+or
+
+```PowerShell
+python path/to/your/git/repo/setup.py install develop
+```
 
 ## Run RSVis
 
-Navigate to the main folder with lecture's dataset and run the following command
+Start the virtual environment in python where the data visualization package is located and navigate to the main folder with the dataset of the lecture and run the following command
 
 ```PowerShell
 rsvis run "lecture.yaml" --task_set tasks --task rsshow
 ```
+
+![RSVis](temp/rsvis.png)

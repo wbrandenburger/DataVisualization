@@ -12,8 +12,8 @@ import numpy as np
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_keys(param_specs, img_out, param_label=dict()):
-    keys, keys_description = get_general_keys(img_out)
+def get_keys(param_specs, param_label=dict()):
+    keys, keys_description = get_general_keys()
     if "label" in param_specs:
         keys_optional = get_label_keys(param_label)
     
@@ -24,14 +24,11 @@ def get_keys(param_specs, img_out, param_label=dict()):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_general_keys(img_out):
+def get_general_keys():
 
     keys = {
         # Return to the current original image."
         "key_e" : lambda obj: obj.set_img(obj.get_img(), show=True),
-        
-        # Save the currently displayed image to a given folder.
-        "key_r": lambda obj: img_out(obj.get_img(path=True), obj.get_window_img()),
         
         # Raise the contrast of the currently displayed image.
         "key_t" : lambda obj: obj.set_img(imgtools.raise_contrast(obj.get_window_img()), show=True),
@@ -42,7 +39,6 @@ def get_general_keys(img_out):
 
     keys_description = {
         "e" : "Return to the current original image.",
-        "r" : "Save the currently displayed image to a given folder.",
         "t" : "Raise the contrast of the currently displayed image."
     }
 
