@@ -41,7 +41,7 @@ setuptools.setup(
         # - python image processing packages -
         "opencv-python==4.2.0.34",
         "pillow==7.1.2",
-        "tifffile=2020.2.16",
+        "tifffile==2020.2.16",
         # - python numerical analysis packages -
         "matplotlib==3.2.1",
         "numpy==1.18.3",
