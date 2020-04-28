@@ -45,6 +45,7 @@ setuptools.setup(
         # - python numerical analysis packages -
         "matplotlib",
         "numpy",
+        "scipy",
     ],
     python_requires=">=3",
     classifiers=[
