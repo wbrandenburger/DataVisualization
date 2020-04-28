@@ -12,7 +12,7 @@ class Patches():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, img, limit=list(), margin=list(), pad=0, sub_patch=list()):
+    def __init__(self, img, limit=list(), margin=list(), pad=0, sub_patch=list(), logger=None):
 
         self._img = img
 
@@ -24,6 +24,8 @@ class Patches():
         self._len = reduce((lambda x, y: x * y), self._sub_patch)
 
         self.set_patches()
+
+        self._logger = logger
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -44,6 +46,17 @@ class Patches():
             return self
         else:
             raise StopIteration
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def logger(self, log_str, stream="info"):
+        if self._logger is None:
+            return
+
+        if stream == "info":
+            self._logger.info(log_str)
+        elif stream == "debug":
+            self._logger.debug(log_str)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -68,6 +81,7 @@ class Patches():
         for patch in self._patch:
             if point[0] >= patch[0] and point[0] < patch[1] and point[1] >= patch[2] and point[1] < patch[3]:
 
+                self.logger("Patch: {}".format(patch))
                 return self.get_patch(patch)
 
     #   method --------------------------------------------------------------

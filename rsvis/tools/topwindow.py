@@ -39,7 +39,8 @@ class TopWindow(Toplevel):
     # -----------------------------------------------------------------------
     def set_msg(self, msg):
         frame = ttk.Label(self, text=msg)# anchor='w' ttk?
-        frame.pack(side=TOP, fill=X, pady=10)
+        frame.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
+        # frame.pack(side=TOP, fill=X, pady=10)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -47,15 +48,7 @@ class TopWindow(Toplevel):
         self.frame_img = ImageTk.PhotoImage(image=Image.fromarray(img))
 
         frame = ttk.Label(self, image=self.frame_img)
-        frame.grid(row=0, column=0, columnspan=2)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def set_img(self, img):
-        self.frame_img = ImageTk.PhotoImage(image=Image.fromarray(img))
-
-        frame = ttk.Label(self, image=self.frame_img)
-        frame.grid(row=0, column=0, columnspan=2)
+        frame.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -72,7 +65,7 @@ class TopWindow(Toplevel):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_canvas(self, img):
-        canvas = Canvas(self, bg="black")
-        canvas.create_image(0, 0, image=self.frame_img, anchor=NW)
-        canvas.grid(row=0, column=index, sticky=N+S+W+E)
+    # def set_canvas(self, img):
+    #     canvas = Canvas(self, bg="black")
+    #     canvas.create_image(0, 0, image=self.frame_img, anchor=NW)
+    #     canvas.grid(row=0, column=0, sticky=N+S+W+E)

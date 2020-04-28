@@ -147,7 +147,7 @@ class ImageCanvas(Canvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_patches(self):
-        self.patches = rsvis.utils.patches.Patches(np.asarray(self.img_resize), sub_patch=self._grid_settings)
+        self.patches = rsvis.utils.patches.Patches(np.asarray(self.img_resize), sub_patch=self._grid_settings, logger=self._logger)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
