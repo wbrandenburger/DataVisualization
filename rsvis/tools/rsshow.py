@@ -6,7 +6,7 @@
 # ---------------------------------------------------------------------------
 from rsvis.__init__ import _logger
 import rsvis.tools.rsshowui
-import rsvis.tools.keys
+import rsvis.tools.options
 from rsvis.utils import imgtools
 import rsvis.utils.imgio
 import rsvis.utils.objindex
@@ -29,8 +29,14 @@ def rsshow(
     #   settings ------------------------------------------------------------
     # -----------------------------------------------------------------------
     img_in, img_out, _ , get_path = rsvis.utils.imgio.get_data(files, param_specs, param_io, param_log=param_log, param_label=param_label, param_show=param_show)
-    
-    keys, keys_description = rsvis.tools.keys.get_keys(param_specs, param_label=param_label)
 
-    ui = rsvis.tools.rsshowui.RSShowUI(img_in, img_out, keys=keys, description=keys_description, logger=_logger, **param_show)
+    ui = rsvis.tools.rsshowui.RSShowUI(
+        img_in, 
+        img_out, 
+        options=rsvis.tools.options.get_options(
+            param_specs, param_label=param_label
+        ), 
+        logger=_logger, 
+        **param_show)
+
     ui.imshow(wait=True)

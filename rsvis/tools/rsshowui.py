@@ -31,10 +31,12 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, data, img_out, keys=dict(), description=dict(), grid=list(),  logger=None, **kwargs):
+    def __init__(self, data, img_out, options=list(), grid=list(),  logger=None, **kwargs):
         self._data = data
         self._img_out = img_out
-        self.set_keys(keys, description=description)
+
+        self._options = options
+        self.set_options(self._options)
 
         self._index = rsvis.utils.index.Index(len(self._data))
         self._index_spec = rsvis.utils.index.Index(len(self._data[0]))
@@ -61,7 +63,7 @@ class RSShowUI():
    
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_keys(self, keys, description=dict()):
+    def set_options(self, options):
         self._keys_description = {
             "F1" : "Show help.",
             "q" : "Exit RSVis.",
@@ -73,12 +75,12 @@ class RSShowUI():
             "y" : "Display the previous single channel of current image.",
             "g" : "Show grid lines in current image.",
         }
-        self._keys_description.update(description)
 
-        if isinstance(keys, dict):
-            self._keys = keys
-        else:
-            self._keys = dict()
+        self._keys = dict()
+        for option in options:
+            if option["key"] is not None:
+                self._keys_description[option["key"]] = option["description"]
+                self._keys["key_{}".format(option["key"])] = option["command"]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -105,12 +107,13 @@ class RSShowUI():
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.window.quit)
         self.menubar.add_cascade(label="File", menu=filemenu)
-
-        editmenu = Menu(self.menubar, tearoff=0)
-        editmenu.add_command(label="Help", command=self.show_help)
-        self.menubar.add_cascade(label="Information", menu=editmenu)
-
+        
+        self.add_option_menu(self._options, label="Options")
         self.window.config(menu=self.menubar)
+        
+        infomenu = Menu(self.menubar, tearoff=0)
+        infomenu.add_command(label="Help", command=self.show_help)
+        self.menubar.add_cascade(label="Information", menu=infomenu)
 
         self.window.columnconfigure(0)
         self.window.columnconfigure(1)
@@ -141,13 +144,41 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def add_menu(self, label, menu=dict()):
-        labelmenu = Menu(self.menubar, tearoff=0)
-        for key in menu.keys(): 
-            print(key)
-            labelmenu.add_command(label=key, command=(lambda obj=self: menu[key](obj)))
+    def invoke(self, command):
+        return command(self)
 
-        self.menubar.add_cascade(label=label, menu=labelmenu)
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def add_option_menu(self, options, label="Default"):
+        optionmenu = Menu(self.menubar, tearoff=0)
+        for option in options: 
+            optionmenu.add_command(label=option["name"], command=lambda cmd=option["command"]: self.invoke(cmd))
+        
+        self.menubar.add_cascade(label=label, menu=optionmenu)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_key_event_name(self, arg):
+        return 'key_' + str(arg)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def has_key(self, arg):
+        return hasattr(self, self.get_key_event_name(arg)) or arg in self._keys 
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_event(self, event):
+        # Get the method from 'self'. Default to a lambda.
+        key_event_name = self.get_key_event_name(event.char)
+
+        if hasattr(self, key_event_name):
+            method = getattr(self, key_event_name, lambda: "Invalid key")
+            # Call the method as we return it
+            return method()
+        elif key_event_name in self._keys:
+            # param = [self.show(index=p) for p in self._keys[key_event_name]["param"]]
+            return self._keys[key_event_name](self) 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -269,30 +300,6 @@ class RSShowUI():
     def listbox_event(self,event):
         self._index(index=self.listbox.curselection()[0])
         self.set_img_from_index(show=True)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_key_event_name(self, arg):
-        return 'key_' + str(arg)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def has_key(self, arg):
-        return hasattr(self, self.get_key_event_name(arg)) or arg in self._keys 
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_event(self, event):
-        # Get the method from 'self'. Default to a lambda.
-        key_event_name = self.get_key_event_name(event.char)
-
-        if hasattr(self, key_event_name):
-            method = getattr(self, key_event_name, lambda: "Invalid key")
-            # Call the method as we return it
-            return method()
-        elif key_event_name in self._keys:
-            # param = [self.show(index=p) for p in self._keys[key_event_name]["param"]]
-            return self._keys[key_event_name](self) 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

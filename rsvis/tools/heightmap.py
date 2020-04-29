@@ -106,9 +106,12 @@ def get_normal_image(img, height, bins=None, verbose=False, show=False):
 
     compute_normals(path, verbose=verbose)
 
-    normals = read_height_map(path)["nz"].to_numpy().reshape(height.shape)*(-1.)+1. 
+    normals = read_height_map(path)["nz"].to_numpy().reshape(height.shape[0:2])*(-1.)+1. 
     normals = np.where(normals>0., normals, np.min(normals[normals>0.]))
-    normals = imgtools.project_data_to_img(-np.log(normals))
+    if not show:
+        normals = imgtools.project_data_to_img(-np.log(normals))
+    else:
+        normals = imgtools.project_data_to_img(-np.log(normals), dtype=np.uint8, factor=255)
 
     if bins:
         normals = np.ceil(normals*bins)
