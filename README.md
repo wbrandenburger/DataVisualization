@@ -32,6 +32,6 @@ Start the virtual environment in python where the data visualization package is 
 rsvis run "lecture.yaml" --task_set tasks --task rsshow
 ```
 
-The path of key `param_io` in `lecture.yaml` have to point to an existing path, where displayed images can be saved.
+The path of key `param_io` in `lecture.yaml` has to point to an existing path, where displayed images can be saved.
 
 ![RSVis](temp/rsvis.png)
