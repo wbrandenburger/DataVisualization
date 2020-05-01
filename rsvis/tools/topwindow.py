@@ -18,7 +18,6 @@ class TopWindow(Toplevel):
     def __init__(self, title="Box", command=None, dtype="msg", value=""):
         Toplevel.__init__(self)
         self.wm_title(title)
-        # self.geometry("300x300")
 
         if dtype=="msg":
             self.set_msg(value)
@@ -44,27 +43,6 @@ class TopWindow(Toplevel):
         frame = ttk.Label(self, text=msg)# anchor='w' ttk?
 
         frame.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def set_img(self, img):
-        self.frame_img = ImageTk.PhotoImage(image=Image.fromarray(img))
-        frame = ttk.Label(self, image=self.frame_img)
-
-        frame.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def set_grid_img(self, img):
-        frame = ttk.Frame(self)
-        
-        self.frame_img = list()
-
-        for index, item in enumerate(img):
-            self.frame_img.append(ImageTk.PhotoImage(image=Image.fromarray(item)))
-            frame_obj = ttk.Label(self, image=self.frame_img[-1])
-
-            frame_obj.grid(row=0, column=index, sticky=N+S+W+E)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
