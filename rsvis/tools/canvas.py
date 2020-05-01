@@ -9,7 +9,7 @@ import rsvis.utils.patches
 
 import numpy as np
 from PIL import Image, ImageTk
-from tkinter import Canvas, NW
+from tkinter import Canvas, NW, N
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -17,12 +17,12 @@ class ResizingCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, parent, logger=None, **kwargs):
+    def __init__(self, parent, shift=[4,7], logger=None, **kwargs):
         super(ResizingCanvas, self).__init__(parent, **kwargs)
-        self.bind("<Configure>", lambda event=self: self.resize_image(event))
+        self.bind("<Configure>", self.resize_image)
 
-        self.shiftw = self.shifth = 0
-        self.set_size(width=self.winfo_reqwidth(), height=self.winfo_reqheight()) 
+        self.shift = shift
+        self.set_size([self.winfo_reqwidth(), self.winfo_reqheight()]) 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -39,21 +39,14 @@ class ResizingCanvas(Canvas):
     # -----------------------------------------------------------------------
     def resize_image(self, event):
         # determine the ratio of old width/height to new width/height
-        if not self.shiftw and not self.shifth:
-            self.shiftw = self.winfo_reqwidth() + 4 - event.width
-            self.shifth = self.winfo_reqheight() + 10 - event.height
-            print(self.shiftw, self.shifth)
-            self.set_size(width=event.width, height=event.height)
-
-        wscale = float(event.width)/self.width
-        hscale = float(event.height)/self.height
+        scale = [float(event.width)/self.size[0], float(event.height)/self.size[1]]
         
-        self.set_size(width=event.width, height=event.height)
+        self.set_size([event.width, event.height])
         # resize the canvas 
-        self.config(width=self.width, height=self.height)
+        self.config(width=self.size[0], height=self.size[1])
 
         # rescale all the objects tagged with the "all" tag
-        self.scale("all", 0, 0, wscale, hscale)
+        self.scale("all", 0, 0, scale[0], scale[1])
 
         self.create_image()
 
@@ -65,14 +58,18 @@ class ResizingCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_size(self, width=None, height=None):
-        self.width = width - self.shiftw
-        self.height = height - self.shifth
+    def set_size(self, size):
+        self.size = [s - sh for s, sh in zip(size, self.shift)]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_size(self):
+        return [s + sh for s, sh in zip(self.size, self.shift)]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def create_image(self, **kwargs):
-        img_resize = self.img.resize((self.width + self.shiftw, self.height + self.shifth))
+        img_resize = self.img.resize(self.get_size())
         self.canvas_img = ImageTk.PhotoImage(image=img_resize)
         super(ResizingCanvas, self).create_image(0, 0, image=self.canvas_img, anchor=NW)
 
@@ -83,7 +80,7 @@ class ImageCanvas(Canvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __init__(self, parent, grid=list(), double_button=None, logger=None, **kwargs):
-        Canvas.__init__(self, parent, **kwargs)
+        super(ImageCanvas, self).__init__(parent, **kwargs)
 
         self.double_button = double_button if double_button else (lambda x: x)
 
@@ -92,7 +89,10 @@ class ImageCanvas(Canvas):
         self.bind("<ButtonRelease-1>", self.mouse_button_released)
         self.bind("<Double-Button-1>", self.mouse_double_button)
 
-        self.set_size([], self.winfo_reqheight(), self.winfo_reqwidth())
+        # self.set_size([], self.winfo_reqheight(), self.winfo_reqwidth())
+        self.shiftw = 4
+        self.shifth = 4
+        self.set_size(width=self.winfo_width(), height=self.winfo_height())
 
         self.mouse_area = list()
         self.mouse_point = list()
@@ -123,7 +123,7 @@ class ImageCanvas(Canvas):
         wscale = float(event.width)/self.width
         hscale = float(event.height)/self.height
         
-        self.set_size(event)
+        self.set_size(width=event.width, height=event.height)
         
         # resize the canvas 
         self.config(width=self.width, height=self.height)
@@ -135,13 +135,9 @@ class ImageCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_size(self, event, width=None, height=None):
-        if not event:
-            self.width = width-4
-            self.height = height-4
-        else:
-            self.width = event.width-4
-            self.height = event.height-4
+    def set_size(self, width=None, height=None):
+        self.width = width - self.shiftw
+        self.height = height - self.shifth
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -155,8 +151,8 @@ class ImageCanvas(Canvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_scale(self):
-        wscale = float(self.width+4)/self.img_width
-        hscale = float(self.height+4)/self.img_height
+        wscale = float(self.width+self.shiftw)/self.img_width
+        hscale = float(self.height+self.shifth)/self.img_height
         print(wscale, hscale)
         print(self._boxes)
         boxes = [[0,0,0,0],[0,0,0,0]]
@@ -172,7 +168,7 @@ class ImageCanvas(Canvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def show_img(self):
-        self.img_resize = self.img.resize((self.width+4, self.height+4))
+        self.img_resize = self.img.resize((self.width + self.shiftw, self.height + self.shifth))
         self.set_patches()
 
         img = self.img_resize.copy()
