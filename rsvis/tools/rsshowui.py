@@ -194,7 +194,7 @@ class RSShowUI():
         for index, entry in enumerate(entries):
             grid[index]  = int(entry[1].get())
         self.canvas.set_grid_settings(grid)
-        self.canvas.show_img()
+        self.canvas.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -354,7 +354,7 @@ class RSShowUI():
     def key_g(self, **kwargs):
         """Show grid lines in current image."""
         self.canvas.set_grid()
-        self.canvas.show_img()
+        self.canvas.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

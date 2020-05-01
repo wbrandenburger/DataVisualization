@@ -24,14 +24,14 @@ class TopWindow(Toplevel):
             self.set_msg(value)
         elif dtype=="img":
             if isinstance(value, list):
-                self.set_grid_img(value)
+                self.set_canvas_grid(value)
             else: 
                 self.set_canvas(value)
 
-        self.columnconfigure(0, pad=3, weight=1)
-        self.columnconfigure(1, pad=3, weight=1)
-        self.rowconfigure(0, pad=3, weight=1)
-        self.rowconfigure(1, pad=3)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1)
 
         button = ttk.Button(self, text="OK", 
             command=lambda toplevel=self, title=title: command(toplevel, title)
@@ -42,15 +42,15 @@ class TopWindow(Toplevel):
     # -----------------------------------------------------------------------
     def set_msg(self, msg):
         frame = ttk.Label(self, text=msg)# anchor='w' ttk?
+
         frame.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
-        # frame.pack(side=TOP, fill=X, pady=10)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img(self, img):
         self.frame_img = ImageTk.PhotoImage(image=Image.fromarray(img))
-
         frame = ttk.Label(self, image=self.frame_img)
+
         frame.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
 
     #   method --------------------------------------------------------------
@@ -62,15 +62,24 @@ class TopWindow(Toplevel):
 
         for index, item in enumerate(img):
             self.frame_img.append(ImageTk.PhotoImage(image=Image.fromarray(item)))
-
             frame_obj = ttk.Label(self, image=self.frame_img[-1])
+
             frame_obj.grid(row=0, column=index, sticky=N+S+W+E)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img):
-        # self.frame_img = ImageTk.PhotoImage(image=Image.fromarray(img))
-        
         canvas = rsvis.tools.canvas.ResizingCanvas(self, bg="black")
         canvas.set_img(img)
+
         canvas.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
+    
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_canvas_grid(self, img):
+
+        for index, item in enumerate(img):
+            canvas = rsvis.tools.canvas.ResizingCanvas(self, bg="black")
+            canvas.set_img(item)
+            
+            canvas.grid(row=0, column=index, sticky=N+S+W+E)
