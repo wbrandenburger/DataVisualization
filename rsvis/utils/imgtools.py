@@ -200,6 +200,25 @@ def get_grid_image(shape, patches, color=[255, 0 ,0]):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def draw_box(img, shape, boxes, color=[255, 0 ,0]):
+    if not hasattr(img, "shape"):
+        img = np.zeros(img.shape[0:2], dtype=np.uint8)
+
+    boxes = boxes if isinstance(boxes[0],list) else [boxes]
+
+    for box in boxes:
+        for i in range(len(box)):
+            box[i] = box[i]-1 if box[i] else box[i]
+        img[box[0]:box[1] + 1, box[2], :] = np.array(color)
+        img[box[0]:box[1] + 1, box[3], :] = np.array(color)
+        img[box[0], box[2]:box[3] + 1, :] = np.array(color)
+        img[box[1], box[2]:box[3] + 1, :] = np.array(color)
+    
+    return img
+
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def get_transparent_image(img, method="any"):
     # Creating RGBA images
     # https://pythoninformer.com/python-libraries/numpy/numpy-and-images/

@@ -4,6 +4,8 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
+import rsvis.tools.canvas
+
 from PIL import Image, ImageTk
 from tkinter import Toplevel, ttk, Button, Canvas, Label, TOP, X, NW, N, W, S, E
 
@@ -23,7 +25,7 @@ class TopWindow(Toplevel):
             if isinstance(value, list):
                 self.set_grid_img(value)
             else: 
-                self.set_img(value)
+                self.set_canvas(value)
 
         self.columnconfigure(0, pad=3)
         self.columnconfigure(1, pad=3)
@@ -65,7 +67,10 @@ class TopWindow(Toplevel):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    # def set_canvas(self, img):
-    #     canvas = Canvas(self, bg="black")
-    #     canvas.create_image(0, 0, image=self.frame_img, anchor=NW)
-    #     canvas.grid(row=0, column=0, sticky=N+S+W+E)
+    def set_canvas(self, img):
+        # self.frame_img = ImageTk.PhotoImage(image=Image.fromarray(img))
+        
+        canvas = rsvis.tools.canvas.ResizingCanvas(self, bg="black")
+        canvas.set_img(img)
+        # canvas.create_image(0, 0, img, anchor=NW)
+        canvas.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
