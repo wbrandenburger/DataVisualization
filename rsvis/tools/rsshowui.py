@@ -151,8 +151,6 @@ class RSShowUI():
         self.canvas = rsvis.tools.canvas_image.ImageCanvas(self.window, bg="black", grid=self._grid, double_button=self.new_popup, classes=self._classes, logger=self._logger)
         self.set_img(self.img, show=True)
         self.canvas.grid(row=0, column=2, rowspan=5, sticky=N+S+E+W)
-
-        self.set_class() # after initializing canvas as well as cbox_class
         
         self.window.bind("<F1>", self.show_help)
         self.canvas.bind("<Key>", self.key_event)
@@ -206,6 +204,8 @@ class RSShowUI():
     # -----------------------------------------------------------------------
     def set_class(self, event=None):
         self.canvas.set_class(self.cbox_class.get()["label"])
+        self.cbox_area.set_choice("Objects")
+        self.set_area_event()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

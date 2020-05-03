@@ -144,6 +144,3 @@ class Patches():
         for idx, bbox in enumerate(self._bbox):
             if box[0] in range(bbox[0]-1, bbox[0]+2) and box[1] in range(bbox[1]-1, bbox[1]+2) and box[2] in range(bbox[2]-1, bbox[2]+2) and box[3] in range(bbox[3]-1, bbox[3]+2):
                 return idx
-
-
-

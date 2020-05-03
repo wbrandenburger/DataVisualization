@@ -26,10 +26,6 @@ def task_rsshow(setting="training"):
         rsvis.config.settings._SETTINGS["param_io"],
         param_log=glu.get_value(
             rsvis.config.settings._SETTINGS,"param_log", dict()),
-        param_msi=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_msi", list()),
-        param_dist=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_dist", dict()),
         param_show=glu.get_value(
             rsvis.config.settings._SETTINGS,"param_show", dict()),
         param_classes=glu.get_value(
@@ -37,7 +33,7 @@ def task_rsshow(setting="training"):
         param_cloud=glu.get_value(
             rsvis.config.settings._SETTINGS,"param_cloud", dict( )),
         param_obj=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_obj", dict()),              
+            rsvis.config.settings._SETTINGS,"param_obj", dict())             
     )
 
 #   function ----------------------------------------------------------------

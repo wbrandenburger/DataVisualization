@@ -44,6 +44,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
         self._boxes = list()                        
         self._color = dict((c["name"], c["color"]) for c in classes)
+        self._label = self._color[list(self._color.keys())[0]] if self._color else None
 
         self._bbox = [0]*4
 
@@ -94,7 +95,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
             img = imgtools.get_grid_image(img, [], self._patches_grid.get_bbox())
 
         if self._selection:
-            img = imgtools.draw_box(img, [], self.resize_bbox([self._selection["box"]]), [self._selection["color"]])
+            img = imgtools.draw_box(img, [], [self._selection["box"]], [self._selection["color"]])
         img = Image.fromarray(imgtools.get_transparent_image(img))
 
         img_label = self.img_resize.copy()
@@ -180,7 +181,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
             self._patches_bbox.get_bbox_from_point(ev, boxes=boxes)
             
             if len(boxes):
-                self._selection = {"box": self.resize_bbox(boxes, inverted=True)[0], "color": [150,150,150]}
+                self._selection = {"box": boxes[0], "color": [150,150,150]}
                 
         self.create_image()
         
@@ -200,7 +201,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
         if self._area_event==0:
             patch = self._patches_bbox.get_patch(bbox=self._bbox)
-            self._selection = {"box": self.resize_bbox([self._bbox], inverted=True)[0], "color": [150,150,150]}
+            self._selection = {"box": self._bbox, "color": [150,150,150]}
             self.create_image()
 
             self.double_button(title="Histogram", dtype="img", value=[patch, imgtools.get_histogram(patch)])
