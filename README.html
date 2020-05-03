@@ -1,1 +1,42 @@
-undefined
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+<link rel="stylesheet" href="https://gitcdn.xyz/repo/goessner/mdmath/master/css/texmath.css">
+<link rel="stylesheet" href="https://gitcdn.xyz/repo/goessner/mdmath/master/css/vscode-texmath.css">
+
+</head><body>
+<a for="toc-anchor" id="readme"></a><h1 id="readme" data-line="0" class="code-line">README</h1>
+<p data-line="2" class="code-line">RSVis is a visualization tool for exploring and for viewing remote sensing data.</p>
+<a for="toc-anchor" id="repository"></a><h2 id="repository" data-line="4" class="code-line">Repository</h2>
+<p data-line="6" class="code-line">The source code can be found under the following <a href="https://github.com/wbrandenburger/DataVisualization" data-href="https://github.com/wbrandenburger/DataVisualization">link</a>.</p>
+<a for="toc-anchor" id="install"></a><h2 id="install" data-line="8" class="code-line">Install</h2>
+<p data-line="10" class="code-line">If <code>git</code> is installed on your personal computer, start a virtual environment in <code>python</code> and run the following installation command</p>
+<pre><code data-line="12" class="code-line language-PowerShell"><div>pip install -e git+http://github.com/wbrandenburger/DataVisualization.git<span class="hljs-comment">#egg=rsvis</span>
+</div></code></pre>
+<p data-line="16" class="code-line">Otherwise, download the source code of the repository to an arbitrary path and install the package via</p>
+<pre><code data-line="18" class="code-line language-PowerShell"><div>pip install -e git+file:///path/to/your/git/repo<span class="hljs-comment">#egg=rsvis</span>
+</div></code></pre>
+<p data-line="22" class="code-line">or</p>
+<pre><code data-line="24" class="code-line language-PowerShell"><div>python path/to/your/git/repo/setup.py install develop
+</div></code></pre>
+<a for="toc-anchor" id="run-rsvis"></a><h2 id="run-rsvis" data-line="28" class="code-line">Run RSVis</h2>
+<p data-line="30" class="code-line">Start the virtual environment in python where the data visualization package is located and navigate to the main folder with the dataset of the lecture and run the following command</p>
+<pre><code data-line="32" class="code-line language-PowerShell"><div>rsvis run <span class="hljs-string">"lecture.yaml"</span> --task_set tasks --task rsshow
+</div></code></pre>
+<p data-line="36" class="code-line">The field <code>path_dir</code> of key <code>param_io</code> in <code>lecture.yaml</code> has to point to an existing path, where displayed images can be saved. The other parameter of the key are not relevant for the user. If images have to be saved under Windows in folder <code>C:\User\Username\RSVis</code> the key <code>param_io</code> might be defined as follows:</p>
+<pre><code data-line="38" class="code-line language-yaml"><div><span class="hljs-attr">param_io:</span>
+<span class="hljs-attr">  path_dir:</span> <span class="hljs-attr">C:\User\Username\RSVis</span>
+<span class="hljs-attr">  path_name:</span> <span class="hljs-string">'{}'</span>
+<span class="hljs-attr">  regex:</span>
+<span class="hljs-bullet">  -</span> <span class="hljs-string">.*</span>
+<span class="hljs-bullet">  -</span> <span class="hljs-number">0</span>
+<span class="hljs-attr">  ext:</span> <span class="hljs-string">.tif</span>
+</div></code></pre>
+<p data-line="48" class="code-line"><img src="temp/rsvis_obj.png" alt="" class="loading" id="image-hash-50b695a96714593b341c0e972c7783b05648368328a2a23cc3f9ea9ba421093f"></p>
+<a for="toc-anchor" id="acknowledgement"></a><h2 id="acknowledgement" data-line="50" class="code-line">Acknowledgement</h2>
+<p data-line="52" class="code-line">The Vaihingen data set was provided by the German Society for Photogrammetry, Remote Sensing and Geoinformation (DGPF) <a href="http://www.ifp.uni-stuttgart.de/dgpf/DKEP-Allg.htm" data-href="http://www.ifp.uni-stuttgart.de/dgpf/DKEP-Allg.htm">Cramer, 2010</a></p>
+<a for="toc-anchor" id="references"></a><h2 id="references" data-line="54" class="code-line">References</h2>
+<p data-line="56" class="code-line">[1]: Cramer, M., 2010. The DGPF test on digital aerial camera evaluation – overview and test design. Photogrammetrie – Fernerkundung – Geoinformation 2(2010): 73-82.</p>
+
+</body></html>
