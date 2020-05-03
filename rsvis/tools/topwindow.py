@@ -4,7 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.tools.canvas
+import rsvis.tools.canvas_resizing
 
 from PIL import Image, ImageTk
 from tkinter import Toplevel, ttk, Button, Canvas, Label, TOP, X, NW, N, W, S, E, CENTER
@@ -15,8 +15,8 @@ class TopWindow(Toplevel):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, title="Box", command=None, dtype="msg", value=""):
-        Toplevel.__init__(self)
+    def __init__(self, parent, title="Box", command=None, dtype="msg", value=""):
+        Toplevel.__init__(self, parent)
         self.wm_title(title)
 
         if dtype=="msg":
@@ -47,7 +47,7 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img):
-        canvas = rsvis.tools.canvas.ResizingCanvas(self, bg="black")
+        canvas = rsvis.tools.canvas_resizing.ResizingCanvas(self, bg="black")
         canvas.set_img(img)
 
         canvas.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
@@ -57,7 +57,7 @@ class TopWindow(Toplevel):
     def set_canvas_grid(self, img):
 
         for index, item in enumerate(img):
-            canvas = rsvis.tools.canvas.ResizingCanvas(self, bg="black")
+            canvas = rsvis.tools.canvas_resizing.ResizingCanvas(self, bg="black")
             canvas.set_img(item)
             
             canvas.grid(row=0, column=index, sticky=N+S+W+E)

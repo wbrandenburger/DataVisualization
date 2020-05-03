@@ -24,7 +24,21 @@ def get_options(param_specs, param_label=dict()):
 # ---------------------------------------------------------------------------
 def get_general_options():
 
-    return [ 
+    return [
+        { 
+            "label" : "General",
+            "name" : "Grid On/Off",
+            "key" : None,
+            "description": "Show a grid in the currently displayed image.",
+            "command": lambda obj: obj.show_grid()
+        },
+        { 
+            "label" : "General",
+            "name" : "Objects On/Off",
+            "key" : "g",
+            "description": "Show the bounding boxes in the currently displayed image.",
+            "command": lambda obj: obj.show_objects()
+        },        
         { 
             "label" : "General",
             "name" : "Reload",
@@ -37,7 +51,7 @@ def get_general_options():
             "name" : "Contrast",
             "key" : "r",
             "description": "Raise the contrast of the currently displayed image.",
-            "command": lambda obj: obj.set_img(imgtools.raise_contrast(obj.get_window_img()), show=True),
+            "command": lambda obj: obj.set_img(imgtools.raise_contrast(obj.get_window_img()), show=True)
         }
     ]
 

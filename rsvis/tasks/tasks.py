@@ -33,7 +33,9 @@ def task_rsshow(setting="training"):
         param_dist=glu.get_value(
             rsvis.config.settings._SETTINGS,"param_dist", dict()),
         param_show=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_show", 100)
+            rsvis.config.settings._SETTINGS,"param_show", dict()),
+        param_class=glu.get_value(
+            rsvis.config.settings._SETTINGS,"param_class", list())            
     )
 
 #   function ----------------------------------------------------------------

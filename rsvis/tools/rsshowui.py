@@ -9,7 +9,7 @@ from rsvis.utils import imgtools
 import rsvis.utils.imgio
 import rsvis.utils.format
 
-import rsvis.tools.canvas
+import rsvis.tools.canvas_image
 import rsvis.tools.settingsbox
 import rsvis.tools.topwindow
 
@@ -31,7 +31,7 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, data, img_out, options=list(), grid=list(),  logger=None, **kwargs):
+    def __init__(self, data, img_out, options=list(), grid=list(), classes=list(),  logger=None, **kwargs):
         self._data = data
         self._img_out = img_out
 
@@ -47,6 +47,9 @@ class RSShowUI():
         self._popup_help = 0
         
         self._grid = grid if grid else [2, 2]
+
+        self._classes = classes
+        self._settings= dict()
 
         self.initialize_window()
 
@@ -120,9 +123,11 @@ class RSShowUI():
         self.window.columnconfigure(2, weight=1)
         self.window.rowconfigure(0, pad=3, weight=1)
         self.window.rowconfigure(1, pad=3)
+        self.window.rowconfigure(2, pad=3)
+        self.window.rowconfigure(3, pad=3)
 
         self.scrollbar = Scrollbar(self.window, orient="vertical", width=16)
-        self.listbox = Listbox(self.window, yscrollcommand=self.scrollbar.set, width=30)
+        self.listbox = Listbox(self.window, yscrollcommand=self.scrollbar.set, width=37)
         self.scrollbar.config(command=self.listbox.yview)
         self.scrollbar.grid(row=0, column=0, sticky=N+S)
         self.listbox.grid(row=0, column=1, sticky=N+S)
@@ -130,18 +135,26 @@ class RSShowUI():
         for count, item in enumerate(self._data):
            self.listbox.insert(END, pathlib.Path(item[0].path).stem)
         self.set_img_from_index()
-        
-        self.settingsbox = rsvis.tools.settingsbox.SettingsBox(self.window,  ["Dimension x", "Dimension y"],  self.set_grid_settings, default=self._grid)
-        self.settingsbox.grid(row=1, column=0, columnspan=2, sticky=N+S)
-        self.settingsbox.button_set.grid(row=2, column=0, columnspan=2)
 
-        self.canvas = rsvis.tools.canvas.ImageCanvas(self.window, bg="black", grid=self._grid, double_button=self.new_popup, logger=self._logger)
+        self.cbox_area = rsvis.tools.settingsbox.ComboBox(self.window, "Histogram", ["Selection", "Grid", "Objects"], self.set_area_event)
+        self.cbox_area.grid(row=1, column=0, columnspan=2, sticky=N+S)
+
+        # self.label_settingsbox = rsvis.tools.settingsbox.SettingsBox(self.window,  ["Label"],  self.set_label_settings, default=["Fucki"])
+        # self.label_settingsbox.grid(row=2, column=0, columnspan=2, sticky=N+S)
+        self.cbox_class = rsvis.tools.settingsbox.ComboBox(self.window, "Class", self._classes, self.set_class)
+        self.cbox_class.grid(row=2, column=0, columnspan=2, sticky=N+S)
+
+        self.grid_settingsbox = rsvis.tools.settingsbox.SettingsBox(self.window,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=self._grid)
+        self.grid_settingsbox.grid(row=3, column=0, columnspan=2, sticky=N+S)
+        self.grid_settingsbox.button_set.grid(row=4, column=0, columnspan=2,)
+    
+        self.canvas = rsvis.tools.canvas_image.ImageCanvas(self.window, bg="black", grid=self._grid, double_button=self.new_popup, logger=self._logger)
         self.canvas.set_img(self.img)
-        self.canvas.grid(row=0, column=2, rowspan=3, sticky=N+S+E+W)
+        self.canvas.grid(row=0, column=2, rowspan=5, sticky=N+S+E+W)
         
         self.window.bind("<F1>", self.show_help)
-        self.window.bind("<Key>", self.key_event)
-
+        self.canvas.bind("<Key>", self.key_event)
+        
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def invoke(self, command):
@@ -183,18 +196,45 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def new_popup(self, title="Box", dtype="msg", value=""):
-        t = rsvis.tools.topwindow.TopWindow(title=title, dtype=dtype, value=value, command=self.quit_window)
+        t = rsvis.tools.topwindow.TopWindow(self.window, title=title, dtype=dtype, value=value, command=self.quit_window)
         t.wm_deiconify()
         t.mainloop()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_grid_settings(self, entries):
+    def set_label_settings(self, entries):
+        for index, entry in enumerate(entries):
+            self._settings[entry[0]] = entry[1].get()
+        
+        self.canvas._label = self._settings["Label"]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_class(self, event):
+        self.canvas.set_class(self.cbox_class.get()["label"])
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_grid(self, entries):
         grid = [0, 0]
         for index, entry in enumerate(entries):
             grid[index]  = int(entry[1].get())
-        self.canvas.set_grid_settings(grid)
-        self.canvas.create_image()
+        self.canvas.set_grid(grid)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def show_grid(self):
+        self.canvas.show_grid()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_area_event(self, event):
+        self.canvas.set_area_event(**self.cbox_area.get())
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def show_objects(self):
+        self.canvas.show_objects()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -263,9 +303,8 @@ class RSShowUI():
         if isinstance(self._index_channel, rsvis.utils.index.Index):
             number_channel = get_number_of_channel(img)
             if number_channel:
-                img = imgtools.project_and_stack(img[..., self._index_channel()])
+                img = imgtools.project_and_stack(img[..., self._index_channel()], dtype=np.uint8, factor=255)
                 return img
-
         return img
 
     #   method --------------------------------------------------------------
@@ -348,13 +387,6 @@ class RSShowUI():
         if isinstance(self._index_channel, rsvis.utils.index.Index):
             self._index_channel.last()
         self.set_img(self.get_img_channel(), show=True)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_g(self, **kwargs):
-        """Show grid lines in current image."""
-        self.canvas.set_grid()
-        self.canvas.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

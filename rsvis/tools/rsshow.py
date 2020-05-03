@@ -21,7 +21,8 @@ def rsshow(
         param_label=dict(), 
         param_msi=list(), 
         param_dist=dict(), # param?
-        param_show=dict()
+        param_show=dict(),
+        param_class=list()
     ):
         
     _logger.debug("Start training multi task classification and regression model with settings:\nparam_specs:\t{}\nparam_io:\t{}\nparam_log:\t{}\nparam_label:\t{}\nparam_msi:\t{}\nparam_dist:\t{}\nparam_show:\t{}".format(param_specs, param_io, param_log, param_label, param_msi, param_dist, param_show))
@@ -36,6 +37,7 @@ def rsshow(
         options=rsvis.tools.options.get_options(
             param_specs, param_label=param_label
         ), 
+        classes=param_class,
         logger=_logger, 
         **param_show)
 

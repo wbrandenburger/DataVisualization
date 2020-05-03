@@ -187,35 +187,33 @@ def get_sub_img(img, channels):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_grid_image(shape, patches, color=[255, 0 ,0]):
-    grid_img = np.zeros(shape, dtype=np.uint8)
-    for patch in patches:
-        for i in range(len(patch)):
-            patch[i] = patch[i]-1 if patch[i] else patch[i]
-        grid_img[patch[0]:patch[1] + 1, patch[2], :] = np.array(color)
-        grid_img[patch[0]:patch[1] + 1, patch[3], :] = np.array(color)
-        grid_img[patch[0], patch[2]:patch[3] + 1, :] = np.array(color)
-        grid_img[patch[1], patch[2]:patch[3] + 1, :] = np.array(color)
-    return grid_img
-
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-def draw_box(img, shape, boxes, color=[255, 0 ,0]):
+def get_grid_image(img, shape, bbox, color=[255, 0 ,0]):
     if not hasattr(img, "shape"):
-        img = np.zeros(img.shape[0:2], dtype=np.uint8)
+        img = np.zeros(shape[0:2], dtype=np.uint8)
 
-    boxes = boxes if isinstance(boxes[0],list) else [boxes]
-
-    for box in boxes:
+    for idx, box in enumerate(bbox):
         for i in range(len(box)):
             box[i] = box[i]-1 if box[i] else box[i]
         img[box[0]:box[1] + 1, box[2], :] = np.array(color)
         img[box[0]:box[1] + 1, box[3], :] = np.array(color)
         img[box[0], box[2]:box[3] + 1, :] = np.array(color)
         img[box[1], box[2]:box[3] + 1, :] = np.array(color)
-    
     return img
 
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def draw_box(img, shape, bbox, color):
+    if not hasattr(img, "shape"):
+        img = np.zeros(shape[0:2], dtype=np.uint8)
+
+    for idx, box in enumerate(bbox):
+        for i in range(len(box)):
+            box[i] = box[i]-1 if box[i] else box[i]
+        img[box[0]:box[1] + 1, box[2], :] = np.array(color[idx])
+        img[box[0]:box[1] + 1, box[3], :] = np.array(color[idx])
+        img[box[0], box[2]:box[3] + 1, :] = np.array(color[idx])
+        img[box[1], box[2]:box[3] + 1, :] = np.array(color[idx])
+    return img
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
