@@ -50,7 +50,7 @@ param_io:
 
 ## Acknowledgement
 
-The Vaihingen data set was provided by the German Society for Photogrammetry, Remote Sensing and Geoinformation (DGPF) [Cramer, 2010]: http://www.ifp.uni-stuttgart.de/dgpf/DKEP-Allg.htm
+The Vaihingen data set was provided by the German Society for Photogrammetry, Remote Sensing and Geoinformation (DGPF) [Cramer, 2010](http://www.ifp.uni-stuttgart.de/dgpf/DKEP-Allg.htm)
 
 ## References
 
