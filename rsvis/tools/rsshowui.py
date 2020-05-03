@@ -100,7 +100,7 @@ class RSShowUI():
     def initialize_window(self):
         self.window = Tk()
         self.window.title(
-            "RSVis - Exploring and viewing RS data"
+            "RSVis - Exploring and Viewing RS-Data"
         )
         self.window.geometry("1000x700")
         # https://effbot.org/tkinterbook/tkinter-events-and-bindings.htm
