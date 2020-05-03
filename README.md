@@ -34,7 +34,7 @@ Start the virtual environment in python where the data visualization package is 
 rsvis run "lecture.yaml" --task_set tasks --task rsshow
 ```
 
-The field `path_dir` of key `param_io` in `lecture.yaml` has to point to an existing path, where displayed images can be saved. The other parameter of the key are not relevant for the  If images have to be saved under Windows in folder `C:\User\Username\RSVis` the key `param_io` might be defined as follows:
+The field `path_dir` of key `param_io` in `lecture.yaml` has to point to an existing path, where displayed images can be saved. The other parameter of the key are not relevant for the user. If images have to be saved under Windows in folder `C:\User\Username\RSVis` the key `param_io` might be defined as follows:
 
 ```yaml
 param_io:
