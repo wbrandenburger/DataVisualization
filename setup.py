@@ -76,7 +76,7 @@ setuptools.setup(
         ]
     ),
     description=(
-        "Visualization tool for exploring remote sensing data and view processing results"
+        "Visualization tool for exploring and for viewing remote sensing data."
     ),
     long_description=long_description,
     keywords=[

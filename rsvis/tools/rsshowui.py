@@ -4,10 +4,12 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
+import rsvis.utils.general as glu
 import rsvis.utils.index
 from rsvis.utils import imgtools
 import rsvis.utils.imgio
 import rsvis.utils.format
+import rsvis.utils.yaml
 
 import rsvis.tools.canvas_image
 import rsvis.tools.settingsbox
@@ -31,7 +33,7 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, data, img_out, options=list(), grid=list(), classes=list(),  logger=None, **kwargs):
+    def __init__(self, data, img_out, options=list(), grid=list(), classes=dict, objects=dict(), logger=None, **kwargs):
         self._data = data
         self._img_out = img_out
 
@@ -50,9 +52,9 @@ class RSShowUI():
 
         self._classes = classes
         self._settings= dict()
+        self._get_obj_path = glu.PathCreator(**objects)
 
         self.initialize_window()
-
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def logger(self, log_str, stream="info"):
@@ -98,7 +100,7 @@ class RSShowUI():
     def initialize_window(self):
         self.window = Tk()
         self.window.title(
-            "RSVis - Visualization for Aerial and Satellite Datasets"
+            "RSVis - Exploring and viewing RS data"
         )
         self.window.geometry("1000x700")
         # https://effbot.org/tkinterbook/tkinter-events-and-bindings.htm
@@ -106,7 +108,7 @@ class RSShowUI():
         filemenu = Menu(self.menubar, tearoff=0)
         filemenu.add_command(label="Open")
         # Save the currently displayed image to a given folder.
-        filemenu.add_command(label="Save", command=lambda obj=self: obj._img_out(obj.get_img(path=True), obj.get_window_img()))
+        filemenu.add_command(label="Save", command=lambda obj=self: obj._img_out(obj.get_img(path=True), obj.get_window_img(), prefix=obj.get_label()))
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.window.quit)
         self.menubar.add_cascade(label="File", menu=filemenu)
@@ -136,21 +138,21 @@ class RSShowUI():
            self.listbox.insert(END, pathlib.Path(item[0].path).stem)
         self.set_img_from_index()
 
-        self.cbox_area = rsvis.tools.settingsbox.ComboBox(self.window, "Histogram", ["Selection", "Grid", "Objects"], self.set_area_event)
+        self.cbox_area = rsvis.tools.settingsbox.ComboBox(self.window, "Histogram", ["Grid", "Objects"], self.set_area_event)
         self.cbox_area.grid(row=1, column=0, columnspan=2, sticky=N+S)
 
-        # self.label_settingsbox = rsvis.tools.settingsbox.SettingsBox(self.window,  ["Label"],  self.set_label_settings, default=["Fucki"])
-        # self.label_settingsbox.grid(row=2, column=0, columnspan=2, sticky=N+S)
-        self.cbox_class = rsvis.tools.settingsbox.ComboBox(self.window, "Class", self._classes, self.set_class)
+        self.cbox_class = rsvis.tools.settingsbox.ComboBox(self.window, "Class", [c["name"] for c in self._classes], self.set_class )
         self.cbox_class.grid(row=2, column=0, columnspan=2, sticky=N+S)
 
         self.grid_settingsbox = rsvis.tools.settingsbox.SettingsBox(self.window,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=self._grid)
         self.grid_settingsbox.grid(row=3, column=0, columnspan=2, sticky=N+S)
         self.grid_settingsbox.button_set.grid(row=4, column=0, columnspan=2,)
     
-        self.canvas = rsvis.tools.canvas_image.ImageCanvas(self.window, bg="black", grid=self._grid, double_button=self.new_popup, logger=self._logger)
-        self.canvas.set_img(self.img)
+        self.canvas = rsvis.tools.canvas_image.ImageCanvas(self.window, bg="black", grid=self._grid, double_button=self.new_popup, classes=self._classes, logger=self._logger)
+        self.set_img(self.img, show=True)
         self.canvas.grid(row=0, column=2, rowspan=5, sticky=N+S+E+W)
+
+        self.set_class() # after initializing canvas as well as cbox_class
         
         self.window.bind("<F1>", self.show_help)
         self.canvas.bind("<Key>", self.key_event)
@@ -202,15 +204,7 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_label_settings(self, entries):
-        for index, entry in enumerate(entries):
-            self._settings[entry[0]] = entry[1].get()
-        
-        self.canvas._label = self._settings["Label"]
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def set_class(self, event):
+    def set_class(self, event=None):
         self.canvas.set_class(self.cbox_class.get()["label"])
 
     #   method --------------------------------------------------------------
@@ -228,13 +222,16 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_area_event(self, event):
+    def set_area_event(self, event=None):
         self.canvas.set_area_event(**self.cbox_area.get())
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def show_objects(self):
         self.canvas.show_objects()
+        if self.canvas.obj:
+            self.cbox_area.set_choice("Objects")
+            self.set_area_event()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -275,6 +272,18 @@ class RSShowUI():
                     img = self.get_img_channel(img=img)
 
         return img
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_label(self):
+        img_container = self._data[self._index()][self._index_spec()]
+        return img_container.spec
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_path(self):
+        img_container = self._data[self._index()][self._index_spec()]
+        return img_container.path
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -329,10 +338,28 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def get_obj_path(self):
+        
+        try: 
+            import pathlib
+            path = self._get_obj_path(self.get_path())
+            if pathlib.Path(path).is_file():
+                return path
+        except TypeError:
+            pass
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_img(self, img, show=False):
         self.img = img
+
         if show:
-            self.canvas.set_img(self.img)
+            objects = list()
+            path = self.get_obj_path()
+            if path:
+                objects=rsvis.utils.yaml.yaml_to_data(path)
+
+            self.canvas.set_img(self.img, objects=objects)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -394,5 +421,14 @@ class RSShowUI():
         """Exit RSVis."""
         self.window.destroy()
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def remove_object(self):
+        self.canvas.remove_object()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def save_object(self):
+        rsvis.utils.yaml.data_to_yaml(self.get_obj_path(), self.canvas.get_objects())        
         
 

@@ -122,12 +122,12 @@ def get_normal_image(img, height, bins=None, verbose=False, show=False):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def compute_normals(path, verbose=False):
-    args = rsvis.config.settings._SETTINGS["cloud_normals_args"]
+    args = rsvis.config.settings._SETTINGS["param_cloud"]["cloud_normals_args"]
 
     cloud_process = "cloud_process" if not verbose else "cloud_process_verbose"
     process = subprocess.Popen(
         get_args(
-            rsvis.config.settings._SETTINGS[cloud_process], 
+            rsvis.config.settings._SETTINGS["param_cloud"][cloud_process], 
             [item.format(**{"obj": { "path": path}}) for item in args]
         )
     )
@@ -136,12 +136,12 @@ def compute_normals(path, verbose=False):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def compute_mesh(path, verbose=False):
-    args = rsvis.config.settings._SETTINGS["cloud_delaunay_args"]
+    args = rsvis.config.settings._SETTINGS["param_cloud"]["cloud_delaunay_args"]
 
     cloud_process = "cloud_process" if not verbose else "cloud_process_verbose"
     process = subprocess.Popen(
         get_args(
-            rsvis.config.settings._SETTINGS[cloud_process], 
+            rsvis.config.settings._SETTINGS["param_cloud"][cloud_process], 
             [item.format(**{"obj": { "path": path}}) for item in args]
         )
     )
@@ -152,11 +152,11 @@ def compute_mesh(path, verbose=False):
 def open_height_map(path, ccviewer=False):
     if ccviewer:
         subprocess.Popen(
-            get_args( rsvis.config.settings._SETTINGS["cloud_viewer"], path)
+            get_args(rsvis.config.settings._SETTINGS["param_cloud"]["cloud_viewer"], path)
         )
     else:          
         subprocess.Popen( 
-            get_args(rsvis.config.settings._SETTINGS["cloud_editor"],path)
+            get_args(rsvis.config.settings._SETTINGS["param_cloud"]["cloud_editor"],path)
         )
 
 #   function ----------------------------------------------------------------

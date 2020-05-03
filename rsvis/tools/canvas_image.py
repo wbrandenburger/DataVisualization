@@ -19,7 +19,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, parent, grid=list(), double_button=None, logger=None, **kwargs):
+    def __init__(self, parent, grid=list(), double_button=None, classes=dict(), logger=None, **kwargs):
         super(ImageCanvas, self).__init__(parent, shift=[4,4], **kwargs)
 
         self.double_button = double_button if double_button else (lambda x: x)
@@ -39,13 +39,13 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
         self._object_flag = 0
 
         self._selection = dict()
+        self._patches_bbox = None
+        self._patches_grid = None
 
-        self._boxes = [ 
-            {"box" : [20, 30, 50, 170], "label": "Car"},
-            {"box" : [120, 260, 400, 410], "label": "Tree"},
-        ]                        
-        self._label = self._boxes[0]["label"]
-        self._color = {"Car" : [23, 210, 100], "Tree": [150, 189, 40]}
+        self._boxes = list()                        
+        self._color = dict((c["name"], c["color"]) for c in classes)
+
+        self._bbox = [0]*4
 
         self._mouse_sensitivity = 4
 
@@ -94,8 +94,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
             img = imgtools.get_grid_image(img, [], self._patches_grid.get_bbox())
 
         if self._selection:
-            img = imgtools.draw_box(img, [], [self._selection["box"]], [self._selection["color"]])
-            self.clear()
+            img = imgtools.draw_box(img, [], self.resize_bbox([self._selection["box"]]), [self._selection["color"]])
         img = Image.fromarray(imgtools.get_transparent_image(img))
 
         img_label = self.img_resize.copy()
@@ -104,15 +103,26 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_img(self, img):
+    @property
+    def obj(self):
+        return self._object_flag
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_img(self, img, objects=list()):
         self.img_size = [img.shape[1], img.shape[0]]
         self.img = Image.fromarray(img)
+
+        self._boxes = objects
         self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_area_event(self, index=0, label="Selection"):
+    def set_area_event(self, index=0, **kwargs):
         self._area_event = index
+        if self._area_event==1:
+            self._object_flag = 0
+            self.show_objects()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -140,6 +150,11 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def get_objects(self):
+        return self._boxes
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def resize_event(self, event):
         img = self.img_resize
         ev = [
@@ -159,6 +174,15 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
         ev = self.resize_event(event)
         self._bbox = [ev[0], ev[0], ev[1], ev[1]]
+
+        if self._area_event==1:
+            boxes = list()
+            self._patches_bbox.get_bbox_from_point(ev, boxes=boxes)
+            
+            if len(boxes):
+                self._selection = {"box": self.resize_bbox(boxes, inverted=True)[0], "color": [150,150,150]}
+                
+        self.create_image()
         
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -174,13 +198,13 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
         if not (self._bbox[1]-self._bbox[0] > self._mouse_sensitivity and self._bbox[3]-self._bbox[2] > self._mouse_sensitivity):
             return
 
-        if self._area_event==0 or self._area_event==1:
+        if self._area_event==0:
             patch = self._patches_bbox.get_patch(bbox=self._bbox)
-            self._selection = {"box": self._bbox, "color": [240, 240, 40]}
+            self._selection = {"box": self.resize_bbox([self._bbox], inverted=True)[0], "color": [150,150,150]}
             self.create_image()
 
             self.double_button(title="Histogram", dtype="img", value=[patch, imgtools.get_histogram(patch)])
-        elif self._area_event==2:
+        elif self._area_event==1:
             self._boxes.append({"box": self.resize_bbox([self._bbox], inverted=True)[0],"label": self._label})
             self.create_image()
 
@@ -191,9 +215,9 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
         
         ev = self.resize_event(event)
 
-        if self._area_event==0 or self._area_event==1:
+        if self._area_event==0:
             patch = self._patches_grid.get_patch_from_point(ev)
-        elif self._area_event==2:
+        elif self._area_event==1:
             patches = list()
             self._patches_bbox.get_patch_from_point(ev, patches=patches)
             
@@ -204,3 +228,12 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
         self.double_button(title="Histogram", dtype="img", value=[patch,imgtools.get_histogram(patch)])
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def remove_object(self):
+        if self._selection and self._patches_bbox:
+            idx = self._patches_bbox.equal(self._selection["box"])
+            if idx is not None: 
+                self._boxes.pop(idx)
+                self._selection = dict()
+            self.create_image()

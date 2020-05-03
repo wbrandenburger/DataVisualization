@@ -101,6 +101,19 @@ class Patches():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def get_bbox_from_point(self, point, boxes=list(), indices=list()):
+        for idx, bbox in enumerate(self._bbox):
+            if point[0] >= bbox[0] and point[0] < bbox[1] and point[1] >= bbox[2] and point[1] < bbox[3]:
+
+                boxes.append(bbox)
+                indices.append(idx)
+
+                if self._dtype=="ORDERED":
+                    self.logger("Patch '{}' with index '{}'".format(bbox, idx))
+                    return boxes[-1]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def get_patch_from_point(self, point, patches=list(), indices=list()):
         for idx, bbox in enumerate(self._bbox):
             if point[0] >= bbox[0] and point[0] < bbox[1] and point[1] >= bbox[2] and point[1] < bbox[3]:
@@ -111,3 +124,26 @@ class Patches():
                 if self._dtype=="ORDERED":
                     self.logger("Patch '{}' with index '{}'".format(bbox, idx))
                     return patches[-1]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def remove(self, bbox=list(), index=None):
+        if index is None:
+            index = self.equal(bbox)
+ 
+        if index is None:
+            return
+        
+        if index < self._len:
+            self._bbox.pop(index)
+            self._len = len(self._bbox)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def equal(self, box):
+        for idx, bbox in enumerate(self._bbox):
+            if box[0] in range(bbox[0]-1, bbox[0]+2) and box[1] in range(bbox[1]-1, bbox[1]+2) and box[2] in range(bbox[2]-1, bbox[2]+2) and box[3] in range(bbox[3]-1, bbox[3]+2):
+                return idx
+
+
+

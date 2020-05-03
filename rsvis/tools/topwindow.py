@@ -27,7 +27,7 @@ class TopWindow(Toplevel):
             else: 
                 self.set_canvas(value)
 
-        self.columnconfigure(0, weight=1)
+        self.columnconfigure(0, weight=0)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1)

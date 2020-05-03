@@ -5,20 +5,52 @@
 # ---------------------------------------------------------------------------
 import rsvis.tools.heightmap
 from rsvis.utils import imgtools
+import rsvis.utils.objindex
 import rsvis.utils.general as glu
 
 import numpy as np
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_options(param_specs, param_label=dict()):
+def get_options(param_specs, param_label=dict(), param_cloud=dict()):
     options = get_general_options()
+    options.extend(get_object_options())
+
     if "label" in param_specs:
         options.extend(get_label_options(param_label))
     if "height" in param_specs:
-        options.extend(get_height_options(param_label))
+        if param_cloud:
+            options.extend(get_height_options())
     
     return options
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_object_options():
+
+    return [
+        { 
+            "label" : "Objects",
+            "name" : "Objects On/Off",
+            "key" : "g",
+            "description": "Show the bounding boxes in the currently displayed image.",
+            "command": lambda obj: obj.show_objects()
+        },
+        { 
+            "label" : "Objects",
+            "name" : "Save objects",
+            "key" : None,
+            "description": "Save displayed objects.",
+            "command": lambda obj: obj.save_object()
+        },
+        { 
+            "label" : "Objects",
+            "name" : "Remove selected object",
+            "key" : "h",
+            "description": "Remove the selected object.",
+            "command": lambda obj: obj.remove_object()
+        }
+    ]
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -31,14 +63,7 @@ def get_general_options():
             "key" : None,
             "description": "Show a grid in the currently displayed image.",
             "command": lambda obj: obj.show_grid()
-        },
-        { 
-            "label" : "General",
-            "name" : "Objects On/Off",
-            "key" : "g",
-            "description": "Show the bounding boxes in the currently displayed image.",
-            "command": lambda obj: obj.show_objects()
-        },        
+        },       
         { 
             "label" : "General",
             "name" : "Reload",
@@ -94,7 +119,7 @@ def get_label_options(param_label, param=dict()):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_height_options(param_label, param=dict()):
+def get_height_options(param=dict()):
 
     return [
         { 
