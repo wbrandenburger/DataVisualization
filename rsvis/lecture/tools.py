@@ -13,7 +13,7 @@ from scipy import ndimage
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_histogram(img,alpha=0.7):    
+def get_histogram(img):    
     fig = plt.figure(dpi=64)
     color = ('b','g','r')
     # computation of the histogram for each channel
