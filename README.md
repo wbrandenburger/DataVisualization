@@ -6,6 +6,13 @@ RSVis is a visualization tool for exploring and for viewing remote sensing data.
 
 The source code can be found under the following [link](https://github.com/wbrandenburger/DataVisualization).
 
+## Requirements
+
+- Python 3.x
+
+- Git (optional)
+- CloudCompare (optional)
+
 ## Install
 
 If `git` is installed on your personal computer, start a virtual environment in `python` and run the following installation command
@@ -31,7 +38,7 @@ python path/to/your/git/repo/setup.py install develop
 Start the virtual environment in python where the data visualization package is located and navigate to the main folder with the dataset of the lecture and run the following command
 
 ```PowerShell
-rsvis run "lecture.yaml" --task_set tasks --task rsshow
+rsvis run "lecture.yaml" --task_set tasks --task lecture
 ```
 
 The field `path_dir` of key `param_io` in `lecture.yaml` has to point to an existing path, where displayed images can be saved. The other parameter of the key are not relevant for the user. If images have to be saved under Windows in folder `C:\User\Username\RSVis` the key `param_io` might be defined as follows:

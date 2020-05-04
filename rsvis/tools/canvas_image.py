@@ -84,10 +84,10 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
         shape = np.asarray(self.img_resize).shape
         img = np.zeros((shape[0], shape[1], 3), dtype=np.uint8)
         
-        self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(self.img_resize), bbox=self.resize_bbox([b["box"] for b in self._boxes]))
+        self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(self.img_resize), bbox=self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]))
         
         if self._object_flag:
-            img = imgtools.draw_box(img, [], self.resize_bbox([b["box"] for b in self._boxes]), [self._color[i["label"]] for i in self._boxes])            
+            img = imgtools.draw_box(img, [], self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]), [self._color[i["label"]] for i in self._boxes])            
 
         self._patches_grid = rsvis.utils.patches_ordered.OrderedPatches(np.asarray(self.img_resize), num_patches=self._grid, logger=self._logger)
 
