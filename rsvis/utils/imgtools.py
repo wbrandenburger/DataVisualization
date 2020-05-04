@@ -11,7 +11,6 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import ndimage
-import matplotlib.pyplot as plt
 from PIL import Image
 from io import BytesIO
 
