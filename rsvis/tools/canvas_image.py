@@ -44,7 +44,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
         self._boxes = list()                        
         self._color = dict((c["name"], c["color"]) for c in classes)
-        self._label = self._color[list(self._color.keys())[0]] if self._color else None
+        self._label = list(self._color.keys())[0] if self._color else None
 
         self._bbox = [0]*4
 
@@ -87,8 +87,6 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
         self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(self.img_resize), bbox=self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]))
         
         if self._object_flag:
-            print(self._boxes)
-            print(self._color)
             img = imgtools.draw_box(img, [], self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]), [self._color[b["label"]] for b in self._boxes if isinstance(b, dict)])            
 
         self._patches_grid = rsvis.utils.patches_ordered.OrderedPatches(np.asarray(self.img_resize), num_patches=self._grid, logger=self._logger)
@@ -208,7 +206,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
             self.double_button(title="Histogram", dtype="img", value=[patch, imgtools.get_histogram(patch)])
         elif self._area_event==1:
-            self._boxes.append({"box": self.resize_bbox([self._bbox], inverted=True)[0],"label": self._label})
+            self._boxes.append({"box": self.resize_bbox([self._bbox], inverted=True)[0], "label": self._label})
             self.create_image()
 
     #   method --------------------------------------------------------------
