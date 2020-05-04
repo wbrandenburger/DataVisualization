@@ -36,7 +36,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
         self._grid_flag = 1
         self._grid = grid if grid else [1, 1]
         
-        self._object_flag = 1
+        self._object_flag = 0
 
         self._selection = dict()
         self._patches_bbox = None
