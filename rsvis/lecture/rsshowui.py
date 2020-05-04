@@ -138,7 +138,7 @@ class RSShowUI():
            self.listbox.insert(END, pathlib.Path(item[0].path).stem)
         self.set_img_from_index()
 
-        self.cbox_area = rsvis.tools.settingsbox.ComboBox(self.window, "Histogram", ["Grid", "Objects"], self.set_area_event)
+        self.cbox_area = rsvis.tools.settingsbox.ComboBox(self.window, "Histogram", ["Objects", "Grid"], self.set_area_event)
         self.cbox_area.grid(row=1, column=0, columnspan=2, sticky=N+S)
 
         self.cbox_class = rsvis.tools.settingsbox.ComboBox(self.window, "Class", [c["name"] for c in self._classes], self.set_class )
