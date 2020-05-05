@@ -108,6 +108,7 @@ def get_histogram(img,alpha=0.7):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def raise_contrast(img):
+    print(img.shape)
     for c in range(0, img.shape[2]):
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
         img[:,:,c] = clahe.apply(img[:,:,c])
@@ -190,7 +191,8 @@ def get_grid_image(img, shape, bbox, color=[255, 0 ,0]):
     if not hasattr(img, "shape"):
         img = np.zeros(shape[0:2], dtype=np.uint8)
 
-    for idx, box in enumerate(bbox):
+    for idx, box_original in enumerate(bbox):
+        box = box_original.copy()
         for i in range(len(box)):
             box[i] = box[i]-1 if box[i] else box[i]
         img[box[0]:box[1] + 1, box[2], :] = np.array(color)
@@ -205,7 +207,8 @@ def draw_box(img, shape, bbox, color):
     if not hasattr(img, "shape"):
         img = np.zeros(shape[0:2], dtype=np.uint8)
 
-    for idx, box in enumerate(bbox):
+    for idx, box_original in enumerate(bbox):
+        box = box_original.copy()
         for i in range(len(box)):
             box[i] = box[i]-1 if box[i] else box[i]
         img[box[0]:box[1] + 1, box[2], :] = np.array(color[idx])

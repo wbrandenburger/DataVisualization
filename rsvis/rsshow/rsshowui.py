@@ -11,9 +11,10 @@ import rsvis.utils.imgio
 import rsvis.utils.format
 import rsvis.utils.yaml
 
-import rsvis.tools.canvas_image
+import rsvis.tools.imgcanvas
 import rsvis.tools.settingsbox
 import rsvis.tools.topwindow
+import rsvis.tools.widgets
 
 from tkinter import *
 import numpy as np
@@ -41,9 +42,6 @@ class RSShowUI():
         self.set_options(self._options)
 
         self._index = rsvis.utils.index.Index(len(self._data))
-        self._index_spec = rsvis.utils.index.Index(len(self._data[0]))
-        self._index_channel = None
-
         self._logger = logger
 
         self._popup_help = 0
@@ -104,22 +102,6 @@ class RSShowUI():
         )
         self._root.geometry("1000x700")
         # https://effbot.org/tkinterbook/tkinter-events-and-bindings.htm
-        self.menubar = Menu(self._root)
-        filemenu = Menu(self.menubar, tearoff=0)
-        filemenu.add_command(label="Open")
-        # Save the currently displayed image to a given folder.
-        filemenu.add_command(label="Save", command=lambda obj=self: obj._img_out(obj.get_img(path=True), obj.get_window_img(), prefix=obj.get_label()))
-        filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=self._root.quit)
-        self.menubar.add_cascade(label="File", menu=filemenu)
-        
-        self.add_option_menu(self._options, label="Options")
-        self._root.config(menu=self.menubar)
-        
-        infomenu = Menu(self.menubar, tearoff=0)
-        infomenu.add_command(label="Help", command=self.show_help)
-        self.menubar.add_cascade(label="Information", menu=infomenu)
-
         self._root.columnconfigure(0)
         self._root.columnconfigure(1)
         self._root.columnconfigure(2, weight=1)
@@ -136,7 +118,6 @@ class RSShowUI():
         self.listbox.bind("<<ListboxSelect>>", self.listbox_event)
         for count, item in enumerate(self._data):
            self.listbox.insert(END, pathlib.Path(item[0].path).stem)
-        self.set_img_from_index()
 
         self.cbox_area = rsvis.tools.settingsbox.ComboBox(self._root, "Histogram", ["Grid", "Objects"], self.set_area_event)
         self.cbox_area.grid(row=1, column=0, columnspan=2, sticky=N+S)
@@ -148,27 +129,31 @@ class RSShowUI():
         self.grid_settingsbox.grid(row=3, column=0, columnspan=2, sticky=N+S)
         self.grid_settingsbox.button_set.grid(row=4, column=0, columnspan=2,)
     
-        self.canvas = rsvis.tools.canvas_image.ImageCanvas(self._root, bg="black", grid=self._grid, double_button=self.new_popup, classes=self._classes, logger=self._logger)
-        self.set_img(self.img, show=True)
+        self.canvas = rsvis.tools.imgcanvas.ImageCanvas(self._root, bg="black", grid=self._grid, double_button=self.new_popup, classes=self._classes, logger=self._logger)
+        self.set_img_container()
         self.canvas.grid(row=0, column=2, rowspan=5, sticky=N+S+E+W)
+        
+        self._menubar = Menu(self._root)
+        filemenu = Menu(self._menubar, tearoff=0)
+        filemenu.add_command(label="Open")
+        # Save the currently displayed image to a given folder.
+        filemenu.add_command(label="Save", command=lambda obj=self: obj._img_out(obj.get_img_path(), obj.get_img(), prefix=obj.get_img_spec()))
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit", command=self._root.quit)
+        self._menubar.add_cascade(label="File", menu=filemenu)
+        ##########
+        rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self,label="Options")
+        #self.add_option_menu(self._options, self, label="Options")
+
+        infomenu = Menu(self._menubar, tearoff=0)
+        infomenu.add_command(label="Help", command=self.show_help)
+        self._menubar.add_cascade(label="Information", menu=infomenu)
+
+        self._root.config(menu=self._menubar)
         
         self._root.bind("<F1>", self.show_help)
         self.canvas.bind("<Key>", self.key_event)
         
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def invoke(self, command):
-        return command(self)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def add_option_menu(self, options, label="Default"):
-        optionmenu = Menu(self.menubar, tearoff=0)
-        for option in options: 
-            optionmenu.add_command(label=option["name"], command=lambda cmd=option["command"]: self.invoke(cmd))
-        
-        self.menubar.add_cascade(label=label, menu=optionmenu)
-
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_key_event_name(self, arg):
@@ -195,9 +180,8 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def new_popup(self, title="Box", dtype="msg", value=""):
-        t = rsvis.tools.topwindow.TopWindow(self._root, title=title, dtype=dtype, value=value, command=self.quit_window)
-        t.wm_deiconify()
+    def new_popup(self, title="Box", dtype="msg", value="", **kwargs):
+        t = rsvis.tools.topwindow.TopWindow(self._root, title=title, dtype=dtype, value=value, command=self.quit_window, menubar=self._options, **kwargs)
         t.mainloop()
 
     #   method --------------------------------------------------------------
@@ -232,7 +216,7 @@ class RSShowUI():
         if self.canvas.obj:
             self.cbox_area.set_choice("Objects")
             self.set_area_event()
-
+            
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def quit_window(self, window, title=None, **kwargs):
@@ -258,38 +242,8 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img(self, index=None, path=False, show=True):
-        index = self._index_spec() if index is None else index
-        img_container = self._data[self._index()][index]
-
-        if path:
-            return img_container.path
-        else:
-            img = img_container.data
-            self.get_log(img_container)
-            if show:
-                if get_number_of_channel(img) > 3:
-                    img = self.get_img_channel(img=img)
-
-        return img
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_label(self):
-        img_container = self._data[self._index()][self._index_spec()]
-        return img_container.spec
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_path(self):
-        img_container = self._data[self._index()][self._index_spec()]
-        return img_container.path
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
     def get_log(self, img_container):
         try: 
-            import pathlib
             log = img_container.log
             if pathlib.Path(log).is_file():
                 print(rsvis.utils.imgio.read_log(log))
@@ -298,74 +252,9 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img_channel(self, index=None, img=np.ndarray(0)):
-        index = self._index_spec() if not index else index
-        img_container = self._data[self._index()][index]
-        
-        if not len(img):
-            img = img_container.data
-
-        if not isinstance(self._index_channel, rsvis.utils.index.Index):
-            if get_number_of_channel(img):
-                self._index_channel = rsvis.utils.index.Index(get_number_of_channel(img))
-        
-        if isinstance(self._index_channel, rsvis.utils.index.Index):
-            number_channel = get_number_of_channel(img)
-            if number_channel:
-                img = imgtools.project_and_stack(img[..., self._index_channel()], dtype=np.uint8, factor=255)
-                return img
-        return img
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_window_img(self):
-        return self.img.copy()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_img_from_spec(self, spec, path=False, show=True):
-        if spec:
-            try:
-                index = self._data[self._index()].index(spec)
-                return self.get_img(index=index, path=path, show=show)
-            except ValueError:
-                return None 
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def set_img_from_index(self, index=None, show=False):
-        self.set_img(self.get_img(index=index), show=show)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_obj_path(self):
-        
-        try: 
-            import pathlib
-            path = self._get_obj_path(self.get_path())
-            if pathlib.Path(path).is_file():
-                return path
-        except TypeError:
-            pass
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def set_img(self, img, show=False):
-        self.img = img
-
-        if show:
-            objects = list()
-            path = self.get_obj_path()
-            if path:
-                objects=rsvis.utils.yaml.yaml_to_data(path)
-
-            self.canvas.set_img(self.img, objects=objects)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
     def listbox_event(self,event):
         self._index(index=self.listbox.curselection()[0])
-        self.set_img_from_index(show=True)
+        self.set_img_container()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -373,7 +262,7 @@ class RSShowUI():
         """Display the next image in given list."""
         index = self._index.next()
         self.listbox.activate(index)
-        self.set_img_from_index(show=True)
+        self.set_img_container()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -381,39 +270,7 @@ class RSShowUI():
         """Display the previous image in given list.""",
         index = self._index.last()
         self.listbox.activate(index)
-        self.set_img_from_index(show=True)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_w(self, **kwargs):
-        """Display the next image of the given image set.""",
-        self._index_spec.next()
-        self._index_channel = None
-        self.set_img_from_index(show=True)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_s(self, **kwargs):
-        """Display the previous image of the given image set.""",
-        self._index_spec.last()
-        self._index_channel = None
-        self.set_img_from_index(show=True)     
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_x(self, **kwargs):
-        """Display the next single channel of cuurent image."""
-        if isinstance(self._index_channel, rsvis.utils.index.Index):
-            self._index_channel.next()
-        self.set_img(self.get_img_channel(), show=True)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_y(self, **kwargs):
-        """Display the previous single channel of current image."""
-        if isinstance(self._index_channel, rsvis.utils.index.Index):
-            self._index_channel.last()
-        self.set_img(self.get_img_channel(), show=True)
+        self.set_img_container()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -423,12 +280,68 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def set_img(self, img, show=False):
+        self.img = img
+        self.canvas.set_img(self.img, objects=self.get_object())
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_img_container(self, index=None):
+        self.canvas.set_img_container(self._data[self._index()], objects=self.get_object())
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_img(self):
+        return self.canvas.get_img()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_img_spec(self):
+        try:
+            return self.canvas.get_img_container().spec
+        except AttributeError:
+            pass
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_img_path(self):
+        try:
+            return self.canvas.get_img_container().path
+        except AttributeError:
+            pass
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_img_from_spec(self, spec):
+        try:
+            return self.canvas.get_img_from_spec(spec)
+        except AttributeError:
+            pass
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_object(self):
+        if self.get_obj_path():
+            return rsvis.utils.yaml.yaml_to_data(self.get_obj_path())
+        return list()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_obj_path(self):
+        try: 
+            path = self._get_obj_path(self._data[self._index()][0].path)
+            if pathlib.Path(path).is_file():
+                return path
+        except TypeError:
+            return
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def remove_object(self):
         self.canvas.remove_object()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def save_object(self):
-        rsvis.utils.yaml.data_to_yaml(self.get_obj_path(), self.canvas.get_objects())        
-        
+        rsvis.utils.yaml.data_to_yaml(self.get_obj_path(), self.canvas.get_objects())  
 

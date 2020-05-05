@@ -59,6 +59,7 @@ def get_image(
         show=False, 
         **kwargs
     ):
+
     img = read_image(path)
 
     if show:

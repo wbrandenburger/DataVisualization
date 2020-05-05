@@ -14,7 +14,7 @@ import rsvis.utils.yaml
 import rsvis.tools.settingsbox
 import rsvis.tools.topwindow
 
-import rsvis.lecture.canvas_image
+import rsvis.lecture.imgcanvas
 
 from tkinter import *
 import numpy as np
@@ -149,7 +149,7 @@ class RSShowUI():
         self.grid_settingsbox.grid(row=3, column=0, columnspan=2, sticky=N+S)
         self.grid_settingsbox.button_set.grid(row=4, column=0, columnspan=2,)
     
-        self.canvas = rsvis.lecture.canvas_image.ImageCanvas(self.window, bg="black", grid=self._grid, double_button=self.new_popup, classes=self._classes, logger=self._logger)
+        self.canvas = rsvis.lecture.imgcanvas.ImageCanvas(self.window, bg="black", grid=self._grid, double_button=self.new_popup, classes=self._classes, logger=self._logger)
         self.set_img(self.img, show=True)
         self.canvas.grid(row=0, column=2, rowspan=5, sticky=N+S+E+W)
         

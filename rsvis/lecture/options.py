@@ -62,13 +62,13 @@ def get_general_options():
             "description": "Show a grid in the currently displayed image.",
             "command": lambda obj: obj.show_grid()
         },       
-        { 
-            "label" : "General",
-            "name" : "Reload",
-            "key" : "e",
-            "description": "Return to the current original image.",
-            "command": lambda obj: obj.set_img(obj.get_img(), show=True),
-        },
+        # { 
+        #     "label" : "General",
+        #     "name" : "Reload",
+        #     "key" : "e",
+        #     "description": "Return to the current original image.",
+        #     "command": lambda obj: obj.set_img(obj.get_img(), show=True),
+        # },
         { 
             "label" : "General",
             "name" : "Contrast",

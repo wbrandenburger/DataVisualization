@@ -1,13 +1,16 @@
 # ===========================================================================
-#   canvas_image.py ---------------------------------------------------------
+#   imgcanvas.py ---------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 import rsvis.utils.imgtools as imgtools
-import rsvis.tools.canvas_resizing
 import rsvis.utils.patches_ordered
 import rsvis.utils.patches_unordered
+
+import rsvis.tools.rescanvas
+
+import rsvis.lecture.tools as tools
 
 import numpy as np
 from PIL import Image, ImageTk
@@ -15,7 +18,7 @@ from tkinter import Canvas, NW
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
+class ImageCanvas(rsvis.tools.rescanvas.ResizingCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -76,7 +79,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
     def create_image(self):
         self.img_resize = self.img.resize(self.get_size())
         self.canvas_img = ImageTk.PhotoImage(image= self.draw_image())
-        super(rsvis.tools.canvas_resizing.ResizingCanvas, self).create_image(0, 0, image=self.canvas_img, anchor=NW)
+        super(rsvis.tools.rescanvas.ResizingCanvas, self).create_image(0, 0, image=self.canvas_img, anchor=NW)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -204,7 +207,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
             self._selection = {"box": self._bbox, "color": [150,150,150]}
             self.create_image()
 
-            self.double_button(title="Histogram", dtype="img", value=[patch, imgtools.get_histogram(patch)])
+            self.double_button(title="Histogram", dtype="img", value=[patch, tools.get_histogram(patch)])
         elif self._area_event==1:
             self._boxes.append({"box": self.resize_bbox([self._bbox], inverted=True)[0], "label": self._label})
             self.create_image()
@@ -227,7 +230,7 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
             else:
                 return
 
-        self.double_button(title="Histogram", dtype="img", value=[patch,imgtools.get_histogram(patch)])
+        self.double_button(title="Histogram", dtype="img", value=[patch, tools.get_histogram(patch)])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

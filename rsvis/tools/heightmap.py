@@ -26,7 +26,8 @@ def get_height_map(img, height=dict(), show=False):
     img = img.astype(float)
 
     if show:
-        height_factor = float(np.max(img))/(float(np.max([img.shape[0], img.shape[1]])) / 10)
+        img = img - np.min(img)
+        height_factor = float(np.max(img))/(float(np.max([img.shape[0], img.shape[1]])) / 6.0)
         img = img/height_factor
 
     grid = np.indices((img.shape[0], img.shape[1]), dtype="float")

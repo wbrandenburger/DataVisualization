@@ -1,5 +1,5 @@
 # ===========================================================================
-#   canvas_image.py ---------------------------------------------------------
+#   imgcanvas.py ---------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -8,9 +8,8 @@ import rsvis.utils.imgtools as imgtools
 import rsvis.utils.patches_ordered
 import rsvis.utils.patches_unordered
 
-import rsvis.tools.canvas_resizing
-
-import rsvis.lecture.tools as tools
+import rsvis.tools.extcanvas
+import rsvis.tools.imgconcanvas
 
 import numpy as np
 from PIL import Image, ImageTk
@@ -18,18 +17,28 @@ from tkinter import Canvas, NW
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
+class ImageCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, parent, grid=list(), double_button=None, classes=dict(), logger=None, **kwargs):
+    def __init__(
+        self, 
+        parent, 
+        grid=list(), 
+        double_button=None, 
+        classes=dict(), 
+        **kwargs
+    ):
+
         super(ImageCanvas, self).__init__(parent, shift=[4,4], **kwargs)
 
         self.double_button = double_button if double_button else (lambda x: x)
 
-        self.bind("<Button-1>", self.mouse_button_pressed)
-        self.bind("<ButtonRelease-1>", self.mouse_button_released)
-        self.bind("<Double-Button-1>", self.mouse_double_button)
+        self.bind("<Button-1>", self.mouse_button_1_pressed)
+        self.bind("<ButtonRelease-1>", self.mouse_button_1_released)
+        self.bind("<ButtonRelease-2>", self.mouse_button_2_released)
+        self.bind("<Double-Button-1>", self.mouse_double_1_button)
+        self.bind("<B1-Motion>", self.mouse_motion)
 
         self.mouse_area = list()
         self.mouse_point = list()
@@ -49,20 +58,21 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
         self._color = dict((c["name"], c["color"]) for c in classes)
         self._label = list(self._color.keys())[0] if self._color else None
 
-        self._bbox = [0]*4
+        self._bbox = [0, 0, 0, 0]
+
+        self._point = [0,0]
 
         self._mouse_sensitivity = 4
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def clear(self):
-        self._selection = dict()
-        self.create_image()
-
+    def clear(self, **kwargs):
+        super(ImageCanvas, self).clear(**kwargs)
+    
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def resize_bbox(self, boxes, inverted=False):
-        scale = [float(s)/i for s, i in zip(self.get_size(), self.img_size)]
+        scale = [float(s)/i for s, i in zip(self.get_size(), self._img_size)]
 
         if inverted:
             scale = [1/s for s in scale]
@@ -76,32 +86,28 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def create_image(self):
-        self.img_resize = self.img.resize(self.get_size())
-        self.canvas_img = ImageTk.PhotoImage(image= self.draw_image())
-        super(rsvis.tools.canvas_resizing.ResizingCanvas, self).create_image(0, 0, image=self.canvas_img, anchor=NW)
+    def draw_image(self, **kwargs):
+        img_resize = super(ImageCanvas, self).draw_image(**kwargs)
+        shape = np.asarray(img_resize).shape
 
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def draw_image(self):
-        shape = np.asarray(self.img_resize).shape
         img = np.zeros((shape[0], shape[1], 3), dtype=np.uint8)
         
-        self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(self.img_resize), bbox=self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]))
+        self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(img_resize), bbox=self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]))
         
         if self._object_flag:
             img = imgtools.draw_box(img, [], self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]), [self._color[b["label"]] for b in self._boxes if isinstance(b, dict)])            
 
-        self._patches_grid = rsvis.utils.patches_ordered.OrderedPatches(np.asarray(self.img_resize), num_patches=self._grid, logger=self._logger)
+        self._patches_grid = rsvis.utils.patches_ordered.OrderedPatches(np.asarray(img_resize), num_patches=self._grid, logger=self._logger)
 
         if self._grid_flag:            
             img = imgtools.get_grid_image(img, [], self._patches_grid.get_bbox())
 
         if self._selection:
-            img = imgtools.draw_box(img, [], [self._selection["box"]], [self._selection["color"]])
+            img = imgtools.draw_box(img, [], self.resize_bbox([self._selection["box"]]), [self._selection["color"]])
+
         img = Image.fromarray(imgtools.get_transparent_image(img))
 
-        img_label = self.img_resize.copy()
+        img_label = img_resize.copy()
         img_label.paste(img, (0, 0), img)
         return img_label
 
@@ -114,8 +120,8 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img(self, img, objects=list()):
-        self.img_size = [img.shape[1], img.shape[0]]
-        self.img = Image.fromarray(img)
+        self._img_size = [img.shape[1], img.shape[0]]
+        self._img = Image.fromarray(img)
 
         self._boxes = objects
         self.create_image()
@@ -160,61 +166,97 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def resize_event(self, event):
-        img = self.img_resize
-        ev = [
-            int(float(event.y)/float(self.size[1])*float(img.size[1])),
-            int(float(event.x)/float(self.size[0])*float(img.size[0]))
-        ]
-        ev[0] = ev[0] if ev[0] <= img.size[1] else img.size[1]
-        ev[1] = ev[1] if ev[1] <= img.size[0] else img.size[0]
+        ev = [event.y, event.x]
+
+        ev[0] = ev[0] if ev[0] >= 0 else 0 
+        ev[0] = ev[0] if ev[0] <= self._img_resize.size[1] else self._img_resize.size[1]
+        
+        ev[1] = ev[1] if ev[1] >= 0 else 0 
+        ev[1] = ev[1] if ev[1] <= self._img_resize.size[0] else self._img_resize.size[0]
         
         return ev
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def mouse_button_pressed(self, event):
+    def mouse_button_1_pressed(self, event):
         self.focus_set()
-        self.clear()
+        self._selection = dict()
 
         ev = self.resize_event(event)
-        self._bbox = [ev[0], ev[0], ev[1], ev[1]]
-
+        self._point = [ev[0], ev[1]]
         if self._area_event==1:
-            boxes = list()
-            self._patches_bbox.get_bbox_from_point(ev, boxes=boxes)
+            indices=list()
+            self._patches_bbox.get_bbox_from_point(ev, indices=indices)
             
-            if len(boxes):
-                self._selection = {"box": boxes[0], "color": [150,150,150]}
+            if len(indices):
+                self._selection = {"box": self._boxes[indices[0]]["box"], "color": [150,150,150]}
                 
         self.create_image()
-        
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def mouse_button_released(self, event):
+    def mouse_motion(self, event):
+        self.focus_set()
+
+        ev = self.resize_event(event)
+        self._bbox[0] = min([self._point[0], ev[0]])
+        self._bbox[1] = max([self._point[0], ev[0]])
+        self._bbox[2] = min([self._point[1], ev[1]])
+        self._bbox[3] = max([self._point[1], ev[1]])
+        self._selection = {"box": self.resize_bbox([self._bbox], inverted=True)[0], "color": [150,150,150]}
+        self.create_image()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def mouse_button_1_released(self, event):
         self.focus_set()
         
         ev = self.resize_event(event)
-        self._bbox[0] = min([self._bbox[0], ev[0]])
-        self._bbox[1] = max([self._bbox[1], ev[0]])
-        self._bbox[2] = min([self._bbox[2], ev[1]])
-        self._bbox[3] = max([self._bbox[3], ev[1]])
+        self._bbox[0] = min([self._point[0], ev[0]])
+        self._bbox[1] = max([self._point[0], ev[0]])
+        self._bbox[2] = min([self._point[1], ev[1]])
+        self._bbox[3] = max([self._point[1], ev[1]])
 
         if not (self._bbox[1]-self._bbox[0] > self._mouse_sensitivity and self._bbox[3]-self._bbox[2] > self._mouse_sensitivity):
             return
 
         if self._area_event==0:
             patch = self._patches_bbox.get_patch(bbox=self._bbox)
-            self._selection = {"box": self._bbox, "color": [150,150,150]}
+            self._selection = {"box": self.resize_bbox([self._bbox], inverted=True)[0], "color": [150,150,150]}
             self.create_image()
 
-            self.double_button(title="Histogram", dtype="img", value=[patch, tools.get_histogram(patch)])
+            self.double_button(title="Histogram", dtype="img", value=patch, histogram=True)
         elif self._area_event==1:
             self._boxes.append({"box": self.resize_bbox([self._bbox], inverted=True)[0], "label": self._label})
             self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def mouse_double_button(self, event):
+    def mouse_button_2_released(self, event):
+        self.focus_set()
+        
+        ev = self.resize_event(event)
+
+        boxes = None
+        if self._area_event==0:
+            bbox = self.resize_bbox([self._patches_grid.get_bbox_from_point(ev)], inverted=True)[0]
+        elif self._area_event==1:
+            boxes = list()
+            self._patches_bbox.get_bbox_from_point(ev, boxes=boxes)
+    
+            if len(boxes):
+                bbox = self.resize_bbox(boxes, inverted=True)[0]
+            else:
+                return
+
+        if bbox:
+            img_container = self._img_container.copy()
+            img_container.set_bbox(bbox)
+            self.double_button(title="Histogram", dtype="img", value=img_container, container=True)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def mouse_double_1_button(self, event):
         self.focus_set()
         
         ev = self.resize_event(event)
@@ -230,13 +272,13 @@ class ImageCanvas(rsvis.tools.canvas_resizing.ResizingCanvas):
             else:
                 return
 
-        self.double_button(title="Histogram", dtype="img", value=[patch, tools.get_histogram(patch)])
+        self.double_button(title="Histogram", dtype="img", value=patch, histogram=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def remove_object(self):
         if self._selection and self._patches_bbox:
-            idx = self._patches_bbox.equal(self._selection["box"])
+            idx = self._patches_bbox.equal(self.resize_bbox([self._selection["box"]])[0])
             if idx is not None: 
                 self._boxes.pop(idx)
                 self._selection = dict()

@@ -67,16 +67,16 @@ def get_general_options():
         { 
             "label" : "General",
             "name" : "Reload",
-            "key" : "e",
+            "key" : None,
             "description": "Return to the current original image.",
-            "command": lambda obj: obj.set_img(obj.get_img(), show=True),
+            "command": lambda obj: obj.set_img(obj.get_img()),
         },
         { 
             "label" : "General",
             "name" : "Contrast",
             "key" : "r",
             "description": "Raise the contrast of the currently displayed image.",
-            "command": lambda obj: obj.set_img(imgtools.raise_contrast(obj.get_window_img()), show=True)
+            "command": lambda obj: obj.set_img(imgtools.raise_contrast(obj.get_img()))
         }
     ]
 
@@ -94,12 +94,11 @@ def get_label_options(param_label, param=dict()):
             "description": "Show the mask of one label in current image.",
             "command": lambda obj: obj.set_img(
                 imgtools.get_label_image(
-                    obj.get_img(), 
+                    obj.get_img_from_spec("image"), 
                     obj.get_img_from_spec("label"), 
                     value=label_index(),
-                    equal=False
-                ), show=True
-            )
+                    equal=False)
+                )
         },
         { 
             "label" : "Label",
@@ -111,9 +110,8 @@ def get_label_options(param_label, param=dict()):
                         obj.get_img_from_spec("label")[...,0],
                         label=label_index(),
                         **glu.get_value(param,"distance-transform", dict()),
-                    ), dtype=np.uint8, factor=255
-                ), show=True
-            )
+                    ), dtype=np.uint8, factor=255)
+                )
         }
     ]
 
@@ -128,7 +126,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in ccViewer as pointcloud.",
             "command": lambda obj: rsvis.tools.heightmap.main(
-                obj.get_window_img(), 
+                obj.get_img(), 
                 obj.get_img_from_spec("height"),
                 normals=False,
                 mesh=False,
@@ -141,7 +139,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in ccViewer as mesh.",
             "command": lambda obj: rsvis.tools.heightmap.main(
-                obj.get_window_img(), 
+                obj.get_img(), 
                 obj.get_img_from_spec("height"),
                 normals=True,
                 mesh=True,
@@ -155,7 +153,7 @@ def get_height_options(param=dict()):
             "description": "Compute and show the normal image.",
             "command": lambda obj: obj.set_img(
                 rsvis.tools.heightmap.get_normal_image(
-                    obj.get_window_img(), 
+                    obj.get_img(), 
                     obj.get_img_from_spec("height"),
                     show=True,
                 ),
@@ -168,7 +166,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: rsvis.tools.heightmap.main(
-                obj.get_window_img(),
+                obj.get_img(),
                 obj.get_img_from_spec("height"), 
                 obj.get_img_from_spec("label"),
                 normals=False,
@@ -183,7 +181,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: rsvis.tools.heightmap.main(
-                obj.get_window_img(),
+                obj.get_img(),
                 obj.get_img_from_spec("height"), 
                 obj.get_img_from_spec("label"),
                 normals=True,
