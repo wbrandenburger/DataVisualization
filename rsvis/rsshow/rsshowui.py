@@ -259,7 +259,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_img(self, index=None, path=False, show=True):
-        index = self._index_spec() if not index else index
+        index = self._index_spec() if index is None else index
         img_container = self._data[self._index()][index]
 
         if path:

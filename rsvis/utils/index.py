@@ -16,7 +16,7 @@ class Index:
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __call__(self, index=None):
-        if index:
+        if index is not None:
             self._index=index
         return self.index
   
