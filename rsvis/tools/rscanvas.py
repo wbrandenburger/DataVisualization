@@ -1,5 +1,5 @@
 # ===========================================================================
-#   imgcanvas.py ---------------------------------------------------------
+#   rscanvas.py ---------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -8,31 +8,38 @@ import rsvis.utils.imgtools as imgtools
 import rsvis.utils.patches_ordered
 import rsvis.utils.patches_unordered
 
-import rsvis.tools.extcanvas
 import rsvis.tools.imgconcanvas
 
 import numpy as np
+import pathlib
 from PIL import Image, ImageTk
-from tkinter import Canvas, NW
+from tkinter import Canvas, Frame, Listbox, Scrollbar, END, N, W, E, S
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class ImageCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
+class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __init__(
         self, 
         parent, 
+        data,
         grid=list(), 
-        double_button=None, 
+        obj_path=None,
+        popup=None, 
         classes=dict(), 
         **kwargs
     ):
+        
+        super(RSCanvas, self).__init__(parent, shift=[4,4], **kwargs)
+        
+        self._new_popup = popup if popup else (lambda x: x)
 
-        super(ImageCanvas, self).__init__(parent, shift=[4,4], **kwargs)
+        self._data = data
+        self._index_list = rsvis.utils.index.Index(len(self._data))
 
-        self.double_button = double_button if double_button else (lambda x: x)
+        self._get_obj_path = obj_path
 
         self.bind("<Button-1>", self.mouse_button_1_pressed)
         self.bind("<ButtonRelease-1>", self.mouse_button_1_released)
@@ -64,10 +71,15 @@ class ImageCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
         self._mouse_sensitivity = 4
 
+        self.bind("<a>", self.key_a)
+        self.bind("<d>", self.key_d)
+        self.bind("<f>", self.key_f)
+        self.bind("<g>", self.key_g)
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def clear(self, **kwargs):
-        super(ImageCanvas, self).clear(**kwargs)
+        super(RSCanvas, self).clear(**kwargs)
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -87,7 +99,7 @@ class ImageCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def draw_image(self, **kwargs):
-        img_resize = super(ImageCanvas, self).draw_image(**kwargs)
+        img_resize = super(RSCanvas, self).draw_image(**kwargs)
         shape = np.asarray(img_resize).shape
 
         img = np.zeros((shape[0], shape[1], 3), dtype=np.uint8)
@@ -110,6 +122,13 @@ class ImageCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         img_label = img_resize.copy()
         img_label.paste(img, (0, 0), img)
         return img_label
+        
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_container(self, index=None):
+        index = self._index_list() if index is None else index   
+        self.get_object()
+        self.set_img_container(self._data[index])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -121,10 +140,12 @@ class ImageCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
     # -----------------------------------------------------------------------
     def set_img(self, img, objects=list()):
         self._img_size = [img.shape[1], img.shape[0]]
-        self._img = Image.fromarray(img)
+        super(RSCanvas, self).set_img(img)
 
-        self._boxes = objects
-        self.create_image()
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_index_list(self):
+        return self._index_list()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -165,6 +186,36 @@ class ImageCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def get_object(self):
+        self._boxes = rsvis.utils.yaml.yaml_to_data(self.get_obj_path()) if self.get_obj_path() else list()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def remove_object(self):
+        if self._selection and self._patches_bbox:
+            idx = self._patches_bbox.equal(self.resize_bbox([self._selection["box"]])[0])
+            if idx is not None: 
+                self._boxes.pop(idx)
+                self._selection = dict()
+            self.create_image()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def save_object(self):
+        rsvis.utils.yaml.data_to_yaml(self.get_obj_path(), self.get_objects())  
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_obj_path(self):
+        try: 
+            path = self._get_obj_path(self._data[self._index_list()][0].path)
+            if pathlib.Path(path).is_file():
+                return path
+        except TypeError:
+            return
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def resize_event(self, event):
         ev = [event.y, event.x]
 
@@ -178,108 +229,126 @@ class ImageCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def mouse_button_1_pressed(self, event):
-        self.focus_set()
+    def get_bbox(self, event):
+        ev = self.resize_event(event)
+        return [ 
+            min([self._point[0], ev[0]]),
+            max([self._point[0], ev[0]]),
+            min([self._point[1], ev[1]]),
+            max([self._point[1], ev[1]])
+        ]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def is_mouse_event(self, bbox):
+        if not (bbox[1]-bbox[0] > self._mouse_sensitivity and bbox[3]-bbox[2] > self._mouse_sensitivity):
+            return False
+        return True
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def clear_selection(self):
         self._selection = dict()
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_selection(self, bbox, resize=True):
+        if resize:
+            bbox = self.resize_bbox([bbox], inverted=True)[0]
+        self._selection = {"box": bbox, "color": [150,150,150]}
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_boxes(self, bbox, resize=True):
+        if resize:
+            bbox = self.resize_bbox([bbox], inverted=True)[0]
+        self._boxes.append({"box": bbox, "label": self._label})
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def new_popup(self, bbox, histogram=True):
+        if bbox:
+            img_container = self._img_container.copy()
+            img_container.set_bbox(bbox)
+            self._new_popup(title="Histogram", dtype="img", value=img_container, histogram=histogram) 
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def mouse_button_1_pressed(self, event):
+        self.focus_set()
+        self.clear_selection()
         ev = self.resize_event(event)
         self._point = [ev[0], ev[1]]
         if self._area_event==1:
             indices=list()
             self._patches_bbox.get_bbox_from_point(ev, indices=indices)
-            
             if len(indices):
-                self._selection = {"box": self._boxes[indices[0]]["box"], "color": [150,150,150]}
-                
+                self.set_selection(self._boxes[indices[0]]["box"], resize=False)
         self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def mouse_motion(self, event):
         self.focus_set()
-
-        ev = self.resize_event(event)
-        self._bbox[0] = min([self._point[0], ev[0]])
-        self._bbox[1] = max([self._point[0], ev[0]])
-        self._bbox[2] = min([self._point[1], ev[1]])
-        self._bbox[3] = max([self._point[1], ev[1]])
-        self._selection = {"box": self.resize_bbox([self._bbox], inverted=True)[0], "color": [150,150,150]}
+        bbox = self.get_bbox(event)
+        self.set_selection(bbox)
         self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def mouse_button_1_released(self, event):
         self.focus_set()
-        
-        ev = self.resize_event(event)
-        self._bbox[0] = min([self._point[0], ev[0]])
-        self._bbox[1] = max([self._point[0], ev[0]])
-        self._bbox[2] = min([self._point[1], ev[1]])
-        self._bbox[3] = max([self._point[1], ev[1]])
-
-        if not (self._bbox[1]-self._bbox[0] > self._mouse_sensitivity and self._bbox[3]-self._bbox[2] > self._mouse_sensitivity):
-            return
-
-        if self._area_event==0:
-            patch = self._patches_bbox.get_patch(bbox=self._bbox)
-            self._selection = {"box": self.resize_bbox([self._bbox], inverted=True)[0], "color": [150,150,150]}
-            self.create_image()
-
-            self.double_button(title="Histogram", dtype="img", value=patch, histogram=True)
-        elif self._area_event==1:
-            self._boxes.append({"box": self.resize_bbox([self._bbox], inverted=True)[0], "label": self._label})
-            self.create_image()
+        bbox = self.get_bbox(event)
+        if self.is_mouse_event(bbox):
+            if self._area_event==0:
+                patch = self._patches_bbox.get_patch(bbox=bbox)
+                self.set_selection(bbox)
+                self.new_popup(self._selection["box"])
+            elif self._area_event==1:
+                self.set_boxes(bbox)
+            
+        self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def mouse_button_2_released(self, event):
-        self.focus_set()
-        
-        ev = self.resize_event(event)
+    def mouse_double_1_button(self, event):
+        self.mouse_button_2_released(event, histogram=False)
 
-        boxes = None
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def mouse_button_2_released(self, event, histogram=True):
+        self.focus_set()
+        ev = self.resize_event(event)
         if self._area_event==0:
             bbox = self.resize_bbox([self._patches_grid.get_bbox_from_point(ev)], inverted=True)[0]
         elif self._area_event==1:
             boxes = list()
             self._patches_bbox.get_bbox_from_point(ev, boxes=boxes)
-    
-            if len(boxes):
-                bbox = self.resize_bbox(boxes, inverted=True)[0]
-            else:
-                return
-
-        if bbox:
-            img_container = self._img_container.copy()
-            img_container.set_bbox(bbox)
-            self.double_button(title="Histogram", dtype="img", value=img_container, container=True)
+            bbox = self.resize_bbox(boxes, inverted=True)[0] if len(boxes) else None
+        self.new_popup(bbox, histogram=histogram)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def mouse_double_1_button(self, event):
-        self.focus_set()
+    def key_d(self, event, **kwargs):
+        """Display the next image in given list."""
+        index = self._index_list.next()
+        self.set_container(index=index)
         
-        ev = self.resize_event(event)
-
-        if self._area_event==0:
-            patch = self._patches_grid.get_patch_from_point(ev)
-        elif self._area_event==1:
-            patches = list()
-            self._patches_bbox.get_patch_from_point(ev, patches=patches)
-            
-            if len(patches):
-                patch = patches[0]
-            else:
-                return
-
-        self.double_button(title="Histogram", dtype="img", value=patch, histogram=True)
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_a(self, event, **kwargs):
+        """Display the previous image in given list.""",
+        index = self._index_list.last()
+        self.set_container(index=index)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def remove_object(self):
-        if self._selection and self._patches_bbox:
-            idx = self._patches_bbox.equal(self.resize_bbox([self._selection["box"]])[0])
-            if idx is not None: 
-                self._boxes.pop(idx)
-                self._selection = dict()
-            self.create_image()
+    def key_f(self, event=None):
+        """Objects On/Off"""
+        self.show_objects()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_g(self, event=None):
+        "Remove the selected object."
+        self.remove_object()

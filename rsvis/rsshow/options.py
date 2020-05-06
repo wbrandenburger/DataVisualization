@@ -30,23 +30,30 @@ def get_object_options():
 
     return [
         { 
-            "label" : "Objects",
+            "label" : "objects",
+            "name" : "Grid On/Off",
+            "key" : None,
+            "description": "Show a grid in the currently displayed image.",
+            "command": lambda obj: obj.show_grid()
+        },      
+        { 
+            "label" : "objects",
             "name" : "Objects On/Off",
-            "key" : "g",
+            "key" : None,
             "description": "Show the bounding boxes in the currently displayed image.",
             "command": lambda obj: obj.show_objects()
         },
         { 
-            "label" : "Objects",
+            "label" : "objects",
             "name" : "Save objects",
             "key" : None,
             "description": "Save displayed objects.",
             "command": lambda obj: obj.save_object()
         },
         { 
-            "label" : "Objects",
+            "label" : "objects",
             "name" : "Remove selected object",
-            "key" : "h",
+            "key" : None,
             "description": "Remove the selected object.",
             "command": lambda obj: obj.remove_object()
         }
@@ -56,23 +63,9 @@ def get_object_options():
 # ---------------------------------------------------------------------------
 def get_general_options():
 
-    return [
+    return [ 
         { 
-            "label" : "General",
-            "name" : "Grid On/Off",
-            "key" : None,
-            "description": "Show a grid in the currently displayed image.",
-            "command": lambda obj: obj.show_grid()
-        },       
-        { 
-            "label" : "General",
-            "name" : "Reload",
-            "key" : None,
-            "description": "Return to the current original image.",
-            "command": lambda obj: obj.set_img(obj.get_img()),
-        },
-        { 
-            "label" : "General",
+            "label" : "image",
             "name" : "Contrast",
             "key" : "r",
             "description": "Raise the contrast of the currently displayed image.",
@@ -88,9 +81,9 @@ def get_label_options(param_label, param=dict()):
 
     return [ 
         { 
-            "label" : "Label",
+            "label" : "label",
             "name" : "Projection ",
-            "key" : "f",
+            "key" : "t",
             "description": "Show the mask of one label in current image.",
             "command": lambda obj: obj.set_img(
                 imgtools.get_label_image(
@@ -101,7 +94,7 @@ def get_label_options(param_label, param=dict()):
                 )
         },
         { 
-            "label" : "Label",
+            "label" : "label",
             "name" : "Distance Transform",
             "key" : "z",
             "description": "Compute the distance transform map of a label given by current label index.",
@@ -121,7 +114,7 @@ def get_height_options(param=dict()):
 
     return [
         { 
-            "label" : "Height",
+            "label" : "height",
             "name" : "Open Pointcloud in ccViewer",
             "key" : None,
             "description": "Open the currently displayed image in ccViewer as pointcloud.",
@@ -134,7 +127,7 @@ def get_height_options(param=dict()):
             ), 
         },
         { 
-            "label" : "Height",
+            "label" : "height",
             "name" : "Open Mesh in ccViewer",
             "key" : None,
             "description": "Open the currently displayed image in ccViewer as mesh.",
@@ -147,7 +140,7 @@ def get_height_options(param=dict()):
             ), 
         },
         { 
-            "label" : "Height",
+            "label" : "height",
             "name" : "Normal image",
             "key" : None,
             "description": "Compute and show the normal image.",
@@ -156,12 +149,11 @@ def get_height_options(param=dict()):
                     obj.get_img(), 
                     obj.get_img_from_spec("height"),
                     show=True,
-                ),
-                show=True
+                )
             )
         },
         { 
-            "label" : "Height",
+            "label" : "height",
             "name" : "Open Pointcloud in CloudCompare",
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
@@ -176,7 +168,7 @@ def get_height_options(param=dict()):
             ),
         },        
         { 
-            "label" : "Height",
+            "label" : "height",
             "name" : "Open Mesh in CloudCompare",
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",

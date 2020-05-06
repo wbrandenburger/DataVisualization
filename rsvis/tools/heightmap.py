@@ -43,8 +43,8 @@ def get_height_map(img, height=dict(), show=False):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def colorize_height_map(img, height=dict()):
-    img_width, img_height, _ = img.shape
-    dim_new =(img_width*img_height)
+    img = imgtools.stack_image_dim(img)
+    dim_new = (img.shape[0]*img.shape[1])
 
     height.update(
         {

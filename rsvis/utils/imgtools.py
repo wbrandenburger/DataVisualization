@@ -108,7 +108,6 @@ def get_histogram(img,alpha=0.7):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def raise_contrast(img):
-    print(img.shape)
     for c in range(0, img.shape[2]):
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
         img[:,:,c] = clahe.apply(img[:,:,c])

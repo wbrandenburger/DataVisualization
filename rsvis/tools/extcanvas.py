@@ -30,9 +30,9 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
         self._channel_flag = 0
         self._index_channel = self._index_channel = rsvis.utils.index.Index(3)
 
-        self._parent.bind("<x>", self.key_x)
-        self._parent.bind("<y>", self.key_y)
-        self._parent.bind("<e>", self.key_e)
+        self.bind("<x>", self.key_x)
+        self.bind("<y>", self.key_y)
+        self.bind("<e>", self.key_e)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

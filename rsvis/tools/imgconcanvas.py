@@ -1,5 +1,5 @@
 # ===========================================================================
-#   imgcanvas.py ---------------------------------------------------------
+#   rscanvas.py ---------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -23,15 +23,15 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     # -----------------------------------------------------------------------
     def __init__(
         self, 
-        parent, 
+        parent,
         shift=[4,4],
         **kwargs
     ):
 
         super(ImageContainerCanvas, self).__init__(parent, shift=shift, **kwargs)
 
-        self._parent.bind("<w>", self.key_w)
-        self._parent.bind("<s>", self.key_s)
+        self.bind("<w>", self.key_w)
+        self.bind("<s>", self.key_s)
 
         self._idx_current = 0
 
@@ -49,6 +49,7 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     def set_img_container(self, img_container, **kwargs):
         self._img_container = img_container
         self._idx_spec = rsvis.utils.index.Index(len(self._img_container))
+        self._idx_spec.index = self._idx_current
         self.set_img_from_index(index=self._idx_current, **kwargs)
 
     #   method --------------------------------------------------------------
@@ -63,6 +64,14 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
             return
             
         return self._img_container.get_img_from_spec(spec).data
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_img_path(self, **kwargs):
+        if not self._img_container:
+            return
+            
+        return self._img_container[self._idx_spec()].path
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -85,14 +94,14 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
-        """Display the next image of the given image set.""",
+        """Display the next image of the given image set."""
         self._idx_current = self._idx_spec.next()
         self.set_img_from_index()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, event, **kwargs):
-        """Display the previous image of the given image set.""",
+        """Display the previous image of the given image set."""
         self._idx_current = self._idx_spec.last()
         self.set_img_from_index()
     
@@ -101,4 +110,5 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     def key_e(self, event, **kwargs):
         """Show the current original image."""
         self.clear()
+        self._idx_spec.index = self._idx_current
         self.set_img_from_index(index=self._idx_current)

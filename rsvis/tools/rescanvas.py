@@ -24,6 +24,13 @@ class ResizingCanvas(Canvas):
         self._logger = logger
 
         self._parent = parent
+        
+        self.bind("<Button-1>", self.mouse_button_1_pressed)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def mouse_button_1_pressed(self, event):
+        self.focus_set()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

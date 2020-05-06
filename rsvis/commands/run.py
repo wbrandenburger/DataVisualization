@@ -15,7 +15,7 @@ import click
 # ---------------------------------------------------------------------------
 @click.command(
     "run",
-    help="Blubb",
+    help="RSCanvas",
     context_settings=dict(ignore_unknown_options=True)
 )
 @click.help_option(
