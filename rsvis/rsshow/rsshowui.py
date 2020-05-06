@@ -205,7 +205,8 @@ class RSShowUI():
     def quit_window(self, window, title=None, **kwargs):
         """Exit Window."""
         if title=="Help":
-            self._popup_help = 0       
+            self._popup_help = 0
+        window.quit()       
         window.destroy()
 
     #   method --------------------------------------------------------------

@@ -43,8 +43,11 @@ class RSCanvasFrame(Frame):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def listbox_event(self,event):
-        self._canvas._index_list(index=self.listbox.curselection()[0])
-        self._canvas.set_container()
+        try:
+            self._canvas._index_list(index=self.listbox.curselection()[0])
+            self._canvas.set_container()
+        except IndexError:
+            pass
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

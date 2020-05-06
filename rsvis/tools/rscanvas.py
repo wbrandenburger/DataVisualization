@@ -306,8 +306,6 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
                 self.new_popup(self._selection["box"])
             elif self._area_event==1:
                 self.set_boxes(bbox)
-            
-        self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -333,7 +331,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         """Display the next image in given list."""
         index = self._index_list.next()
         self.set_container(index=index)
-        
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_a(self, event, **kwargs):

@@ -89,7 +89,8 @@ class ResizingCanvas(Canvas):
     # -----------------------------------------------------------------------
     def create_image(self, **kwargs):
         self._img_resize = self._img.resize(self.get_size())
-        self._canvas_img = ImageTk.PhotoImage(image=self.draw_image())
+        hm = self.draw_image()
+        self._canvas_img = ImageTk.PhotoImage(image=hm)
         super(ResizingCanvas, self).create_image(0, 0, image=self._canvas_img, anchor=NW)
 
     #   method --------------------------------------------------------------
