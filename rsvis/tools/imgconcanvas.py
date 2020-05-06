@@ -75,6 +75,14 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def get_img_spec(self, **kwargs):
+        if not self._img_container:
+            return
+            
+        return self._img_container[self._idx_spec()].spec
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def get_img_container(self, index=None, **kwargs):
         if not self._img_container:
             return

@@ -79,7 +79,8 @@ class RSShowUI():
             "s" : "Display the previous image of the given image set.",
             "x" : "Display the next single channel of cuurent image.",
             "y" : "Display the previous single channel of current image.",
-            "g" : "Show grid lines in current image.",
+            "f" : "Show grid lines in current image.",
+            "g" : "Remove the selected object"
         }
 
         self._keys = dict()
@@ -127,7 +128,7 @@ class RSShowUI():
         filemenu = Menu(self._menubar, tearoff=0)
         filemenu.add_command(label="Open")
         # Save the currently displayed image to a given folder.
-        filemenu.add_command(label="Save", command=lambda obj=self: obj._img_out(obj.get_img_path(), obj.get_img(), prefix=obj.get_img_from_spec()))
+        filemenu.add_command(label="Save", command=lambda obj=self._frame._canvas, img_out=self._img_out: img_out(obj.get_img_path(), obj.get_img(), prefix=obj.get_img_spec()))
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self._root.quit)
         self._menubar.add_cascade(label="File", menu=filemenu)
