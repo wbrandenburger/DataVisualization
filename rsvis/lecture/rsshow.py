@@ -33,7 +33,7 @@ def run(
     
     img_in, img_out, _ , get_path = rsvis.utils.imgio.get_data(files, param_specs, param_io, param_log=param_log, param_label=param_label, param_show=param_show)
 
-    ui = rsvis.lecture.rsshowui.RSShowUI(
+    ui = rsvis.tools.rsshowui.RSShowUI(
         img_in, 
         img_out, 
         options=rsvis.tools.options.get_lecture_options(
