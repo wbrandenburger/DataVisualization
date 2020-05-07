@@ -52,6 +52,8 @@ class TopWindow(Toplevel):
             self.config(menu=self._menubar)
 
         self.bind("<q>", self.key_q)
+        self.bind("<w>", self.key_w)
+        self.bind("<s>", self.key_s)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -83,13 +85,33 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas_histogram(self, img):
-        canvas = rsvis.tools.rescanvas.ResizingCanvas(self, bg="black")
-        canvas.set_img(imgtools.get_histogram(img))
+        self._canvas_hist = rsvis.tools.rescanvas.ResizingCanvas(self, bg="black")
+        self._canvas_hist.set_img(imgtools.get_histogram(img))
         
-        canvas.grid(row=0, column=1, sticky=N+S+W+E)
+        self._canvas_hist.grid(row=0, column=1, sticky=N+S+W+E)
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_w(self, event, **kwargs):
+        self.update_histogram()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_s(self, event, **kwargs):
+        self.update_histogram()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def update_histogram(self, **kwargs):
+        
+        self._canvas_hist.set_img(
+            imgtools.get_histogram(self._canvas.get_img())
+        )
+    
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_q(self, event, **kwargs):
         """Exit RSVis."""
         self._command()
+
+    

@@ -144,32 +144,8 @@ class RSShowUI():
         # https://stackoverflow.com/questions/665566/redirect-command-line-results-to-a-tkinter-gui
 
         self._root.bind("<F1>", self.show_help)
-        self._root.bind("<Key>", self.key_event)
+        self._root.bind("q", self.key_q)
         
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_key_event_name(self, arg):
-        return 'key_' + str(arg)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def has_key(self, arg):
-        return hasattr(self, self.get_key_event_name(arg)) or arg in self._keys 
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_event(self, event):
-        # Get the method from 'self'. Default to a lambda.
-        key_event_name = self.get_key_event_name(event.char)
-
-        if hasattr(self, key_event_name):
-            method = getattr(self, key_event_name, lambda: "Invalid key")
-            # Call the method as we return it
-            return method()
-        elif key_event_name in self._keys:
-            # param = [self.show(index=p) for p in self._keys[key_event_name]["param"]]
-            return self._keys[key_event_name](self) 
-
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def new_popup(self, title="Box", dtype="msg", value="", **kwargs):
@@ -237,6 +213,6 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def key_q(self, **kwargs):
+    def key_q(self, event, **kwargs):
         """Exit RSVis."""
         self._root.destroy()

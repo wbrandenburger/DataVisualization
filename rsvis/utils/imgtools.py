@@ -10,6 +10,8 @@ import rsvis.utils.patches
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 from scipy import ndimage
 from PIL import Image
 from io import BytesIO
@@ -23,6 +25,11 @@ def get_array_info(img, verbose=False):
         info_str = "{}, Stats: {:.3f}, {:.3f}".format(info_str, np.mean(img), np.std(img))
     
     return info_str
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_area(array):
+    return array.shape[0] * array.shape[1]
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -54,7 +61,6 @@ def stack_image_dim(img):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def resize_img(img, scale):
-
     width = int(img.shape[1] * scale / 100.)
     height = int(img.shape[0] * scale / 100.)
     dim = (width, height) 
@@ -88,22 +94,24 @@ def project_dict_to_img(obj, dtype=np.float32, factor=1.0):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_histogram(img,alpha=0.7):    
-    fig = plt.figure(dpi=64)
+def get_histogram(img, alpha=0.7):    
+    fig = Figure(figsize=(5, 4), dpi=100)
+    # A canvas must be manually attached to the figure (pyplot would automatically do it).  This is done by instantiating the canvas with the figure as argument https://matplotlib.org/gallery/user_interfaces/canvasagg.html#sphx-glr-gallery-user-interfaces-canvasagg-py
+    canvas = FigureCanvas(fig)
+    
+    ax = fig.add_subplot(111)
     color = ('b','g','r')
     for channel, col in enumerate(color):
-        histr = cv2.calcHist([img], [channel], None, [256], [0,256])
-        plt.plot(histr, color = col)
-        plt.xlim([0,256])
-    plt.title('Histogram for color scale picture')
+        hist_channel = cv2.calcHist([img], [channel], None, [256], [0,256]) / get_area(img)
+        ax.plot(hist_channel, color = col)
+        ax.set_xlim([0,256])
 
-    png1 = BytesIO()
-    fig.savefig(png1, format='png')
-    hist = np.asarray(Image.open(png1))
-    png1.close()
-    plt.close()
-    
-    return hist
+    canvas.draw()
+    s, (width, height) = canvas.print_to_buffer()
+
+    # Option 2a: Convert to a NumPy array.
+    hist_img = np.fromstring(s, np.uint8).reshape((height, width, 4))
+    return hist_img
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
