@@ -53,6 +53,34 @@ param_io:
   ext: .tif
 ```
 
+## CloudCompare
+
+The field `path_dir` of key `param_io` in `lecture.yaml` has to point to an existing path, where displayed images can be saved. The other parameter of the key are not relevant for the user. If images have to be saved under Windows in folder `C:\User\Username\RSVis` the key `param_io` might be defined as follows:
+
+```yaml
+param_io:
+  path_dir: C:\User\Username\RSVis
+  path_name: '{}'
+  regex:
+  - .*
+  - 0
+  ext: .tif
+```
+
+If the use of CloudCompare is desired, the field `cloud_viewer` and `cloud_editor` of key `param_cloud` have to point to the executables of `ccViewer` and `CloudCompare`, for example:
+
+```yaml
+param_cloud:
+  cloud_viewer: "C:\Program Files\ccViewer\ccViewer.exe",
+  cloud_editor: "C:\Program Files\CloudCompare\CloudCompare.exe",
+```
+
+Since, the use of CloudCompare is not activated by default, the command to execute `RSVis` changes to:
+
+```PowerShell
+rsvis run "lecture.yaml" --task_set tasks --task rsshow
+```
+
 ![RSVis](temp/rsvis_obj.png)
 
 ## Acknowledgement
