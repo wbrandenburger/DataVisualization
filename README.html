@@ -46,9 +46,9 @@
 <span class="hljs-attr">  ext:</span> <span class="hljs-string">.tif</span>
 </div></code></pre>
 <a for="toc-anchor" id="cloudcompare"></a><h2 id="cloudcompare" data-line="55" class="code-line">CloudCompare</h2>
-<p data-line="57" class="code-line">The field <code>path_dir</code> of key <code>param_io</code> in <code>lecture.yaml</code> has to point to an existing path, where displayed images can be saved. The other parameter of the key are not relevant for the user. If images have to be saved under Windows in folder <code>C:\User\Username\RSVis</code> the key <code>param_io</code> might be defined as follows:</p>
+<p data-line="57" class="code-line">The field <code>path_dir</code> of key <code>param_io</code> in <code>lecture.yaml</code> has to point to an existing path, where displayed images can be saved. The other parameter of the key are not relevant for the user. If images have to be saved under Windows in folder <code>C:\\User\\Username\\RSVis</code> the key <code>param_io</code> might be defined as follows:</p>
 <pre><code data-line="59" class="code-line language-yaml"><div><span class="hljs-attr">param_io:</span>
-<span class="hljs-attr">  path_dir:</span> <span class="hljs-attr">C:\User\Username\RSVis</span>
+<span class="hljs-attr">  path_dir:</span> <span class="hljs-attr">C:\\User\\Username\\RSVis</span>
 <span class="hljs-attr">  path_name:</span> <span class="hljs-string">'{}'</span>
 <span class="hljs-attr">  regex:</span>
 <span class="hljs-bullet">  -</span> <span class="hljs-string">.*</span>
@@ -57,17 +57,16 @@
 </div></code></pre>
 <p data-line="69" class="code-line">If the use of CloudCompare is desired, the field <code>cloud_viewer</code> and <code>cloud_editor</code> of key <code>param_cloud</code> have to point to the executables of <code>ccViewer</code> and <code>CloudCompare</code>, for example:</p>
 <pre><code data-line="71" class="code-line language-yaml"><div><span class="hljs-attr">param_cloud:</span>
-<span class="hljs-attr">  cloud_viewer:</span> <span class="hljs-string">"C:\Program Files\ccViewer\ccViewer.exe"</span><span class="hljs-string">,</span>
-<span class="hljs-attr">  cloud_editor:</span> <span class="hljs-string">"C:\Program Files\CloudCompare\CloudCompare.exe"</span><span class="hljs-string">,</span>
+<span class="hljs-attr">  cloud_viewer:</span> <span class="hljs-string">"C:\Program Files\\ccViewer\\ccViewer.exe"</span><span class="hljs-string">,</span>
+<span class="hljs-attr">  cloud_editor:</span> <span class="hljs-string">"C:\Program Files\\CloudCompare\\CloudCompare.exe"</span><span class="hljs-string">,</span>
 </div></code></pre>
 <p data-line="77" class="code-line">Since, the use of CloudCompare is not activated by default, the command to execute <code>RSVis</code> changes to:</p>
 <pre><code data-line="79" class="code-line language-PowerShell"><div>rsvis run <span class="hljs-string">"lecture.yaml"</span> --task_set tasks --task rsshow
 </div></code></pre>
-<p data-line="83" class="code-line"><img src="temp/rsvis_obj.png" alt="" class="loading" id="image-hash-50b695a96714593b341c0e972c7783b05648368328a2a23cc3f9ea9ba421093f"></p>
-<p data-line="85" class="code-line"><img src="temp/rsvis_cloud.png" alt="" class="loading" id="image-hash-35e4e3dcff879366de04b48c61a12bbc1cb8fdde71c2cefa24a8430bb7e5bb85"></p>
-<a for="toc-anchor" id="acknowledgement"></a><h2 id="acknowledgement" data-line="87" class="code-line">Acknowledgement</h2>
-<p data-line="89" class="code-line">The Vaihingen data set was provided by the German Society for Photogrammetry, Remote Sensing and Geoinformation (DGPF) <a href="http://www.ifp.uni-stuttgart.de/dgpf/DKEP-Allg.htm" data-href="http://www.ifp.uni-stuttgart.de/dgpf/DKEP-Allg.htm">Cramer, 2010</a></p>
-<a for="toc-anchor" id="references"></a><h2 id="references" data-line="91" class="code-line">References</h2>
-<p data-line="93" class="code-line">[1]: Cramer, M., 2010. The DGPF test on digital aerial camera evaluation – overview and test design. Photogrammetrie – Fernerkundung – Geoinformation 2(2010): 73-82.</p>
+<p data-line="83" class="code-line"><img src="temp/rsvis_cloud.png" alt="" class="loading" id="image-hash-35e4e3dcff879366de04b48c61a12bbc1cb8fdde71c2cefa24a8430bb7e5bb85"></p>
+<a for="toc-anchor" id="acknowledgement"></a><h2 id="acknowledgement" data-line="85" class="code-line">Acknowledgement</h2>
+<p data-line="87" class="code-line">The Vaihingen data set was provided by the German Society for Photogrammetry, Remote Sensing and Geoinformation (DGPF) <a href="http://www.ifp.uni-stuttgart.de/dgpf/DKEP-Allg.htm" data-href="http://www.ifp.uni-stuttgart.de/dgpf/DKEP-Allg.htm">Cramer, 2010</a></p>
+<a for="toc-anchor" id="references"></a><h2 id="references" data-line="89" class="code-line">References</h2>
+<p data-line="91" class="code-line">[1]: Cramer, M., 2010. The DGPF test on digital aerial camera evaluation – overview and test design. Photogrammetrie – Fernerkundung – Geoinformation 2(2010): 73-82.</p>
 
 </body></html>
