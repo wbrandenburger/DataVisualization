@@ -71,8 +71,8 @@ If the use of CloudCompare is desired, the field `cloud_viewer` and `cloud_edito
 
 ```yaml
 param_cloud:
-  cloud_viewer: "C:\Program Files\\ccViewer\\ccViewer.exe",
-  cloud_editor: "C:\Program Files\\CloudCompare\\CloudCompare.exe",
+  cloud_viewer: "C:\\Program Files\\ccViewer\\ccViewer.exe",
+  cloud_editor: "C:\\Program Files\\CloudCompare\\CloudCompare.exe",
 ```
 
 Since, the use of CloudCompare is not activated by default, the command to execute `RSVis` changes to:

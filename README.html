@@ -57,8 +57,8 @@
 </div></code></pre>
 <p data-line="69" class="code-line">If the use of CloudCompare is desired, the field <code>cloud_viewer</code> and <code>cloud_editor</code> of key <code>param_cloud</code> have to point to the executables of <code>ccViewer</code> and <code>CloudCompare</code>, for example:</p>
 <pre><code data-line="71" class="code-line language-yaml"><div><span class="hljs-attr">param_cloud:</span>
-<span class="hljs-attr">  cloud_viewer:</span> <span class="hljs-string">"C:\Program Files\\ccViewer\\ccViewer.exe"</span><span class="hljs-string">,</span>
-<span class="hljs-attr">  cloud_editor:</span> <span class="hljs-string">"C:\Program Files\\CloudCompare\\CloudCompare.exe"</span><span class="hljs-string">,</span>
+<span class="hljs-attr">  cloud_viewer:</span> <span class="hljs-string">"C:\\Program Files\\ccViewer\\ccViewer.exe"</span><span class="hljs-string">,</span>
+<span class="hljs-attr">  cloud_editor:</span> <span class="hljs-string">"C:\\Program Files\\CloudCompare\\CloudCompare.exe"</span><span class="hljs-string">,</span>
 </div></code></pre>
 <p data-line="77" class="code-line">Since, the use of CloudCompare is not activated by default, the command to execute <code>RSVis</code> changes to:</p>
 <pre><code data-line="79" class="code-line language-PowerShell"><div>rsvis run <span class="hljs-string">"lecture.yaml"</span> --task_set tasks --task rsshow
