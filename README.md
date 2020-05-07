@@ -83,6 +83,8 @@ rsvis run "lecture.yaml" --task_set tasks --task rsshow
 
 ![RSVis](temp/rsvis_obj.png)
 
+![RSVis](temp/rsvis_cloud.png)
+
 ## Acknowledgement
 
 The Vaihingen data set was provided by the German Society for Photogrammetry, Remote Sensing and Geoinformation (DGPF) [Cramer, 2010](http://www.ifp.uni-stuttgart.de/dgpf/DKEP-Allg.htm)
