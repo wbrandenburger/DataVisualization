@@ -5,11 +5,13 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 from rsvis.__init__ import _logger
-import rsvis.lecture.rsshowui
-import rsvis.lecture.options
 from rsvis.utils import imgtools
 import rsvis.utils.imgio
 import rsvis.utils.objindex
+
+import rsvis.tools.options
+import rsvis.tools.rsshowui
+
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -34,7 +36,7 @@ def run(
     ui = rsvis.lecture.rsshowui.RSShowUI(
         img_in, 
         img_out, 
-        options=rsvis.lecture.options.get_options(
+        options=rsvis.tools.options.get_lecture_options(
             param_specs, param_label=param_label
         ), 
         classes=param_classes,

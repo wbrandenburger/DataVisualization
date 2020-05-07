@@ -3,10 +3,13 @@
 # ===========================================================================    
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.tools.heightmap
 from rsvis.utils import imgtools
 import rsvis.utils.objindex
 import rsvis.utils.general as glu
+
+import rsvis.lecture.lecture
+
+import rsvis.tools.heightmap
 
 import numpy as np
 
@@ -21,6 +24,19 @@ def get_options(param_specs, param_label=dict(), param_cloud=dict()):
     if "height" in param_specs:
         if param_cloud:
             options.extend(get_height_options())
+    
+    return options
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_lecture_options(param_specs, param_label=dict()):
+    options = get_general_options()
+    options.extend(get_object_options())
+
+    if "label" in param_specs:
+        options.extend(get_label_options(param_label))
+
+    options.extend(rsvis.lecture.lecture.lecture_options)
     
     return options
 

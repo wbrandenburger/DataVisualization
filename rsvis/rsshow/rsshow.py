@@ -5,11 +5,12 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 from rsvis.__init__ import _logger
-import rsvis.rsshow.rsshowui
-import rsvis.rsshow.options
 from rsvis.utils import imgtools
 import rsvis.utils.imgio
 import rsvis.utils.objindex
+
+import rsvis.tools.options
+import rsvis.tools.rsshowui
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
