@@ -28,6 +28,8 @@ class TopWindow(Toplevel):
         Toplevel.__init__(self, parent)
         self.wm_title(title)
 
+        self._histogram_flag = histogram
+
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
@@ -38,7 +40,7 @@ class TopWindow(Toplevel):
         if dtype=="msg":
             self.set_msg(value)
         elif dtype=="img":
-            self.set_canvas(value, histogram)
+            self.set_canvas(value)
 
         self._command = lambda toplevel=self, title=title: command(toplevel, title)
         button = ttk.Button(self, text="OK", 
@@ -64,8 +66,8 @@ class TopWindow(Toplevel):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_canvas(self, value, histogram=False):
-        columnspan=1 if histogram else 2
+    def set_canvas(self, value):
+        columnspan=1 if self._histogram_flag else 2
         img = value
         if isinstance(value,rsvis.utils.imgcontainer.ImgListContainer):
             self._canvas = rsvis.tools.imgconcanvas.ImageContainerCanvas(self, bg="black")
@@ -79,7 +81,7 @@ class TopWindow(Toplevel):
 
         self._canvas.grid(row=0, column=0, columnspan=columnspan, sticky=N+S+W+E)
 
-        if histogram:
+        if self._histogram_flag:
             self.set_canvas_histogram(img)
 
     #   method --------------------------------------------------------------
@@ -103,10 +105,10 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def update_histogram(self, **kwargs):
-        
-        self._canvas_hist.set_img(
-            imgtools.get_histogram(self._canvas.get_img())
-        )
+        if self._histogram_flag:
+            self._canvas_hist.set_img(
+                imgtools.get_histogram(self._canvas.get_img())
+            )
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
