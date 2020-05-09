@@ -187,8 +187,21 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_object(self):
-        self._boxes = rsvis.utils.yaml.yaml_to_data(self.get_obj_path()) if self.get_obj_path() else list()
+        self._boxes = list()
 
+        path = self.get_obj_path()
+        if path:
+            self.logger("[READ] '{}'".format(path))
+            self._boxes = rsvis.utils.yaml.yaml_to_data(path)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def write_object(self):
+        path = self.get_obj_path()
+
+        self.logger("[SAVE] '{}'".format(path))
+        rsvis.utils.yaml.data_to_yaml(path, self.get_objects())  
+        
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def remove_object(self):
@@ -198,11 +211,6 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
                 self._boxes.pop(idx)
                 self._selection = dict()
             self.create_image()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def save_object(self):
-        rsvis.utils.yaml.data_to_yaml(self.get_obj_path(), self.get_objects())  
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

@@ -64,7 +64,7 @@ def get_object_options():
             "name" : "Save objects",
             "key" : None,
             "description": "Save displayed objects.",
-            "command": lambda obj: obj.save_object()
+            "command": lambda obj: obj.write_object()
         },
         { 
             "label" : "objects",
