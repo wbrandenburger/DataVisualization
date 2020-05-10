@@ -79,6 +79,25 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         self.bind("<f>", self.key_f)
         self.bind("<g>", self.key_g)
 
+        self._keys.extend([
+            {
+                "key": "d",
+                "description":  "Show the next image in given image list (see listbox)."
+            },
+            {
+                "key": "a",
+                "description":  "Show the previous image in given image list (see listbox)."
+            },
+            {
+                "key": "f", 
+                "description": "Show or hide the objects for a given image set."
+            },
+            {
+                "key": "g", 
+                "description": "Remove the selected object."
+            }
+        ])
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def clear(self, **kwargs):
@@ -326,35 +345,35 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
-        """Display the next image of the given image set."""
+        """Show the next image of the given image set."""
         super(RSCanvas, self).key_w(event)
         self.set_log()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, event, **kwargs):
-        """Display the previous image of the given image set."""
+        """Show the previous image of the given image set."""
         super(RSCanvas, self).key_s(event)
         self.set_log()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_d(self, event, **kwargs):
-        """Display the next image in given list."""
+        """Show the next image in given image list (see listbox)."""
         index = self._index_list.next()
         self.set_container(index=index)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_a(self, event, **kwargs):
-        """Display the previous image in given list.""",
+        """Show the previous image in given image list (see listbox).""",
         index = self._index_list.last()
         self.set_container(index=index)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_f(self, event=None):
-        """Objects On/Off"""
+        """Show or hide the objects for a given image set."""
         self.show_objects()
 
     #   method --------------------------------------------------------------

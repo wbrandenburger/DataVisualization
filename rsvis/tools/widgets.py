@@ -4,6 +4,8 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
+import rsvis.tools.topwindow
+
 from tkinter import *
 
 # If you program Tk using the Tcl language, you can ask the system to let you know when a variable is changed. The Tk toolkit can use this feature, called tracing, to update certain widgets when an associated variable is modified.
@@ -12,19 +14,52 @@ from tkinter import *
 
 # https://effbot.org/tkinterbook/variable.htm
 
+#   method --------------------------------------------------------------
+# -----------------------------------------------------------------------
+def quit(window, title=None, **kwargs):
+    """Exit Window."""   
+    # if title=="Help":
+    #     self._popup_help = 0
+    window.quit()
+    window.destroy()
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def add_option_menu(menubar, options, parent, obj, label="Default"):
-    optionmenu = Menu(menubar, tearoff=0)
+    menu = Menu(menubar, tearoff=0)
     for option in options: 
         name = option["name"]
         if option["key"] is not None:
             name = "{} ({})".format(name, option["key"])
-        optionmenu.add_command(label=name, command=lambda cmd=option["command"]: cmd(obj))
+        menu.add_command(label=name, command=lambda cmd=option["command"]: cmd(obj))
     
-    menubar.add_cascade(label=label, menu=optionmenu)
+    menubar.add_cascade(label=label, menu=menu)
 
     #   key bindings ------------------------------------------------
     for option in options:
         if option["key"] is not None:
             parent.bind("<{}>".format(option["key"]), lambda event, cmd=option["command"]: cmd(obj))
+
+# ---------------------------------------------------------------------------
+def add_info_menu(menubar, parent, obj, command):
+    options = [{ 
+        "name" : "Help",
+        "key" : "F1",
+        "description": "Show help.",
+        "command": command
+    }]
+    add_option_menu(menubar, options, parent, obj, label="Information")
+
+#   method --------------------------------------------------------------
+# -----------------------------------------------------------------------
+def set_popup(parent, title="Box", dtype="msg", value="", menubar=list() ,**kwargs):
+    t = rsvis.tools.topwindow.TopWindow(
+        parent, 
+        title=title, 
+        dtype=dtype, 
+        value=value, 
+        command=rsvis.tools.widgets.quit, 
+        menubar=menubar,
+        **kwargs
+    )
+    t.mainloop()

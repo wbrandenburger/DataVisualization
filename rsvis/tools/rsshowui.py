@@ -40,33 +40,9 @@ class RSShowUI():
     def __init__(self, data, options=list(), show=dict(), classes=dict, logger=None, **kwargs):
         
         self._data = data
-    
         self._options = options
-        self.set_options()
-
-        self._popup_help = 0
 
         self.initialize_window(show=show, classes=classes, logger=logger)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def set_options(self):
-        self._keys_description = {
-            "F1" : "Show help.",
-            "q" : "Exit RSVis.",
-            "d" : "Display the next image in given list.",
-            "a" : "Display the previous image in given list.",
-            "w" : "Display the next image of the given image set.",
-            "s" : "Display the previous image of the given image set.",
-            "x" : "Display the next single channel of cuurent image.",
-            "y" : "Display the previous single channel of current image."
-        }
-
-        self._keys = dict()
-        for option in self._options:
-            if option["key"] is not None:
-                self._keys_description[option["key"]] = option["description"]
-                self._keys["key_{}".format(option["key"])] = option["command"]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -117,7 +93,7 @@ class RSShowUI():
         self.grid_settingsbox.grid(row=3, column=0, sticky=N+W+S+E)
     
         #   main image window -----------------------------------------------
-        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, bg="black", textbox=self._textbox, popup=self.set_popup, classes=classes, logger=logger, **show)
+        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, textbox=self._textbox, popup=self.set_popup, classes=classes, logger=logger, **show)
         self._frame.grid(row=0, column=0, columnspan=3, sticky=N+S+W+E)
 
         #   menubar (File / Options / Information) --------------------------
@@ -128,28 +104,30 @@ class RSShowUI():
         filemenu.add_command(label="Open")
         filemenu.add_command(label="Save", command=lambda obj=self._frame._canvas, img_out=self._data.get_img_out(): img_out(obj.get_img_path(), obj.get_img(), prefix=obj.get_img_spec()))
         filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=self._root.quit)
+        filemenu.add_command(label="Exit", command=rsvis.tools.widgets.quit)
         self._menubar.add_cascade(label="File", menu=filemenu)
-
-        #   menubar "Information"
-        infomenu = Menu(self._menubar, tearoff=0)
-        infomenu.add_command(label="Help", command=self.show_help)
-        self._menubar.add_cascade(label="Information", menu=infomenu)
 
         #   menubar "Options"
         rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self._root, self._frame._canvas, label="Options")
 
+        #   menubar "Information"
+        rsvis.tools.widgets.add_info_menu(self._menubar, self._root, self._root, lambda obj=self: self.show_help())
+
         self._root.config(menu=self._menubar)
         
         #   key bindings ----------------------------------------------------
-        self._root.bind("<F1>", self.show_help)
         self._root.bind("q", self.key_q)
-        
+        self._keys = [
+            {
+                "key": "q",
+                "description":  "Exit RSVis."
+            }
+        ]
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_popup(self, title="Box", dtype="msg", value="", **kwargs):
-        t = rsvis.tools.topwindow.TopWindow(self._root, title=title, dtype=dtype, value=value, command=self.quit, menubar=[m for m in self._options if m["label"] in ["image", "label", "height"]], **kwargs)
-        t.mainloop()
+        rsvis.tools.widgets.set_popup(self._root, title=title, dtype=dtype, value=value, menubar=[m for m in self._options if m["label"] in ["image", "label", "height"]])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -173,23 +151,17 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def quit(self, window, title=None, **kwargs):
-        """Exit RSVis."""   
-        if title=="Help":
-            self._popup_help = 0
-        window.quit()
-        window.destroy()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def show_help(self, event=None):
+    def show_help(self):
         """Show help."""
-        if not self._popup_help:
-            self._popup_help = 1
-            self.set_popup(title="Help", dtype="msg", value=self.get_key_description())
+
+        keys = ""
+        for k in rsvis.tools.keys.update_key_list([self._keys, self._frame._canvas.get_keys()]):
+            keys = "{}\n{}: {}".format(keys, [k["key"]], k["description"])
+
+        rsvis.tools.widgets.set_popup(self._root, title="Help", dtype="msg", value=keys)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_q(self, event, **kwargs):
         """Exit RSVis."""
-        self.quit(self._root)
+        rsvis.tools.widgets.quit(self._root)

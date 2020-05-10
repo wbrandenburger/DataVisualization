@@ -42,6 +42,17 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         self.bind("<w>", self.key_w)
         self.bind("<s>", self.key_s)
 
+        self._keys.extend([
+            {
+                "key": "w", 
+                "description": "Show the next image of the given image set."
+            },
+            {
+                "key": "s", 
+                "description": "Show the previous image of the given image set."
+            }
+        ])
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def clear(self, **kwargs):
@@ -111,14 +122,14 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
-        """Display the next image of the given image set."""
+        """Show the next image of the given image set."""
         self._idx_current = self._idx_spec.next() 
         self.set_img_from_index()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, event, **kwargs):
-        """Display the previous image of the given image set."""
+        """Show the previous image of the given image set."""
         self._idx_current = self._idx_spec.last()
         self.set_img_from_index()
     

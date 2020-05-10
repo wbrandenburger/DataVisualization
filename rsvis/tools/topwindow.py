@@ -9,6 +9,7 @@ import rsvis.utils.imgcontainer
 
 import rsvis.tools.extcanvas
 import rsvis.tools.imgconcanvas
+import rsvis.tools.keys
 import rsvis.tools.rescanvas
 import rsvis.tools.widgets
 
@@ -64,6 +65,7 @@ class TopWindow(Toplevel):
         if self._menubar_flag and menubar:
             self._menubar = Menu(self)
             rsvis.tools.widgets.add_option_menu(self._menubar, menubar, self, self._canvas, label="Options")
+            rsvis.tools.widgets.add_info_menu(self._menubar, self, self, lambda obj=self, parent=parent: self.show_help(parent))
             self.config(menu=self._menubar)
 
         #   key bindings ----------------------------------------------------
@@ -71,6 +73,37 @@ class TopWindow(Toplevel):
         self.bind("<w>", self.key_w)
         self.bind("<s>", self.key_s)
         self.bind("<u>", self.key_u)
+
+        self._keys = [
+            {
+                "key": "q",
+                "description":  "Exit RSVis."
+            },
+            {
+                "key": "w",
+                "description":  "Show the next image of the given image set."
+            },
+            {
+                "key": "s", 
+                "description": "Show the previous image of the given image set."
+            },
+            {
+                "key": "u", 
+                "description": "Update the histogram due to changes in image canvas."
+            }
+        ]
+
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def show_help(self, parent):
+        """Show help."""
+
+        keys = ""
+        for k in rsvis.tools.keys.update_key_list([self._keys, self._canvas.get_keys()]):
+            keys = "{}\n{}: {}".format(keys, [k["key"]], k["description"])
+
+        rsvis.tools.widgets.set_popup(parent, title="Help", dtype="msg", value=keys)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -85,13 +118,13 @@ class TopWindow(Toplevel):
         columnspan=1 if self._histogram_flag else 2
         img = value
         if isinstance(value,rsvis.utils.imgcontainer.ImgListContainer):
-            self._canvas = rsvis.tools.imgconcanvas.ImageContainerCanvas(self, bg="black")
+            self._canvas = rsvis.tools.imgconcanvas.ImageContainerCanvas(self)
             self._canvas.set_img_container(value)
             img = self._canvas.get_img()
 
             self._menubar_flag = True
         else:
-            self._canvas = rsvis.tools.extcanvas.ExtendedCanvas(self, bg="black")
+            self._canvas = rsvis.tools.extcanvas.ExtendedCanvas(self)
             self._canvas.set_img(value)
 
         self._canvas.grid(row=0, column=0, columnspan=columnspan, sticky=N+S+W+E)
@@ -102,7 +135,7 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas_histogram(self, img):
-        self._canvas_hist = rsvis.tools.rescanvas.ResizingCanvas(self, bg="black")
+        self._canvas_hist = rsvis.tools.rescanvas.ResizingCanvas(self)
         self._canvas_hist.set_img(imgtools.get_histogram(img))
         
         self._canvas_hist.grid(row=0, column=1, sticky=N+S+W+E)
@@ -118,13 +151,13 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
-        """Display the next image of the given image set."""
+        """Show the next image of the given image set."""
         self.update_histogram()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, event, **kwargs):
-        """Display the previous image of the given image set."""
+        """Show the previous image of the given image set."""
         self.update_histogram()
 
     #   method --------------------------------------------------------------

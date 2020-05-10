@@ -35,6 +35,22 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
         self.bind("<y>", self.key_y)
         self.bind("<e>", self.key_e)
 
+        self._keys.extend([
+            {
+                "key": "e", 
+                "description": "Show the current original image."
+            },
+            {
+                "key": "x", 
+                "description": "Show the next single channel of current image."
+            },
+            {
+                "key": "y", 
+                "description": "Show the previous single channel of current image."
+            }
+        ])
+
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def clear(self, **kwargs):
@@ -75,14 +91,14 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_e(self, event, **kwargs):
-        """Show the current original image."""
+        """Show current original image."""
         self.clear()
         self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_x(self, event, **kwargs):
-        """Display the next single channel of current image."""
+        """Show the next single channel of current image."""
         self._index_channel.next()
         self.show_channel()
         self.create_image()
@@ -90,7 +106,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_y(self, event, **kwargs):
-        """Display the previous single channel of current image."""
+        """Show the previous single channel of current image."""
         self._index_channel.last()
         self.show_channel()
         self.create_image()
