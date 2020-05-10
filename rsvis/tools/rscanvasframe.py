@@ -19,7 +19,8 @@ class RSCanvasFrame(Frame):
     # -----------------------------------------------------------------------
     def __init__(
         self, 
-        parent, 
+        parent,
+        images, 
         data,
         **kwargs
     ):
@@ -33,10 +34,10 @@ class RSCanvasFrame(Frame):
         self.scrollbar.grid(row=0, column=0, sticky=N+S)
         self.listbox.grid(row=0, column=1, sticky=N+S)
         self.listbox.bind("<<ListboxSelect>>", self.listbox_event)
-        for count, item in enumerate(data):
+        for count, item in enumerate(images):
             self.listbox.insert(END, pathlib.Path(item[0].path).stem)
 
-        self._canvas = rsvis.tools.rscanvas.RSCanvas(self, data, **kwargs)
+        self._canvas = rsvis.tools.rscanvas.RSCanvas(self, images, data, **kwargs)
         self._canvas.set_container()
         self._canvas.grid(row=0, column=2, sticky=N+S+E+W)
 

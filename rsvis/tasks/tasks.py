@@ -7,7 +7,7 @@
 from rsvis.__init__ import _logger
 import rsvis.config.settings
 import rsvis.utils.format
-import rsvis.utils.general as glu
+import rsvis.utils.general as gu
 
 import rsvis.rsshow.rsshow
 import rsvis.lecture.rsshow
@@ -24,17 +24,16 @@ def task_rsshow(setting="training"):
     rsvis.rsshow.rsshow.run(
         rsvis.config.settings.get_data(setting),
         rsvis.config.settings._SETTINGS["param_specs"],
-        rsvis.config.settings._SETTINGS["param_io"],
-        param_log=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_log", dict()),
-        param_show=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_show", dict()),
-        param_classes=glu.get_value(
+        rsvis.config.settings._SETTINGS["param_in"], 
+        param_out=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_out", dict()), 
+        param_classes=gu.get_value(
             rsvis.config.settings._SETTINGS,"param_classes", list()),
-        param_cloud=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_cloud", dict( )),
-        param_obj=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_obj", dict())             
+        param_cloud=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_cloud", dict()),
+        param_show=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_show", dict()),        
+      
     )
 
 #   function ----------------------------------------------------------------
@@ -43,15 +42,15 @@ def task_lecture(setting="training"):
     rsvis.lecture.rsshow.run(
         rsvis.config.settings.get_data(setting),
         rsvis.config.settings._SETTINGS["param_specs"],
-        rsvis.config.settings._SETTINGS["param_io"],
-        param_log=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_log", dict()),
-        param_show=glu.get_value(
+        rsvis.config.settings._SETTINGS["param_in"], 
+        param_in=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_in", dict()),   
+        param_out=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_out", dict()), 
+        param_classes=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_classes", list()),          
+        param_show=gu.get_value(
             rsvis.config.settings._SETTINGS,"param_show", dict()),
-        param_classes=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_classes", list()),
-        param_obj=glu.get_value(
-            rsvis.config.settings._SETTINGS,"param_obj", dict())             
     )
 
 #   function ----------------------------------------------------------------

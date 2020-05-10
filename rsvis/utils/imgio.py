@@ -4,9 +4,9 @@
 
 #   import ------------------------------------------------------------------
 from rsvis.__init__ import _logger
-from rsvis.utils import imgtools
-import rsvis.utils.general as glu
+import rsvis.utils.general as gu
 import rsvis.utils.imgcontainer
+from rsvis.utils import imgtools
 
 import numpy as np
 import pathlib
@@ -16,10 +16,60 @@ import tifffile
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def read_object(path):
+    _logger.info("[READ] '{}'".format(path))
+
+    objects = rsvis.utils.yaml.yaml_to_data(path)
+    return objects
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def write_object(path, obj):
+    _logger.info("[SAVE] '{}'".format(path))
+
+    rsvis.utils.yaml.data_to_yaml(path, obj) 
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_object(path, scale=100, default=list(), **kwargs):
+    if not pathlib.Path(path).exists():
+        return default
+    obj = read_object(path)
+
+    if scale != 100 and obj is not None:
+        for o in obj:
+            o["box"] = [int(box*(float(scale)/100.0)) for box in o["box"]]
+    
+    return obj if obj else default
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def set_object(path, obj, scale=100, **kwargs):
+    if scale != 100:
+        for o in obj:
+            o["box"] = [int(box/(float(scale)/100.0)) for box in o["box"]]
+    
+    write_object(path, obj)
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def read_log(path):
     _logger.info("[READ] '{}'".format(path))
+
     with open(path, "r") as f:
         return f.read()
+        
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def write_log(path, log):
+    _logger.info("[SAVE] '{}'".format(path))
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_log(path, default="", **kwargs):
+    if not pathlib.Path(path).exists():
+        return default
+    return read_log(path)
         
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -35,13 +85,13 @@ def read_image(path):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def save_image(dest, img):
-    _logger.info("[SAVE] '{}'".format(dest))
+def write_image(path, img):
+    _logger.info("[SAVE] '{}'".format(path))
 
-    if str(dest).endswith(".tif"):
-        tifffile.imwrite(dest, img)
+    if str(path).endswith(".tif"):
+        tifffile.imwrite(path, img)
     else:
-        PIL.Image.fromarray(img).write(dest)
+        PIL.Image.fromarray(img).write(path)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -54,7 +104,7 @@ def copy_image(path, dest):
 def get_image(
         path, 
         spec,
-        param_label=dict(), 
+        label=dict(), 
         scale=100, 
         show=False, 
         **kwargs
@@ -68,48 +118,12 @@ def get_image(
     if scale < 100:
         img = imgtools.resize_img(img, scale)
 
-    if param_label and spec == "label":
-        img = imgtools.labels_to_image(img, param_label)
+    if label and spec == "label":
+        img = imgtools.labels_to_image(img, label)
 
     if show:
-        img = imgtools.project_data_to_img(imgtools.stack_image_dim(img), dtype=np.uint8, factor=255)
+        img = imgtools.project_data_to_img(
+            imgtools.stack_image_dim(img), dtype=np.uint8, factor=255
+        )
 
     return img
-    
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-def get_data(
-        files,
-        param_specs, # list()
-        param_io = dict(),
-        param_label=dict(), 
-        param_show=dict(), # scale=100, show=False, live=True, 
-        param_log=dict() # log_dir, ext=".log"
-        # default_spec="image",       
-    ):
-
-    load = lambda path, spec: get_image(
-        path, 
-        spec, 
-        param_label=param_label, 
-        **param_show # scale=100, show=False, live=True
-    )
-    
-    img_in = list() 
-    for f_set in files:
-        img = rsvis.utils.imgcontainer.ImgListContainer(
-            load=load, log_dir=glu.get_value(param_log, "path_dir"))
-        for f, s in zip(f_set, param_specs):
-            img.append(path = f, spec=s, **param_show)# scale=100, show=False, live=True
-
-        img_in.append(img)
-
-    if not param_io:
-        return img_in
-        
-    get_path = glu.PathCreator(**param_io)
-
-    img_out = lambda path, img, **kwargs: save_image(get_path(path, **kwargs), img)
-    log_out = lambda path, **kwargs : get_path(path, **param_log, **kwargs)
-
-    return img_in, img_out, log_out, get_path

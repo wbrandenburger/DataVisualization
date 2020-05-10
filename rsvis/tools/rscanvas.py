@@ -23,10 +23,10 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
     # -----------------------------------------------------------------------
     def __init__(
         self, 
-        parent, 
+        parent,
+        images,
         data,
         grid=list(), 
-        obj_path=None,
         popup=None, 
         classes=dict(), 
         **kwargs
@@ -37,9 +37,8 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         self._new_popup = popup if popup else (lambda x: x)
 
         self._data = data
-        self._index_list = rsvis.utils.index.Index(len(self._data))
-
-        self._get_obj_path = obj_path
+        self._images = images
+        self._index_list = rsvis.utils.index.Index(len(self._images))
 
         self.bind("<Button-1>", self.mouse_button_1_pressed)
         self.bind("<ButtonRelease-1>", self.mouse_button_1_released)
@@ -71,6 +70,8 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
         self._mouse_sensitivity = 4
 
+        self.bind("<w>", self.key_w)
+        self.bind("<s>", self.key_s)
         self.bind("<a>", self.key_a)
         self.bind("<d>", self.key_d)
         self.bind("<f>", self.key_f)
@@ -102,20 +103,21 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         img_resize = super(RSCanvas, self).draw_image(**kwargs)
         shape = np.asarray(img_resize).shape
 
-        img = np.zeros((shape[0], shape[1], 3), dtype=np.uint8)
+
         
         self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(img_resize), bbox=self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]))
-        
+
+        img = np.zeros((shape[0], shape[1], 3), dtype=np.int16) - 1
         if self._object_flag:
-            img = imgtools.draw_box(img, [], self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]), [self._color[b["label"]] for b in self._boxes if isinstance(b, dict)])            
+            img = imgtools.draw_box(img, [], self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]), [self._color[b["label"]] for b in self._boxes if isinstance(b, dict)], dtype=np.int16)            
 
         self._patches_grid = rsvis.utils.patches_ordered.OrderedPatches(np.asarray(img_resize), num_patches=self._grid, logger=self._logger)
 
         if self._grid_flag:            
-            img = imgtools.get_grid_image(img, [], self._patches_grid.get_bbox())
+            img = imgtools.get_grid_image(img, [], self._patches_grid.get_bbox(), dtype=np.int16)
 
         if self._selection:
-            img = imgtools.draw_box(img, [], self.resize_bbox([self._selection["box"]]), [self._selection["color"]])
+            img = imgtools.draw_box(img, [], self.resize_bbox([self._selection["box"]]), [self._selection["color"]], dtype=np.int16)
 
         img = Image.fromarray(imgtools.get_transparent_image(img))
 
@@ -128,7 +130,8 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
     def set_container(self, index=None):
         index = self._index_list() if index is None else index   
         self.get_object()
-        self.set_img_container(self._data[index])
+        self.set_img_container(self._images[index])
+        self.get_log()        
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -181,26 +184,13 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_objects(self):
-        return self._boxes
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
     def get_object(self):
-        self._boxes = list()
-
-        path = self.get_obj_path()
-        if path:
-            self.logger("[READ] '{}'".format(path))
-            self._boxes = rsvis.utils.yaml.yaml_to_data(path)
+        self._boxes = self._data.get_object_in(self._images[self._index_list()][0].path, default=list())
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def write_object(self):
-        path = self.get_obj_path()
-
-        self.logger("[SAVE] '{}'".format(path))
-        rsvis.utils.yaml.data_to_yaml(path, self.get_objects())  
+        self._data.set_object_in(self._images[self._index_list()][0].path, self._boxes) 
         
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -214,13 +204,10 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_obj_path(self):
-        try: 
-            path = self._get_obj_path(self._data[self._index_list()][0].path)
-            if pathlib.Path(path).is_file():
-                return path
-        except TypeError:
-            return
+    def get_log(self):
+        log = self._data.get_log_in(self.get_img_path(), default="")
+        if log:
+            print(log)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -314,6 +301,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
                 self.new_popup(self._selection["box"])
             elif self._area_event==1:
                 self.set_boxes(bbox)
+                self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -332,6 +320,18 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
             self._patches_bbox.get_bbox_from_point(ev, boxes=boxes)
             bbox = self.resize_bbox(boxes, inverted=True)[0] if len(boxes) else None
         self.new_popup(bbox, histogram=histogram)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_w(self, event, **kwargs):
+        super(RSCanvas, self).key_w(event)
+        self.get_log()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_s(self, event, **kwargs):
+        super(RSCanvas, self).key_s(event)
+        self.get_log()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

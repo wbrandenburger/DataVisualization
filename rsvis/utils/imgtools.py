@@ -194,9 +194,9 @@ def get_sub_img(img, channels):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_grid_image(img, shape, bbox, color=[255, 0 ,0]):
+def get_grid_image(img, shape, bbox, color=[255, 0 ,0], dtype=np.uint8):
     if not hasattr(img, "shape"):
-        img = np.zeros(shape[0:2], dtype=np.uint8)
+        img = np.zeros(shape[0:2], dtype=dtype)
 
     for idx, box_original in enumerate(bbox):
         box = box_original.copy()
@@ -210,9 +210,9 @@ def get_grid_image(img, shape, bbox, color=[255, 0 ,0]):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def draw_box(img, shape, bbox, color):
+def draw_box(img, shape, bbox, color, dtype=np.uint8):
     if not hasattr(img, "shape"):
-        img = np.zeros(shape[0:2], dtype=np.uint8)
+        img = np.zeros(shape[0:2], dtype=dtype)
 
     for idx, box_original in enumerate(bbox):
         box = box_original.copy()
@@ -226,11 +226,12 @@ def draw_box(img, shape, bbox, color):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_transparent_image(img, method="any"):
+def get_transparent_image(img, method="any", dtype=np.uint8):
     # Creating RGBA images
     # https://pythoninformer.com/python-libraries/numpy/numpy-and-images/
-    alpha_img = np.zeros((img.shape[0], img.shape[1], 4), dtype=np.uint8)
+    alpha_img = np.zeros((img.shape[0], img.shape[1], 4), dtype=np.int16)
     alpha_img[:, :, 0:3] = img
     if method=="any":
-        alpha_img[:,:,3] = np.where(np.sum(img, axis=2)>0, 255, 0)
+        alpha_img[:,:,3] = np.where(np.sum(img, axis=2)>=0, 255, 0)
+    alpha_img = alpha_img.astype(dtype)
     return alpha_img

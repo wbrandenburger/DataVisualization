@@ -5,7 +5,7 @@
 # ---------------------------------------------------------------------------
 from rsvis.utils import imgtools
 import rsvis.utils.objindex
-import rsvis.utils.general as glu
+import rsvis.utils.general as gu
 
 import rsvis.lecture.lecture
 
@@ -118,7 +118,7 @@ def get_label_options(param_label, param=dict()):
                     imgtools.get_distance_transform(
                         obj.get_img_from_spec("label")[...,0],
                         label=label_index(),
-                        **glu.get_value(param,"distance-transform", dict()),
+                        **gu.get_value(param,"distance-transform", dict()),
                     ), dtype=np.uint8, factor=255)
                 )
         }

@@ -4,7 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.utils.general as glu
+import rsvis.utils.general as gu
 import rsvis.utils.index
 from rsvis.utils import imgtools
 import rsvis.utils.imgio
@@ -36,13 +36,11 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, data, img_out, options=list(), grid=list(), classes=dict, objects=dict(), logger=None, **kwargs):
+    def __init__(self, data, options=list(), grid=list(), classes=dict, logger=None, **kwargs):
         
-        self._img_out = img_out
         self._data = data
-
+    
         self._options = options
-        self._get_obj_path = glu.PathCreator(**objects)
         self.set_options(self._options)
 
         self._logger = logger
@@ -121,14 +119,14 @@ class RSShowUI():
         self.grid_settingsbox = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=self._grid)
         self.grid_settingsbox.grid(row=3, column=0, sticky=N+W+S)
     
-        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data, bg="black", grid=self._grid, obj_path=self._get_obj_path, popup=self.new_popup, classes=self._classes, logger=self._logger)
+        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, bg="black", grid=self._grid, popup=self.new_popup, classes=self._classes, logger=self._logger) #obj_path=self._get_obj_path
         self._frame.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
         
         self._menubar = Menu(self._root)
         filemenu = Menu(self._menubar, tearoff=0)
         filemenu.add_command(label="Open")
         # Save the currently displayed image to a given folder.
-        filemenu.add_command(label="Save", command=lambda obj=self._frame._canvas, img_out=self._img_out: img_out(obj.get_img_path(), obj.get_img(), prefix=obj.get_img_spec()))
+        filemenu.add_command(label="Save", command=lambda obj=self._frame._canvas, img_out=self._data.get_img_out(): img_out(obj.get_img_path(), obj.get_img(), prefix=obj.get_img_spec()))
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self._root.quit)
         self._menubar.add_cascade(label="File", menu=filemenu)
@@ -200,16 +198,6 @@ class RSShowUI():
         if not self._popup_help:
             self._popup_help = 1
             self.new_popup(title="Help", dtype="msg", value=self.get_key_description())
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_log(self, img_container):
-        try: 
-            log = img_container.log
-            if pathlib.Path(log).is_file():
-                print(rsvis.utils.imgio.read_log(log))
-        except TypeError:
-            pass
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

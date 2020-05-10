@@ -16,14 +16,13 @@ class ImgListContainer(list):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, default_spec="image", load=None, live=False, obj_flag=True, obj_copy=False, bbox=list(), log_dir=None, **kwargs):
+    def __init__(self, default_spec="image", load=None, live=False, obj_flag=True, obj_copy=False, bbox=list(), **kwargs):
         self._default_spec = default_spec
         self._load = load
         self._live = live            
         self._obj_flag = obj_flag, 
         self._obj_copy = obj_copy
-        self._bbox = bbox
-        self._log_dir = log_dir        
+        self._bbox = bbox  
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -33,7 +32,6 @@ class ImgListContainer(list):
         self._obj_flag = self._obj_flag if obj_flag is None else obj_flag
         self._obj_copy = self._obj_copy if obj_copy is None else obj_copy
         self._bbox = self._bbox if bbox  else bbox
-        self._log_dir = self._log_dir if log_dir is None else log_dir
         self._load = self._load if load is None else load
         
         spec = self._default_spec if not spec else spec
@@ -46,8 +44,7 @@ class ImgListContainer(list):
                 live=self._live, 
                 obj_flag=self._obj_flag, 
                 obj_copy=self._obj_copy,
-                bbox = self._bbox,
-                log_dir=self._log_dir
+                bbox = self._bbox
             )
         )
 
@@ -64,8 +61,7 @@ class ImgListContainer(list):
                 live=item._live, 
                 bbox=item._bbox, 
                 obj_flag=item._obj_flag, 
-                obj_copy=item._obj_copy, 
-                log_dir=str(item._log_dir)
+                obj_copy=item._obj_copy
             )
         return obj
 
@@ -106,8 +102,8 @@ class ImgContainer(rsvis.utils.objcontainer.ObjContainer):
             live=False,
             obj_flag=True, 
             obj_copy=False,
-            bbox=list(),
-            log_dir=None            
+            bbox=list(),  
+            **kwargs          
         ):
         super(ImgContainer, self).__init__(obj=img, obj_flag=obj_flag, obj_copy=obj_copy)
 
@@ -121,21 +117,11 @@ class ImgContainer(rsvis.utils.objcontainer.ObjContainer):
      
         self._bbox = bbox
 
-        self._log_dir = pathlib.Path(log_dir) if log_dir else None
-
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     @property
     def path(self):
         return self._path
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    @property
-    def log(self):
-        return str(pathlib.Path.joinpath(
-            self._log_dir, "{}.log".format(pathlib.Path(self.path).stem)
-        )) if self._log_dir else None
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
