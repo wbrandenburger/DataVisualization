@@ -21,10 +21,11 @@ class ResizingCanvas(Canvas):
         self._shift = shift
         self.set_size([self.winfo_reqwidth(), self.winfo_reqheight()]) 
 
+        self._parent = parent
+
         self._logger = logger
 
-        self._parent = parent
-        
+        #   key bindings ----------------------------------------------------
         self.bind("<Button-1>", self.mouse_button_1_pressed)
 
     #   method --------------------------------------------------------------

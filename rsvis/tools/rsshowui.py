@@ -127,6 +127,7 @@ class RSShowUI():
         rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self._frame._canvas, label="Options")
         
         self._root.config(menu=self._menubar)
+        
         #   key bindings ----------------------------------------------------
         self._root.bind("<F1>", self.show_help)
         self._root.bind("q", self.key_q)
