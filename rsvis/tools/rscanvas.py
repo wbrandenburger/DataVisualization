@@ -31,7 +31,8 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         classes=dict(), 
         **kwargs
     ):
-        
+
+        #   settings --------------------------------------------------------
         super(RSCanvas, self).__init__(parent, shift=[4,4], **kwargs)
         
         self._set_popup = popup if popup else (lambda x: x)
@@ -39,15 +40,6 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         self._data = data
         self._images = images
         self._index_list = rsvis.utils.index.Index(len(self._images))
-
-        self.bind("<Button-1>", self.mouse_button_1_pressed)
-        self.bind("<ButtonRelease-1>", self.mouse_button_1_released)
-        self.bind("<ButtonRelease-2>", self.mouse_button_2_released)
-        self.bind("<Double-Button-1>", self.mouse_double_1_button)
-        self.bind("<B1-Motion>", self.mouse_motion)
-
-        self.mouse_area = list()
-        self.mouse_point = list()
 
         self._area_event = 0
 
@@ -65,10 +57,19 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         self._label = list(self._color.keys())[0] if self._color else None
 
         self._bbox = [0, 0, 0, 0]
-
         self._point = [0,0]
 
+        #   key bindings ----------------------------------------------------
         self._mouse_sensitivity = 4
+
+        self.mouse_area = list()
+        self.mouse_point = list()
+
+        self.bind("<Button-1>", self.mouse_button_1_pressed)
+        self.bind("<ButtonRelease-1>", self.mouse_button_1_released)
+        self.bind("<ButtonRelease-2>", self.mouse_button_2_released)
+        self.bind("<Double-Button-1>", self.mouse_double_1_button)
+        self.bind("<B1-Motion>", self.mouse_motion)
 
         self.bind("<w>", self.key_w)
         self.bind("<s>", self.key_s)
@@ -324,12 +325,14 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
+        """Display the next image of the given image set."""
         super(RSCanvas, self).key_w(event)
         self.get_log()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, event, **kwargs):
+        """Display the previous image of the given image set."""
         super(RSCanvas, self).key_s(event)
         self.get_log()
 

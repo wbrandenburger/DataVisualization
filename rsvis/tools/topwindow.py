@@ -23,36 +23,50 @@ class TopWindow(Toplevel):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, parent, title="Box", command=None, dtype="msg", value="", histogram=False, menubar=None):
+    def __init__(
+            self, 
+            parent, 
+            title="Box", 
+            command=None, 
+            dtype="msg", 
+            value="", 
+            histogram=False, 
+            menubar=None
+        ):
 
+        #   settings --------------------------------------------------------
         Toplevel.__init__(self, parent)
         self.wm_title(title)
 
         self._histogram_flag = histogram
+        self._menubar_flag = False
 
+        #   general window settings -----------------------------------------
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
-        self.rowconfigure(1)
 
-        self._menubar_flag = False
-
+        #   main image window -----------------------------------------------
         if dtype=="msg":
             self.set_msg(value)
         elif dtype=="img":
             self.set_canvas(value)
 
-        self._command = lambda toplevel=self, title=title: command(toplevel, title)
-        button = ttk.Button(self, text="OK", 
-            command=self._command
-        )
-        button.grid(row=1, column=0, columnspan=2)
+        #   button (Quit) ---------------------------------------------------
+        if command is not None:
+            self._command = lambda toplevel=self, title=title: command(toplevel, title)
+            button = ttk.Button(self, text="OK", 
+                command=self._command
+            )
+            button.grid(row=1, column=0, columnspan=2)
         
+        #   menubar (Options) -----------------------------------------------
         if self._menubar_flag and menubar:
             self._menubar = Menu(self)
             rsvis.tools.widgets.add_option_menu(self._menubar, menubar, self._canvas, label="Options")
             self.config(menu=self._menubar)
 
+        #   key bindings ----------------------------------------------------
         self.bind("<q>", self.key_q)
         self.bind("<w>", self.key_w)
         self.bind("<s>", self.key_s)
@@ -95,28 +109,30 @@ class TopWindow(Toplevel):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def key_w(self, event, **kwargs):
-        self.update_histogram()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_s(self, event, **kwargs):
-        self.update_histogram()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_u(self, event, **kwargs):
-        self.update_histogram()
-
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
     def update_histogram(self, **kwargs):
         if self._histogram_flag:
             self._canvas_hist.set_img(
                 imgtools.get_histogram(self._canvas.get_img())
             )
     
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_w(self, event, **kwargs):
+        """Display the next image of the given image set."""
+        self.update_histogram()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_s(self, event, **kwargs):
+        """Display the previous image of the given image set."""
+        self.update_histogram()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_u(self, event, **kwargs):
+        """Update the histogram due to changes in image canvas."""
+        self.update_histogram()
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_q(self, event, **kwargs):

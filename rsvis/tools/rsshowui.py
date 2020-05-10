@@ -41,7 +41,7 @@ class RSShowUI():
         self._data = data
     
         self._options = options
-        self.set_options(self._options)
+        self.set_options()
 
         self._popup_help = 0
 
@@ -49,7 +49,7 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_options(self, options):
+    def set_options(self):
         self._keys_description = {
             "F1" : "Show help.",
             "q" : "Exit RSVis.",
@@ -62,7 +62,7 @@ class RSShowUI():
         }
 
         self._keys = dict()
-        for option in options:
+        for option in self._options:
             if option["key"] is not None:
                 self._keys_description[option["key"]] = option["description"]
                 self._keys["key_{}".format(option["key"])] = option["command"]
