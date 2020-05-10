@@ -34,7 +34,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         
         super(RSCanvas, self).__init__(parent, shift=[4,4], **kwargs)
         
-        self._new_popup = popup if popup else (lambda x: x)
+        self._set_popup = popup if popup else (lambda x: x)
 
         self._data = data
         self._images = images
@@ -261,11 +261,11 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def new_popup(self, bbox, histogram=True):
+    def set_popup(self, bbox, histogram=True):
         if bbox:
             img_container = self._img_container.copy()
             img_container.set_bbox(bbox)
-            self._new_popup(title="Histogram", dtype="img", value=img_container, histogram=histogram) 
+            self._set_popup(title="Histogram", dtype="img", value=img_container, histogram=histogram) 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -298,7 +298,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
             if self._area_event==0:
                 patch = self._patches_bbox.get_patch(bbox=bbox)
                 self.set_selection(bbox)
-                self.new_popup(self._selection["box"])
+                self.set_popup(self._selection["box"])
             elif self._area_event==1:
                 self.set_boxes(bbox)
                 self.create_image()
@@ -319,7 +319,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
             boxes = list()
             self._patches_bbox.get_bbox_from_point(ev, boxes=boxes)
             bbox = self.resize_bbox(boxes, inverted=True)[0] if len(boxes) else None
-        self.new_popup(bbox, histogram=histogram)
+        self.set_popup(bbox, histogram=histogram)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
