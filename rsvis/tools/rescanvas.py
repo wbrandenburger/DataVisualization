@@ -14,8 +14,14 @@ class ResizingCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, parent, shift=[4,4], logger=None, **kwargs):
-        super(ResizingCanvas, self).__init__(parent, **kwargs)
+    def __init__(
+            self, 
+            parent, 
+            shift=[4,4], 
+            logger=None, 
+            **kwargs
+        ):
+        super(ResizingCanvas, self).__init__(parent)
         self.bind("<Configure>", self.resize_image)
         
         self._shift = shift

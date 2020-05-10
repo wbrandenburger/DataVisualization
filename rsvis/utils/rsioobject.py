@@ -30,7 +30,12 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
     # -----------------------------------------------------------------------
     def get_object_in(self, path, default=list(), **kwargs):
         if self._param_obj_in:
-            return rsvis.utils.imgio.get_object(self._io(path, **self._param_obj_in, **kwargs), default=default, **self._param_show)
+            return rsvis.utils.imgio.get_object(
+                self._io(path, **self._param_obj_in, **kwargs), 
+                default=default, 
+                logger=self._logger, 
+                **self._param_show
+            )
         return default
 
     #   method --------------------------------------------------------------
@@ -40,6 +45,7 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
             rsvis.utils.imgio.set_object(
                 self._io(path, **self._param_obj_in, **kwargs), 
                 obj,
+                logger=self._logger,
                 **self._param_show
             )
 
@@ -49,5 +55,6 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
         if self._param_obj_out:
             rsvis.utils.imgio.write_object(
                 self._io(path, **self._param_obj_out, **kwargs), 
-                obj
+                obj,
+                logger=self._logger
             )

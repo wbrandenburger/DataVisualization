@@ -25,18 +25,22 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         self, 
         parent,
         shift=[4,4],
+        multi_modal=True,
         **kwargs
     ):
 
         super(ImageContainerCanvas, self).__init__(parent, shift=shift, **kwargs)
 
-        self.bind("<w>", self.key_w)
-        self.bind("<s>", self.key_s)
-
         self._idx_current = 0
 
         self._img_container = None
         self._idx_spec = rsvis.utils.index.Index(0)
+
+        self._multi_modal_flag = multi_modal
+
+        #   key bindings ----------------------------------------------------
+        self.bind("<w>", self.key_w)
+        self.bind("<s>", self.key_s)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -49,7 +53,12 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     def set_img_container(self, img_container, **kwargs):
         self._img_container = img_container
         self._idx_spec = rsvis.utils.index.Index(len(self._img_container))
-        self._idx_spec.index = self._idx_current
+        
+        if not self._multi_modal_flag:
+            self._idx_spec.index = self._idx_current = 0
+        else:
+            self._idx_spec.index = self._idx_current
+
         self.set_img_from_index(index=self._idx_current, **kwargs)
 
     #   method --------------------------------------------------------------
@@ -103,7 +112,7 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
         """Display the next image of the given image set."""
-        self._idx_current = self._idx_spec.next()
+        self._idx_current = self._idx_spec.next() 
         self.set_img_from_index()
 
     #   method --------------------------------------------------------------

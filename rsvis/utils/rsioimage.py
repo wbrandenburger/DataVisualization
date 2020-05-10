@@ -41,6 +41,7 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
             path,
             spec,
             label,
+            logger=self._logger,
             **show
         )
 
@@ -52,10 +53,13 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
             img_list_container = rsvis.utils.imgcontainer.ImgListContainer(
                 load=self.get_load_img()
             )
-            for img, spec in zip(images, self._specs):
+
+            specs = self._specs if len(self._specs) == len(images) else ["{}-{}".format(self._specs[0], idx) for idx in range(len(images))]
+            
+            for idx, img in enumerate(images):
                 img_list_container.append(
-                    path = img, 
-                    spec=spec, 
+                    path=img, 
+                    spec=specs[idx], 
                     **self._param_show
                 )
 
@@ -66,9 +70,10 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_img_out(self):
-        return lambda path, img, **kwargs: rsvis.utils.imgio.write_image(
+        return lambda path, img, logger=self._logger, **kwargs: rsvis.utils.imgio.write_image(
             self._io(path, **self._param_out[self._img_name], **kwargs), 
-            img
+            img,
+            logger=self._logger
         )
 
     #   method --------------------------------------------------------------
@@ -80,7 +85,11 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     # -----------------------------------------------------------------------
     def get_log_in(self, path, default="", **kwargs):
         if self._log_io:
-            return rsvis.utils.imgio.get_log(self._log_io(path, **kwargs), default="")
+            return rsvis.utils.imgio.get_log(
+                self._log_io(path, **kwargs), 
+                default="", 
+                logger=self._logger
+            )
         return default
 
     #   method --------------------------------------------------------------

@@ -11,6 +11,7 @@ import rsvis.utils.imgio
 import rsvis.utils.format
 import rsvis.utils.yaml
 
+import rsvis.tools.combobox
 import rsvis.tools.rscanvasframe
 import rsvis.tools.settingsbox
 import rsvis.tools.topwindow
@@ -36,7 +37,7 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, data, options=list(), grid=list(), classes=dict, logger=None, **kwargs):
+    def __init__(self, data, options=list(), show=dict(), classes=dict, logger=None, **kwargs):
         
         self._data = data
     
@@ -45,7 +46,7 @@ class RSShowUI():
 
         self._popup_help = 0
 
-        self.initialize_window(grid=grid, classes=classes, logger=logger)
+        self.initialize_window(show=show, classes=classes, logger=logger)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -78,12 +79,12 @@ class RSShowUI():
         """Start the mainloop for displaying the graphical user interface"""
         self._root.mainloop()
 
-    def initialize_window(self, grid=list(), classes=dict(), logger=None):
+    def initialize_window(self, show=list(), classes=dict(), logger=None):
         """Set the geometry of the main window"""
 
         #   settings --------------------------------------------------------
         self._root = Tk()
-        grid = grid if grid else [2,2]
+        show["grid"] = gu.get_value(show, "grid", [2,2])
 
         #   general window settings -----------------------------------------
         self._root.title(
@@ -94,16 +95,6 @@ class RSShowUI():
         self._root.rowconfigure(0, weight=1)
         self._root.rowconfigure(1, weight=0)
     
-        #   comboboxes (mouse behavior/ classes) ----------------------------
-        self.cbox_area = rsvis.tools.settingsbox.ComboBox(self._root, "Histogram", ["Grid", "Objects"], self.set_area_event)
-        self.cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
-        self.cbox_class = rsvis.tools.settingsbox.ComboBox(self._root, "Class", [c["name"] for c in classes], self.set_class )
-        self.cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
-
-        #   settingsboxes (grid) --------------------------------------------
-        self.grid_settingsbox = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=grid)
-        self.grid_settingsbox.grid(row=3, column=0, sticky=N+W+S+E)
-    
         #   textfield (grid) ------------------------------------------------
         self._textbox_scrollbar = Scrollbar(self._root)
         self._textbox = Text(self._root, height=3)
@@ -111,9 +102,22 @@ class RSShowUI():
         self._textbox.grid(row=1, column=1, rowspan=3, sticky=N+S+W+E)
         self._textbox_scrollbar.config(command=self._textbox.yview)
         self._textbox.config(yscrollcommand=self._textbox_scrollbar.set)
+        
+        #   set the input / output logger
+        self._data.logger = lambda log: self._textbox.insert("1.0", "{}\n".format(log))
 
+        #   comboboxes (mouse behavior/ classes) ----------------------------
+        self.cbox_area = rsvis.tools.combobox.ComboBox(self._root, "Histogram", ["Grid", "Objects"], self.set_area_event)
+        self.cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
+        self.cbox_class = rsvis.tools.combobox.ComboBox(self._root, "Class", [c["name"] for c in classes], self.set_class )
+        self.cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
+
+        #   settingsboxes (grid) --------------------------------------------
+        self.grid_settingsbox = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=show["grid"])
+        self.grid_settingsbox.grid(row=3, column=0, sticky=N+W+S+E)
+    
         #   main image window -----------------------------------------------
-        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, bg="black", textbox=self._textbox, grid=grid, popup=self.set_popup, classes=classes, logger=logger)
+        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, bg="black", textbox=self._textbox, popup=self.set_popup, classes=classes, logger=logger, **show)
         self._frame.grid(row=0, column=0, columnspan=3, sticky=N+S+W+E)
 
         #   menubar (File / Options / Information) --------------------------
@@ -161,11 +165,6 @@ class RSShowUI():
         for index, entry in enumerate(entries):
             grid[index]  = int(entry[1].get())
         self._frame._canvas.set_grid(grid)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def show_grid(self):
-        self._frame._canvas.show_grid()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
