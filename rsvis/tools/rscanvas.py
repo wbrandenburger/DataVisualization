@@ -13,7 +13,7 @@ import rsvis.tools.imgconcanvas
 import numpy as np
 import pathlib
 from PIL import Image, ImageTk
-from tkinter import Canvas, Frame, Listbox, Scrollbar, END, N, W, E, S
+from tkinter import Canvas, Frame, Listbox, Scrollbar, INSERT, END, TOP, N, W, E, S
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -26,6 +26,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         parent,
         images,
         data,
+        textbox=None,
         grid=list(), 
         popup=None, 
         classes=dict(), 
@@ -41,11 +42,11 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         self._images = images
         self._index_list = rsvis.utils.index.Index(len(self._images))
 
-        self._area_event = 0
+        self._textbox = textbox
 
+        self._area_event = 0
         self._grid_flag = 1
         self._grid = grid if grid else [1, 1]
-        
         self._object_flag = 0
 
         self._selection = dict()
@@ -132,7 +133,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         index = self._index_list() if index is None else index   
         self.get_object()
         self.set_img_container(self._images[index])
-        self.get_log()        
+        self.set_log()        
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -205,10 +206,10 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_log(self):
+    def set_log(self):
         log = self._data.get_log_in(self.get_img_path(), default="")
         if log:
-            print(log)
+            self._textbox.insert("1.0", "{}\n".format(log))
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -327,14 +328,14 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
     def key_w(self, event, **kwargs):
         """Display the next image of the given image set."""
         super(RSCanvas, self).key_w(event)
-        self.get_log()
+        self.set_log()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, event, **kwargs):
         """Display the previous image of the given image set."""
         super(RSCanvas, self).key_s(event)
-        self.get_log()
+        self.set_log()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

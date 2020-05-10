@@ -14,9 +14,17 @@ from tkinter import *
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def add_option_menu(menubar, options, obj, label="Default"):
+def add_option_menu(menubar, options, parent, obj, label="Default"):
     optionmenu = Menu(menubar, tearoff=0)
     for option in options: 
-        optionmenu.add_command(label=option["name"], command=lambda cmd=option["command"]: cmd(obj))
+        name = option["name"]
+        if option["key"] is not None:
+            name = "{} ({})".format(name, option["key"])
+        optionmenu.add_command(label=name, command=lambda cmd=option["command"]: cmd(obj))
     
     menubar.add_cascade(label=label, menu=optionmenu)
+
+    #   key bindings ------------------------------------------------
+    for option in options:
+        if option["key"] is not None:
+            parent.bind("<{}>".format(option["key"]), lambda event, cmd=option["command"]: cmd(obj))

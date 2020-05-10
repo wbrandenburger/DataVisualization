@@ -63,8 +63,12 @@ class TopWindow(Toplevel):
         #   menubar (Options) -----------------------------------------------
         if self._menubar_flag and menubar:
             self._menubar = Menu(self)
-            rsvis.tools.widgets.add_option_menu(self._menubar, menubar, self._canvas, label="Options")
+            rsvis.tools.widgets.add_option_menu(self._menubar, menubar, self, self._canvas, label="Options")
             self.config(menu=self._menubar)
+            
+            # #   key bindings ------------------------------------------------
+            # for option in menubar:
+            #     self.bind("<{}>".format(option["key"]), lambda event, cmd=option["command"]: cmd(self._canvas))
 
         #   key bindings ----------------------------------------------------
         self.bind("<q>", self.key_q)

@@ -90,22 +90,31 @@ class RSShowUI():
             "RSVis - Exploring and Viewing RS-Data"
         )
         self._root.geometry("1000x700")
-        self._root.columnconfigure(0, weight=1)
+        self._root.columnconfigure(1, weight=1)
         self._root.rowconfigure(0, weight=1)
-
+        self._root.rowconfigure(1, weight=0)
+    
         #   comboboxes (mouse behavior/ classes) ----------------------------
         self.cbox_area = rsvis.tools.settingsbox.ComboBox(self._root, "Histogram", ["Grid", "Objects"], self.set_area_event)
-        self.cbox_area.grid(row=1, column=0, sticky=N+W+S)
+        self.cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
         self.cbox_class = rsvis.tools.settingsbox.ComboBox(self._root, "Class", [c["name"] for c in classes], self.set_class )
-        self.cbox_class.grid(row=2, column=0, sticky=N+W+S)
+        self.cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (grid) --------------------------------------------
         self.grid_settingsbox = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=grid)
-        self.grid_settingsbox.grid(row=3, column=0, sticky=N+W+S)
+        self.grid_settingsbox.grid(row=3, column=0, sticky=N+W+S+E)
     
+        #   textfield (grid) ------------------------------------------------
+        self._textbox_scrollbar = Scrollbar(self._root)
+        self._textbox = Text(self._root, height=3)
+        self._textbox_scrollbar.grid(row=1, column=2, rowspan=3, sticky=N+S)
+        self._textbox.grid(row=1, column=1, rowspan=3, sticky=N+S+W+E)
+        self._textbox_scrollbar.config(command=self._textbox.yview)
+        self._textbox.config(yscrollcommand=self._textbox_scrollbar.set)
+
         #   main image window -----------------------------------------------
-        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, bg="black", grid=grid, popup=self.set_popup, classes=classes, logger=logger)
-        self._frame.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
+        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, bg="black", textbox=self._textbox, grid=grid, popup=self.set_popup, classes=classes, logger=logger)
+        self._frame.grid(row=0, column=0, columnspan=3, sticky=N+S+W+E)
 
         #   menubar (File / Options / Information) --------------------------
         self._menubar = Menu(self._root)
@@ -124,8 +133,8 @@ class RSShowUI():
         self._menubar.add_cascade(label="Information", menu=infomenu)
 
         #   menubar "Options"
-        rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self._frame._canvas, label="Options")
-        
+        rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self._root, self._frame._canvas, label="Options")
+
         self._root.config(menu=self._menubar)
         
         #   key bindings ----------------------------------------------------
