@@ -15,24 +15,8 @@
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def update_keys(list_x, list_y):
-    list_c = list_x.copy() if len(list_x) <= len(list_y) else list_y.copy()
-    for y in list_y:
-        add_flag = True
-        
-        for x in list_x:
-            if y["key"] == x["key"]:
-                add_flag = False
-        
-        if add_flag:
-            list_c.append(y)
-
-    return list_c
-
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
 def update_key_list(key_list):
-    list_c = list()
+    keys = dict()
     for k in key_list:
-        list_c = update_keys(list_c, k)
-    return list_c
+        keys.update(k)
+    return keys

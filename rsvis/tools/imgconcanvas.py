@@ -42,16 +42,10 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         self.bind("<w>", self.key_w)
         self.bind("<s>", self.key_s)
 
-        self._keys.extend([
-            {
-                "key": "w", 
-                "description": "Show the next image of the given image set."
-            },
-            {
-                "key": "s", 
-                "description": "Show the previous image of the given image set."
-            }
-        ])
+        self._keys.update({
+            "w": "Show the next image of the given image set.",
+            "s": "Show the previous image of the given image set."
+        })
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

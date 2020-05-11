@@ -70,7 +70,17 @@ class RSShowUI():
         self._root.columnconfigure(1, weight=1)
         self._root.rowconfigure(0, weight=1)
         self._root.rowconfigure(1, weight=0)
-    
+
+        #   key bindings ----------------------------------------------------
+        self._root.bind("q", self.key_q)
+        self._keys = {
+                "q":  "Exit RSVis."
+        }
+
+        for o in self._options:
+            if o["key"] is not None:
+                self._keys.update({o["key"]: o["description"]}) 
+
         #   textfield (grid) ------------------------------------------------
         self._textbox_scrollbar = Scrollbar(self._root)
         self._textbox = Text(self._root, height=3)
@@ -114,20 +124,11 @@ class RSShowUI():
         rsvis.tools.widgets.add_info_menu(self._menubar, self._root, self._root, lambda obj=self: self.show_help())
 
         self._root.config(menu=self._menubar)
-        
-        #   key bindings ----------------------------------------------------
-        self._root.bind("q", self.key_q)
-        self._keys = [
-            {
-                "key": "q",
-                "description":  "Exit RSVis."
-            }
-        ]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_popup(self, title="Box", dtype="msg", value="", **kwargs):
-        rsvis.tools.widgets.set_popup(self._root, title=title, dtype=dtype, value=value, menubar=[m for m in self._options if m["label"] in ["image", "label", "height"]])
+        rsvis.tools.widgets.set_popup(self._root, title=title, dtype=dtype, value=value, options=[o for o in self._options if o["label"] in ["image", "label", "height"]])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -155,8 +156,8 @@ class RSShowUI():
         """Show help."""
 
         keys = ""
-        for k in rsvis.tools.keys.update_key_list([self._keys, self._frame._canvas.get_keys()]):
-            keys = "{}\n{}: {}".format(keys, [k["key"]], k["description"])
+        for key, description in rsvis.tools.keys.update_key_list([self._keys, self._frame._canvas.get_keys()]).items():
+            keys = "{}\n{}: {}".format(keys, [key], description)
 
         rsvis.tools.widgets.set_popup(self._root, title="Help", dtype="msg", value=keys)
 

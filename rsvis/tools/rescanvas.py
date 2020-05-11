@@ -34,7 +34,7 @@ class ResizingCanvas(Canvas):
         #   key bindings ----------------------------------------------------
         self.bind("<Button-1>", self.mouse_button_1_pressed)
 
-        self._keys = list()
+        self._keys = dict()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

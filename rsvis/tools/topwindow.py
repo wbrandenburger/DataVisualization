@@ -30,9 +30,9 @@ class TopWindow(Toplevel):
             title="Box", 
             command=None, 
             dtype="msg", 
-            value="", 
-            histogram=False, 
-            menubar=None
+            value="",
+            options=list(),
+            histogram=False
         ):
 
         #   settings --------------------------------------------------------
@@ -46,6 +46,23 @@ class TopWindow(Toplevel):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
+        
+        #   key bindings ----------------------------------------------------
+        self.bind("<q>", self.key_q)
+        self.bind("<w>", self.key_w)
+        self.bind("<s>", self.key_s)
+        self.bind("<u>", self.key_u)
+
+        self._keys = { 
+            "q": "Exit RSVis.",
+            "w": "Show the next image of the given image set.",
+            "s": "Show the previous image of the given image set.",
+            "u": "Update the histogram due to changes in image canvas."
+        }
+
+        for o in options:
+            if o["key"] is not None:
+                self._keys.update({o["key"]: o["description"]}) 
 
         #   main image window -----------------------------------------------
         if dtype=="msg":
@@ -62,37 +79,11 @@ class TopWindow(Toplevel):
             button.grid(row=1, column=0, columnspan=2)
         
         #   menubar (Options) -----------------------------------------------
-        if self._menubar_flag and menubar:
+        if self._menubar_flag and options:
             self._menubar = Menu(self)
-            rsvis.tools.widgets.add_option_menu(self._menubar, menubar, self, self._canvas, label="Options")
+            rsvis.tools.widgets.add_option_menu(self._menubar, options, self, self._canvas, label="Options")
             rsvis.tools.widgets.add_info_menu(self._menubar, self, self, lambda obj=self, parent=parent: self.show_help(parent))
             self.config(menu=self._menubar)
-
-        #   key bindings ----------------------------------------------------
-        self.bind("<q>", self.key_q)
-        self.bind("<w>", self.key_w)
-        self.bind("<s>", self.key_s)
-        self.bind("<u>", self.key_u)
-
-        self._keys = [
-            {
-                "key": "q",
-                "description":  "Exit RSVis."
-            },
-            {
-                "key": "w",
-                "description":  "Show the next image of the given image set."
-            },
-            {
-                "key": "s", 
-                "description": "Show the previous image of the given image set."
-            },
-            {
-                "key": "u", 
-                "description": "Update the histogram due to changes in image canvas."
-            }
-        ]
-
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -100,8 +91,8 @@ class TopWindow(Toplevel):
         """Show help."""
 
         keys = ""
-        for k in rsvis.tools.keys.update_key_list([self._keys, self._canvas.get_keys()]):
-            keys = "{}\n{}: {}".format(keys, [k["key"]], k["description"])
+        for key, description in rsvis.tools.keys.update_key_list([self._keys, self._canvas.get_keys()]).items():
+            keys = "{}\n{}: {}".format(keys, [key], description)
 
         rsvis.tools.widgets.set_popup(parent, title="Help", dtype="msg", value=keys)
 

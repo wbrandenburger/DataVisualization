@@ -79,24 +79,11 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         self.bind("<f>", self.key_f)
         self.bind("<g>", self.key_g)
 
-        self._keys.extend([
-            {
-                "key": "d",
-                "description":  "Show the next image in given image list (see listbox)."
-            },
-            {
-                "key": "a",
-                "description":  "Show the previous image in given image list (see listbox)."
-            },
-            {
-                "key": "f", 
-                "description": "Show or hide the objects for a given image set."
-            },
-            {
-                "key": "g", 
-                "description": "Remove the selected object."
-            }
-        ])
+        self._keys.update({
+            "d": "Show the next image in given image list (see listbox).",
+            "a": "Show the previous image in given image list (see listbox).",
+            "f": "Show or hide the objects for a given image set.",           "g": "Remove the selected object."
+        })
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

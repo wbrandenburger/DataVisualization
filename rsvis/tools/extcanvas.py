@@ -35,21 +35,11 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
         self.bind("<y>", self.key_y)
         self.bind("<e>", self.key_e)
 
-        self._keys.extend([
-            {
-                "key": "e", 
-                "description": "Show the current original image."
-            },
-            {
-                "key": "x", 
-                "description": "Show the next single channel of current image."
-            },
-            {
-                "key": "y", 
-                "description": "Show the previous single channel of current image."
-            }
-        ])
-
+        self._keys.update({
+            "e": "Show the current original image.",
+            "x": "Show the next single channel of current image.",
+            "y": "Show the previous single channel of current image."
+        })
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
