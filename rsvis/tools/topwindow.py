@@ -50,13 +50,11 @@ class TopWindow(Toplevel):
         #   key bindings ----------------------------------------------------
         self.bind("<q>", self.key_q)
         self.bind("<w>", self.key_w)
-        self.bind("<s>", self.key_s)
+        self.bind("<s>", self.key_s)      
         self.bind("<u>", self.key_u)
 
         self._keys = { 
             "q": "Exit RSVis.",
-            "w": "Show the next image of the given image set.",
-            "s": "Show the previous image of the given image set.",
             "u": "Update the histogram due to changes in image canvas."
         }
 
@@ -120,6 +118,7 @@ class TopWindow(Toplevel):
 
         self._canvas.grid(row=0, column=0, columnspan=columnspan, sticky=N+S+W+E)
 
+        print(self._histogram_flag)
         if self._histogram_flag:
             self.set_canvas_histogram(img)
 
@@ -133,7 +132,7 @@ class TopWindow(Toplevel):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def update_histogram(self, **kwargs):
+    def update_histogram(self, event=None, **kwargs):
         if self._histogram_flag:
             self._canvas_hist.set_img(
                 imgtools.get_histogram(self._canvas.get_img())

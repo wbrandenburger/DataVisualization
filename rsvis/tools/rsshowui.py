@@ -61,6 +61,7 @@ class RSShowUI():
         #   settings --------------------------------------------------------
         self._root = Tk()
         show["grid"] = gu.get_value(show, "grid", [2,2])
+        classes = classes if classes else [{"name": "Default", "color": [255, 255, 0]}]
 
         #   general window settings -----------------------------------------
         self._root.title(
@@ -128,7 +129,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_popup(self, title="Box", dtype="msg", value="", **kwargs):
-        rsvis.tools.widgets.set_popup(self._root, title=title, dtype=dtype, value=value, options=[o for o in self._options if o["label"] in ["image", "label", "height"]])
+        rsvis.tools.widgets.set_popup(self._root, title=title, dtype=dtype, value=value, options=[o for o in self._options if o["label"] in ["image", "label", "height"]], **kwargs)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

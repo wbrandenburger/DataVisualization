@@ -132,7 +132,7 @@ def get_height_options(param=dict()):
         { 
             "label" : "height",
             "name" : "Open Pointcloud in ccViewer",
-            "key" : None,
+            "key" : "c",
             "description": "Open the currently displayed image in ccViewer as pointcloud.",
             "command": lambda obj: rsvis.tools.heightmap.main(
                 obj.get_img(), 
@@ -145,7 +145,7 @@ def get_height_options(param=dict()):
         { 
             "label" : "height",
             "name" : "Open Mesh in ccViewer",
-            "key" : None,
+            "key" : "v",
             "description": "Open the currently displayed image in ccViewer as mesh.",
             "command": lambda obj: rsvis.tools.heightmap.main(
                 obj.get_img(), 

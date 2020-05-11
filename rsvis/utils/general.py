@@ -77,10 +77,10 @@ class PathCreator():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, path_dir=os.environ.get("TEMP"), path_name="{}", ext="", regex=[".*", 0]):
+    def __init__(self, path_dir=os.environ.get("TEMP"), path_name="{}", ext="", regex=[".*", 0], parents=True, exist_ok=True):
         self._dir = pathlib.Path(path_dir)
         if not self._dir.exists():
-            self._dir.mkdir(parents=True, exist_ok=True)
+            self._dir.mkdir(parents=parents, exist_ok=exist_ok)
         self._name = path_name
         self._regex = ReSearch(*regex)
         self._ext=ext
@@ -92,11 +92,12 @@ class PathCreator():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __call__(self, path, prefix=None, path_dir=None, ext=None, **kwargs):
+    def __call__(self, path, prefix=None, path_dir=None, ext=None, parents=True, exist_ok=True, **kwargs):
         if path_dir is None:
             path_dir = self._dir
         else:
             path_dir = pathlib.Path(path_dir)
+            path_dir.mkdir(parents=parents, exist_ok=exist_ok)
 
         name = self._name.format(self._regex(pathlib.Path(path).stem))
         if prefix is not None:
