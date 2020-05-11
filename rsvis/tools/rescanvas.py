@@ -81,6 +81,8 @@ class ResizingCanvas(Canvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img(self, img):
+        if not isinstance(img, np.ndarray):
+            return
         self._img = Image.fromarray(img)
         self.create_image()
 

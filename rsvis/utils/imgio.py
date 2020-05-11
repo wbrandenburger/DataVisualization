@@ -17,25 +17,25 @@ import tifffile
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def show_info_str(info, logger=None):
-    info_str = "[INFO] '{}'".format(info)
+    info_str = "[INFO] {}".format(info)
     show_io_str(info_str, logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def show_read_str(path, logger=None):
-    read_str = "[READ] '{}'".format(path)
+    read_str = "[READ] {}".format(path)
     show_io_str(read_str, logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def show_copy_str(path, logger=None):
-    copy_str = "[COPY] '{}'".format(path)
+    copy_str = "[COPY] {}".format(path)
     show_io_str(copy_str, logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def show_write_str(path, logger=None):
-    write_str = "[WRITE] '{}'".format(path)
+    write_str = "[WRITE] {}".format(path)
     show_io_str(write_str, logger=logger)
 
 #   function ----------------------------------------------------------------

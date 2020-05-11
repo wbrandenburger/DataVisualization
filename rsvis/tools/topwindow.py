@@ -26,12 +26,13 @@ class TopWindow(Toplevel):
     # -----------------------------------------------------------------------
     def __init__(
             self, 
-            parent, 
-            title="Box", 
-            command=None, 
+            parent,
+            title="Box",  
             dtype="msg", 
             value="",
+            command=None,
             options=list(),
+            label=None,
             histogram=False
         ):
 
@@ -39,6 +40,7 @@ class TopWindow(Toplevel):
         Toplevel.__init__(self, parent)
         self.wm_title(title)
 
+        self._label = label
         self._histogram_flag = histogram
         self._menubar_flag = False
 
@@ -137,7 +139,7 @@ class TopWindow(Toplevel):
             self._canvas_hist.set_img(
                 imgtools.get_histogram(self._canvas.get_img())
             )
-    
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):

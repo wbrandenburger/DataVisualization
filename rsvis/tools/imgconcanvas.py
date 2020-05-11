@@ -134,3 +134,8 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         self.clear()
         self._idx_spec.index = self._idx_current
         self.set_img_from_index(index=self._idx_current)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_class(self, **kwargs):
+        pass

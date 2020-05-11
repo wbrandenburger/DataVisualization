@@ -10,6 +10,7 @@ import rsvis.tools.rescanvas
 
 from PIL import Image, ImageTk
 import numpy as np
+import numpy
 from tkinter import Canvas, NW
 
 #   class -------------------------------------------------------------------
@@ -50,6 +51,8 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img(self, img):
+        if not isinstance(img, numpy.ndarray):
+            print(type(img))
         super(ExtendedCanvas, self).set_img(img)
 
     #   method --------------------------------------------------------------

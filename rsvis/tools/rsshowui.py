@@ -84,7 +84,7 @@ class RSShowUI():
 
         #   textfield (grid) ------------------------------------------------
         self._textbox_scrollbar = Scrollbar(self._root)
-        self._textbox = Text(self._root, height=3)
+        self._textbox = Text(self._root, height=3, font=("Courier", 8))
         self._textbox_scrollbar.grid(row=1, column=2, rowspan=3, sticky=N+S)
         self._textbox.grid(row=1, column=1, rowspan=3, sticky=N+S+W+E)
         self._textbox_scrollbar.config(command=self._textbox.yview)
@@ -129,14 +129,14 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_popup(self, title="Box", dtype="msg", value="", **kwargs):
-        rsvis.tools.widgets.set_popup(self._root, title=title, dtype=dtype, value=value, options=[o for o in self._options if o["label"] in ["image", "label", "height"]], **kwargs)
+        rsvis.tools.widgets.set_popup(self._root, title=title, dtype=dtype, value=value, options=[o for o in self._options if o["label"] in ["image", "label", "height"]], label=self.cbox_class, **kwargs)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_class(self, event=None):
         self._frame._canvas.set_class(self.cbox_class.get()["label"])
-        self.cbox_area.set_choice("Objects")
-        self.set_area_event()
+        # self.cbox_area.set_choice("Objects")
+        # self.set_area_event()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

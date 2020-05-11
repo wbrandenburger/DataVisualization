@@ -58,7 +58,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         self._label = list(self._color.keys())[0] if self._color else None
 
         self._bbox = [0, 0, 0, 0]
-        self._point = [0,0]
+        self._point = [0, 0]
 
         #   key bindings ----------------------------------------------------
         self._mouse_sensitivity = 4
@@ -111,8 +111,6 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         img_resize = super(RSCanvas, self).draw_image(**kwargs)
         shape = np.asarray(img_resize).shape
 
-
-        
         self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(img_resize), bbox=self.resize_bbox([b["box"] for b in self._boxes if isinstance(b, dict)]))
 
         img = np.zeros((shape[0], shape[1], 3), dtype=np.int16) - 1
@@ -150,6 +148,8 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img(self, img, objects=list()):
+        if not isinstance(img, np.ndarray):
+            return
         self._img_size = [img.shape[1], img.shape[0]]
         super(RSCanvas, self).set_img(img)
 
@@ -172,6 +172,11 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImageContainerCanvas):
         self._grid = grid
         if self._grid_flag: 
             self.create_image()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_class(self, index=False):
+        return list(self._color.keys()).index(self._label) if index else self._label
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

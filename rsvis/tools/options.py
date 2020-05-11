@@ -93,8 +93,6 @@ def get_general_options():
 # ---------------------------------------------------------------------------
 def get_label_options(param_label, param=dict()):
     
-    label_index = rsvis.utils.objindex.ObjIndex(imgtools.project_dict_to_img(param_label.copy(), dtype=np.uint8, factor=255))        
-
     return [ 
         { 
             "label" : "label",
@@ -105,7 +103,7 @@ def get_label_options(param_label, param=dict()):
                 imgtools.get_label_image(
                     obj.get_img_from_spec("image"), 
                     obj.get_img_from_spec("label"), 
-                    value=label_index(),
+                    index=obj.get_class(index=True), # label_index(),
                     equal=False)
                 )
         },
@@ -117,7 +115,7 @@ def get_label_options(param_label, param=dict()):
             "command": lambda obj: obj.set_img(imgtools.project_and_stack(
                     imgtools.get_distance_transform(
                         obj.get_img_from_spec("label")[...,0],
-                        label=label_index(),
+                        index=obj.get_class(index=True),
                         **gu.get_value(param,"distance-transform", dict()),
                     ), dtype=np.uint8, factor=255)
                 )

@@ -138,7 +138,10 @@ def labels_to_image(img, labels):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_label_image(img, label, value, equal=True):
+def get_label_image(img, label, value=None, index=None, equal=True):
+    if index is not None:
+        value = np.unique(label)[index]
+
     rsvis.__init__._logger.debug("Create label image '{}' with value '{}'".format(np.unique(label), value))
 
     img_label = img.copy()
@@ -180,7 +183,10 @@ def get_connected_components(img, connectivity=8):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_distance_transform(img, label=0, threshold=10):
+def get_distance_transform(img, label=0, index=None, threshold=10):
+    if index is not None:
+        label = np.unique(img)[index]
+
     mask_class = ndimage.distance_transform_edt(get_label_mask(img, label_list=[label], equal=True).astype(float))
     mask_non_class = ndimage.distance_transform_edt(get_label_mask(img, label_list=[label], equal=False).astype(float))
 
