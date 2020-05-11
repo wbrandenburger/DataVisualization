@@ -109,7 +109,7 @@ class TopWindow(Toplevel):
         columnspan=1 if self._histogram_flag else 2
         img = value
         if isinstance(value,rsvis.utils.imgcontainer.ImgListContainer):
-            self._canvas = rsvis.tools.imgconcanvas.ImageContainerCanvas(self)
+            self._canvas = rsvis.tools.imgconcanvas.ImgConCanvas(self)
             self._canvas.set_img_container(value)
             img = self._canvas.get_img()
 
@@ -120,7 +120,6 @@ class TopWindow(Toplevel):
 
         self._canvas.grid(row=0, column=0, columnspan=columnspan, sticky=N+S+W+E)
 
-        print(self._histogram_flag)
         if self._histogram_flag:
             self.set_canvas_histogram(img)
 

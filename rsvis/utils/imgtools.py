@@ -200,34 +200,22 @@ def get_sub_img(img, channels):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_grid_image(img, shape, bbox, color=[255, 0 ,0], dtype=np.uint8):
+def draw_box(img, shape, boxes, color=[255, 255, 255], dtype=np.uint8):
     if not hasattr(img, "shape"):
-        img = np.zeros(shape[0:2], dtype=dtype)
+        img = np.zeros(shape, dtype=dtype)
 
-    for idx, box_original in enumerate(bbox):
-        box = box_original.copy()
+    boxes = boxes if isinstance(boxes[0], list) else [boxes]
+    for idx, box in enumerate(boxes):
+        box = box.copy()
         for i in range(len(box)):
             box[i] = box[i]-1 if box[i] else box[i]
-        img[box[0]:box[1] + 1, box[2], :] = np.array(color)
-        img[box[0]:box[1] + 1, box[3], :] = np.array(color)
-        img[box[0], box[2]:box[3] + 1, :] = np.array(color)
-        img[box[1], box[2]:box[3] + 1, :] = np.array(color)
-    return img
 
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-def draw_box(img, shape, bbox, color, dtype=np.uint8):
-    if not hasattr(img, "shape"):
-        img = np.zeros(shape[0:2], dtype=dtype)
-
-    for idx, box_original in enumerate(bbox):
-        box = box_original.copy()
-        for i in range(len(box)):
-            box[i] = box[i]-1 if box[i] else box[i]
-        img[box[0]:box[1] + 1, box[2], :] = np.array(color[idx])
-        img[box[0]:box[1] + 1, box[3], :] = np.array(color[idx])
-        img[box[0], box[2]:box[3] + 1, :] = np.array(color[idx])
-        img[box[1], box[2]:box[3] + 1, :] = np.array(color[idx])
+        c = color if isinstance(color[0], int) else color[idx]
+   
+        img[box[0]:box[1] + 1, box[2], :] = np.array(c)
+        img[box[0]:box[1] + 1, box[3], :] = np.array(c)
+        img[box[0], box[2]:box[3] + 1, :] = np.array(c)
+        img[box[1], box[2]:box[3] + 1, :] = np.array(c)
     return img
 
 #   function ----------------------------------------------------------------

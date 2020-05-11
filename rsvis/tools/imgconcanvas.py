@@ -1,13 +1,10 @@
 # ===========================================================================
-#   rscanvas.py ---------------------------------------------------------
+#   imgconcanvas.py ---------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.utils.imgtools as imgtools
 import rsvis.utils.index
-import rsvis.utils.patches_ordered
-import rsvis.utils.patches_unordered
 
 import rsvis.tools.extcanvas
 
@@ -17,19 +14,18 @@ from tkinter import Canvas, NW
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
+class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __init__(
         self, 
         parent,
-        shift=[4,4],
         multi_modal=True,
         **kwargs
     ):
 
-        super(ImageContainerCanvas, self).__init__(parent, shift=shift, **kwargs)
+        super(ImgConCanvas, self).__init__(parent, **kwargs)
 
         self._idx_current = 0
 
@@ -50,7 +46,7 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def clear(self, **kwargs):
-        super(ImageContainerCanvas, self).clear(**kwargs)
+        super(ImgConCanvas, self).clear(**kwargs)
         self._idx_current = 0
         
     #   method --------------------------------------------------------------
@@ -129,7 +125,7 @@ class ImageContainerCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def key_e(self, event, **kwargs):
+    def key_ctrl_e(self, event, **kwargs):
         """Show the current original image."""
         self.clear()
         self._idx_spec.index = self._idx_current
