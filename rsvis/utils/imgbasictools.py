@@ -30,14 +30,19 @@ def get_inverted_image(img):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_manipulated_image(img, logger=None):
+def get_linear_transformation(img, dm=0, ds=0, logger=None):
     img_mean_old = np.mean(img)
     img_std_old = np.std(img)
 
-    param_b = (img_std_old-10.)/img_std_old
-    param_a = img_mean_old+20.-param_b*img_mean_old
+    param_b = (img_std_old - ds) / img_std_old
+    param_a = img_mean_old + dm - param_b * img_mean_old
 
-    img_new= (param_a+img*param_b).astype(np.uint8)
+    img_new = (param_a+img.astype(np.float)*param_b)
+    img_new = np.where(img_new<0.0, 0.0, img_new)
+    img_new = np.where(img_new>255.0, 255.0, img_new)
+    img_new = img_new.astype(np.uint8)
+
     if logger:
         logger("[MEAN] {:.2f}->{:.2f} [STD] {:.2f}->{:.2f}".format(img_mean_old, np.mean(img_new), img_std_old, np.std(img_new)))
+        
     return img_new

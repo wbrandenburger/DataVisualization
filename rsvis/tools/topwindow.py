@@ -5,6 +5,7 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 import rsvis.utils.imgtools as imgtools
+from rsvis.utils import imgbasictools
 import rsvis.utils.imgcontainer
 
 import rsvis.tools.extcanvas
@@ -15,6 +16,7 @@ import rsvis.tools.widgets
 
 import rsvis.tools.rscanvasframe
 
+import numpy as np
 from PIL import Image, ImageTk
 from tkinter import Toplevel, ttk, Scale, Button, Canvas, Label, Menu, TOP, X, NW, N, W, S, E, CENTER, VERTICAL
 
@@ -80,13 +82,6 @@ class TopWindow(Toplevel):
             rsvis.tools.widgets.add_info_menu(self._menubar, self, self, lambda obj=self, parent=parent: self.show_help(parent))
             self.config(menu=self._menubar)
 
-        self._slider_mean = Scale(self, from_=0., to=125., orient=VERTICAL, tickinterval=25.0)
-        self._slider_mean.set(0.0)
-        self._slider_mean.grid(row=0, column=self._columns-1, sticky=N+S)
-        self._slider_std = Scale(self, from_=0., to=125., orient=VERTICAL)
-        self._slider_std.set(1.0)
-        self._slider_std.grid(row=0, column=self._columns, sticky=N+S)
-
         #   button (Quit) ---------------------------------------------------
         if command is not None:
             self._command = lambda toplevel=self, title=title: command(toplevel, title)
@@ -97,9 +92,18 @@ class TopWindow(Toplevel):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def blubb(self, event):
+        self._canvas.reload()
+        self._canvas.set_img(
+            imgbasictools.get_linear_transformation(self._canvas.get_img(), self._slider_mean.get(), self._slider_std.get(), logger=self._logger
+            )
+        )
+        self.update_histogram()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def show_help(self, parent):
         """Show help."""
-
         keys = ""
         for key, description in rsvis.tools.keys.update_key_list([self._keys, self._canvas.get_keys()]).items():
             keys = "{}\n{}: {}".format(keys, [key], description)
@@ -142,6 +146,15 @@ class TopWindow(Toplevel):
         self._canvas_hist.set_img(imgtools.get_histogram(img, logger=self._logger))
         
         self._canvas_hist.grid(row=0, column=1, sticky=N+S+W+E)
+
+        img_mean = np.mean(img)
+        img_std = np.std(img)
+        self._slider_mean = Scale(self, from_=-img_mean, to=img_mean, orient=VERTICAL, tickinterval=25.0, command=self.blubb)
+        self._slider_mean.grid(row=0, column=self._columns-1, sticky=N+S)
+        self._slider_std = Scale(self, from_=-img_std, to=img_std, orient=VERTICAL, command=self.blubb)
+        self._slider_mean.set(0.0)
+        self._slider_std.set(0.0)
+        self._slider_std.grid(row=0, column=self._columns, sticky=N+S)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

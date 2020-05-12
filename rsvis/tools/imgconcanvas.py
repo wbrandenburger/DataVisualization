@@ -48,6 +48,13 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     def clear(self, **kwargs):
         super(ImgConCanvas, self).clear(**kwargs)
         self._idx_current = 0
+    
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def reload(self):
+        self.clear()
+        self._idx_spec.index = self._idx_current
+        self.set_img_from_index(index=self._idx_current)
         
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -127,9 +134,7 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     # -----------------------------------------------------------------------
     def key_ctrl_e(self, event, **kwargs):
         """Show the current original image."""
-        self.clear()
-        self._idx_spec.index = self._idx_current
-        self.set_img_from_index(index=self._idx_current)
+        self.reload()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

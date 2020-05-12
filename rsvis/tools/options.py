@@ -157,8 +157,10 @@ def get_basic_options():
             "key" : "p",
             "description": "Manipulate the current image.",
             "command": lambda obj: obj.set_img(
-                imgbasictools.get_manipulated_image(
+                imgbasictools.get_linear_transformation(
                     obj.get_img(),
+                    dm=20,
+                    ds=10,
                     logger=obj.get_logger()
                 )
             )
