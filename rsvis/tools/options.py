@@ -233,13 +233,7 @@ def get_height_options(param=dict()):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-# param_msi=dict():  
-# "key_u": lambda obj: print(np.unique(obj.get_img_from_spec("label"))), debug
-
-#in rsshow img_cpy = lambda path: rsvis.utils.imgio.copy_image(path, get_path(path))
-# "key_o": lambda obj: img_cpy(obj.get_img(path=True)),
-
-# # MSI
+# img_cpy = lambda path: rsvis.utils.imgio.copy_image(path, get_path(path))
 # if param_msi:
 #   msi_index = rsvis.utils.objindex.ObjIndex(param_msi.copy())
 # "key_r": lambda obj: obj.set_img(
