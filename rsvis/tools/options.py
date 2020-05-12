@@ -4,6 +4,7 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 from rsvis.utils import imgtools
+from rsvis.utils import imgbasictools
 import rsvis.utils.objindex
 import rsvis.utils.general as gu
 
@@ -15,12 +16,12 @@ import numpy as np
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_options(param_specs, param_label=dict(), param_cloud=dict()):
+def get_options(param_specs, param_cloud=dict()):
     options = get_general_options()
     options.extend(get_object_options())
-
+    options.extend(get_basic_options())
     if "label" in param_specs:
-        options.extend(get_label_options(param_label))
+        options.extend(get_label_options())
     if "height" in param_specs:
         if param_cloud:
             options.extend(get_height_options())
@@ -29,12 +30,12 @@ def get_options(param_specs, param_label=dict(), param_cloud=dict()):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_lecture_options(param_specs, param_label=dict()):
+def get_lecture_options(param_specs):
     options = get_general_options()
     options.extend(get_object_options())
 
     if "label" in param_specs:
-        options.extend(get_label_options(param_label))
+        options.extend(get_label_options())
 
     options.extend(rsvis.lecture.lecture.lecture_options)
     
@@ -91,7 +92,7 @@ def get_general_options():
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_label_options(param_label, param=dict()):
+def get_label_options():
     
     return [ 
         { 
@@ -116,10 +117,52 @@ def get_label_options(param_label, param=dict()):
                     imgtools.get_distance_transform(
                         obj.get_img_from_spec("label")[...,0],
                         index=obj.get_class(index=True),
-                        **gu.get_value(param,"distance-transform", dict()),
                     ), dtype=np.uint8, factor=255)
                 )
         }
+    ]
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_basic_options():
+    
+    return [ 
+        { 
+            "label" : "basic",
+            "name" : "Grayscale",
+            "key" : None,
+            "description": "Convert the current image to a grayscale image.",
+            "command": lambda obj: obj.set_img(
+                imgbasictools.get_gray_image(
+                    obj.get_img()
+                )
+            )
+        },
+        { 
+            "label" : "basic",
+            "name" : "Inversion",
+            "key" : None,
+            "description": "Invert the current image.",
+            "command": lambda obj: obj.set_img(
+                imgbasictools.get_inverted_image(
+                    # imgbasictools.get_gray_image(
+                        obj.get_img()
+                    #)
+                )
+            )
+        },
+        { 
+            "label" : "basic",
+            "name" : "Manipulation",
+            "key" : "p",
+            "description": "Manipulate the current image.",
+            "command": lambda obj: obj.set_img(
+                imgbasictools.get_manipulated_image(
+                    obj.get_img(),
+                    logger=obj.get_logger()
+                )
+            )
+        }                
     ]
 
 #   function ----------------------------------------------------------------

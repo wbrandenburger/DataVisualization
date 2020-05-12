@@ -16,7 +16,7 @@ import rsvis.tools.widgets
 import rsvis.tools.rscanvasframe
 
 from PIL import Image, ImageTk
-from tkinter import Toplevel, ttk, Button, Canvas, Label, Menu, TOP, X, NW, N, W, S, E, CENTER
+from tkinter import Toplevel, ttk, Scale, Button, Canvas, Label, Menu, TOP, X, NW, N, W, S, E, CENTER, VERTICAL
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -33,7 +33,8 @@ class TopWindow(Toplevel):
             command=None,
             options=list(),
             label=None,
-            histogram=False
+            histogram=False,
+            logger=None
         ):
 
         #   settings --------------------------------------------------------
@@ -43,12 +44,14 @@ class TopWindow(Toplevel):
         self._label = label
         self._histogram_flag = histogram
         self._menubar_flag = False
-
+        self._logger = logger
+        
         #   general window settings -----------------------------------------
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
         
+        self._columns = 2 
+
         #   key bindings ----------------------------------------------------
         self.bind("<q>", self.key_q)
         self.bind("<w>", self.key_w)
@@ -69,14 +72,6 @@ class TopWindow(Toplevel):
             self.set_msg(value)
         elif dtype=="img":
             self.set_canvas(value)
-
-        #   button (Quit) ---------------------------------------------------
-        if command is not None:
-            self._command = lambda toplevel=self, title=title: command(toplevel, title)
-            button = ttk.Button(self, text="OK", 
-                command=self._command
-            )
-            button.grid(row=1, column=0, columnspan=2)
         
         #   menubar (Options) -----------------------------------------------
         if self._menubar_flag and options:
@@ -84,6 +79,21 @@ class TopWindow(Toplevel):
             rsvis.tools.widgets.add_option_menu(self._menubar, options, self, self._canvas, label="Options")
             rsvis.tools.widgets.add_info_menu(self._menubar, self, self, lambda obj=self, parent=parent: self.show_help(parent))
             self.config(menu=self._menubar)
+
+        self._slider_mean = Scale(self, from_=0., to=125., orient=VERTICAL, tickinterval=25.0)
+        self._slider_mean.set(0.0)
+        self._slider_mean.grid(row=0, column=self._columns-1, sticky=N+S)
+        self._slider_std = Scale(self, from_=0., to=125., orient=VERTICAL)
+        self._slider_std.set(1.0)
+        self._slider_std.grid(row=0, column=self._columns, sticky=N+S)
+
+        #   button (Quit) ---------------------------------------------------
+        if command is not None:
+            self._command = lambda toplevel=self, title=title: command(toplevel, title)
+            button = ttk.Button(self, text="OK", 
+                command=self._command
+            )
+            button.grid(row=1, column=0, columnspan=self._columns)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -106,10 +116,9 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, value):
-        columnspan=1 if self._histogram_flag else 2
         img = value
         if isinstance(value,rsvis.utils.imgcontainer.ImgListContainer):
-            self._canvas = rsvis.tools.imgconcanvas.ImgConCanvas(self)
+            self._canvas = rsvis.tools.imgconcanvas.ImgConCanvas(self, logger=self._logger)
             self._canvas.set_img_container(value)
             img = self._canvas.get_img()
 
@@ -118,7 +127,7 @@ class TopWindow(Toplevel):
             self._canvas = rsvis.tools.extcanvas.ExtendedCanvas(self)
             self._canvas.set_img(value)
 
-        self._canvas.grid(row=0, column=0, columnspan=columnspan, sticky=N+S+W+E)
+        self._canvas.grid(row=0, column=0, sticky=N+S+W+E)
 
         if self._histogram_flag:
             self.set_canvas_histogram(img)
@@ -126,8 +135,11 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas_histogram(self, img):
+        self.columnconfigure(1, weight=1)
+        self._columns += 1
+
         self._canvas_hist = rsvis.tools.rescanvas.ResizingCanvas(self)
-        self._canvas_hist.set_img(imgtools.get_histogram(img))
+        self._canvas_hist.set_img(imgtools.get_histogram(img, logger=self._logger))
         
         self._canvas_hist.grid(row=0, column=1, sticky=N+S+W+E)
 
@@ -136,7 +148,7 @@ class TopWindow(Toplevel):
     def update_histogram(self, event=None, **kwargs):
         if self._histogram_flag:
             self._canvas_hist.set_img(
-                imgtools.get_histogram(self._canvas.get_img())
+                imgtools.get_histogram(self._canvas.get_img(), logger=self._logger)
             )
 
     #   method --------------------------------------------------------------

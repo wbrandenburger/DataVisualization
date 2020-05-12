@@ -38,7 +38,7 @@ def run(
     ui = rsvis.tools.rsshowui.RSShowUI(
         rsio,
         options = rsvis.tools.options.get_options(
-            param_specs, param_label=param_label, param_cloud=param_cloud
+            param_specs, param_cloud=param_cloud
         ), 
         classes = param_classes,
         objects = rsio,

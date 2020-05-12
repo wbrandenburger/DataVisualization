@@ -89,13 +89,11 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_selection(self, resize=True):
-         return self.resize_boxes(self._selection)[0] if resize else box
+         return self.resize_boxes(self._selection)[0] if resize else self._selection
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img(self, img):
-        if not isinstance(img, numpy.ndarray):
-            return
         super(ExtendedCanvas, self).set_img(img)
 
     #   method --------------------------------------------------------------
@@ -143,7 +141,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     # -----------------------------------------------------------------------
     def set_grid_bboxes(self, img):
         self._grid_bboxes = rsvis.utils.patches_ordered.OrderedPatches(
-            img, num_patches=self._grid, logger=self._logger)
+            img, num_patches=self._grid)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -194,4 +192,3 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
         super(ExtendedCanvas, self).mouse_button_1_released(event)
         self._mouse_selection = self._selection
         self.clear_selection()
-        self.create_image()

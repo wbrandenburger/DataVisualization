@@ -26,7 +26,6 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
         parent,
         images,
         data,
-        textbox=None,
         popup=None, 
         classes=dict(), 
         **kwargs
@@ -40,8 +39,6 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
         self._data = data
         self._images = images
         self._index_list = rsvis.utils.index.Index(len(self._images))
-
-        self._textbox = textbox
 
         self._area_event = 0
 
@@ -81,8 +78,8 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
         
         boxes = self.get_object_boxes()
         self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(self._img_draw), bbox=boxes)
-
-        if self._object_flag:
+        
+        if self._object_flag and boxes:
             img = imgtools.draw_box(self.get_intial_draw_image(), [], boxes, self.get_object_colors(), dtype=np.int16)            
             img_assembly = np.where(img_assembly>=0, img_assembly, img)
 
@@ -97,13 +94,13 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_object_boxes(self, resize=True):
-        boxes = [b["box"] for b in self._boxes if isinstance(b, dict)]
-        return self.resize_boxes(boxes) if resize else boxes 
+        boxes = [b["box"] for b in self._boxes if b]
+        return self.resize_boxes(boxes) if resize and boxes else boxes 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_object_colors(self):
-        return [self._color[b["label"]] for b in self._boxes if isinstance(b, dict)]
+        return [self._color[b["label"]] for b in self._boxes if b]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -172,8 +169,8 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     # -----------------------------------------------------------------------
     def set_log(self):
         log = self._data.get_log_in(self.get_img_path(), default="")
-        if log:
-            self._textbox.insert("1.0", "{}\n".format(log))
+        if log and self._logger:
+            self._logger(log)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from scipy import ndimage
+from scipy.stats import norm
 from PIL import Image
 from io import BytesIO
 
@@ -94,18 +95,34 @@ def project_dict_to_img(obj, dtype=np.float32, factor=1.0):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_histogram(img, alpha=0.7):    
+def get_histogram(img, alpha=0.7, logger=None):    
     fig = Figure(figsize=(5, 4), dpi=100)
     # A canvas must be manually attached to the figure (pyplot would automatically do it).  This is done by instantiating the canvas with the figure as argument https://matplotlib.org/gallery/user_interfaces/canvasagg.html#sphx-glr-gallery-user-interfaces-canvasagg-py
     canvas = FigureCanvas(fig)
     
     ax = fig.add_subplot(111)
-    color = ('b','g','r')
+    color = ("b", "g", "r")
+    
+    log_mean = "[MEAN]"
+    log_std = "[STD]"
     for channel, col in enumerate(color):
         hist_channel = cv2.calcHist([img], [channel], None, [256], [0,256]) / get_area(img)
-        ax.plot(hist_channel, color = col)
+        ax.plot(hist_channel, color=col)
+        
+        img_mean = np.mean(img[...,channel])
+        img_std = np.std(img[...,channel])
+        
+        ax.plot(norm.pdf(np.arange(0, 256, 1), img_mean, img_std), color=col, linestyle="--", linewidth=1 )
+
         ax.set_xlim([0,256])
 
+        log_mean = "{} {}: {:.2f}".format(log_mean, col, img_mean)
+        log_std = "{} {}: {:.2f}".format(log_std, col, img_std)
+    
+    if logger is not None:
+        logger("{}\n{}\n".format(log_mean, log_std))
+
+    
     canvas.draw()
     s, (width, height) = canvas.print_to_buffer()
 

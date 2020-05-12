@@ -6,9 +6,8 @@
 # ---------------------------------------------------------------------------
 import rsvis.utils.general as gu
 import rsvis.utils.index
-from rsvis.utils import imgtools
 import rsvis.utils.imgio
-import rsvis.utils.format
+from rsvis.utils import imgtools
 import rsvis.utils.yaml
 
 import rsvis.tools.combobox
@@ -21,15 +20,7 @@ from tkinter import *
 import numpy as np
 import pandas as pd
 import pathlib 
-
-import subprocess as sub
-
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-def get_number_of_channel(img):
-    if len(img.shape) == 3:
-        return img.shape[2]
-    return None
+import subprocess 
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -91,7 +82,8 @@ class RSShowUI():
         self._textbox.config(yscrollcommand=self._textbox_scrollbar.set)
         
         #   set the input / output logger
-        self._data.logger = lambda log: self._textbox.insert("1.0", "{}\n".format(log))
+        self._logger = lambda log: self._textbox.insert("1.0", "{}\n".format(log))
+        self._data.logger = self._logger
 
         #   comboboxes (mouse behavior/ classes) ----------------------------
         self.cbox_area = rsvis.tools.combobox.ComboBox(self._root, "Histogram", ["Grid", "Objects"], self.set_area_event)
@@ -104,22 +96,22 @@ class RSShowUI():
         self.grid_settingsbox.grid(row=3, column=0, sticky=N+W+S+E)
     
         #   main image window -----------------------------------------------
-        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, textbox=self._textbox, popup=self.set_popup, classes=classes, logger=logger, **show)
+        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, logger=self._logger, **show)
         self._frame.grid(row=0, column=0, columnspan=3, sticky=N+S+W+E)
-
+        
         #   menubar (File / Options / Information) --------------------------
         self._menubar = Menu(self._root)
 
         #   menubar "File"
         filemenu = Menu(self._menubar, tearoff=0)
-        filemenu.add_command(label="Open")
-        filemenu.add_command(label="Save", command=lambda obj=self._frame._canvas, img_out=self._data.get_img_out(): img_out(obj.get_img_path(), obj.get_img(), prefix=obj.get_img_spec()))
+        filemenu.add_command(label="Open", command=lambda: self.open(self.get_img_path()))
+        filemenu.add_command(label="Save", command=lambda obj=self.get_obj(), img_out=self._data.get_img_out(): img_out(obj.get_img_path(), obj.get_img(), prefix=obj.get_img_spec()))
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=rsvis.tools.widgets.quit)
         self._menubar.add_cascade(label="File", menu=filemenu)
 
         #   menubar "Options"
-        rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self._root, self._frame._canvas, label="Options")
+        rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self._root, self.get_obj(), label="Options")
 
         #   menubar "Information"
         rsvis.tools.widgets.add_info_menu(self._menubar, self._root, self._root, lambda obj=self: self.show_help())
@@ -128,15 +120,46 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def get_obj(self):
+        return self._frame._canvas
+        
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_img_path(self):
+        return self.get_obj().get_img_path()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def create_image(self):
+        return self.get_obj().create_image()        
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def open(self, path):
+        path = pathlib.Path(path)
+        self._logger("[OPEN] {}".format(path.parent))
+        subprocess.Popen("explorer.exe {}".format(pathlib.Path(path).parent))
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_popup(self, title="Box", dtype="msg", value="", **kwargs):
-        rsvis.tools.widgets.set_popup(self._root, title=title, dtype=dtype, value=value, options=[o for o in self._options if o["label"] in ["image", "label", "height"]], label=self.cbox_class, **kwargs)
+        rsvis.tools.widgets.set_popup(
+            self._root, 
+            title=title, 
+            dtype=dtype, 
+            value=value, 
+            options=[o for o in self._options if o["label"] in ["image", "basic", "label", "height"]], 
+            label=self.cbox_class, 
+            logger=self._logger,
+            **kwargs
+        )
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_class(self, event=None):
-        self._frame._canvas.set_class(self.cbox_class.get()["label"])
-        # self.cbox_area.set_choice("Objects")
-        # self.set_area_event()
+        self.get_obj().set_class(self.cbox_class.get()["label"])
+        self.cbox_area.set_choice("Objects")
+        self.set_area_event()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -144,20 +167,20 @@ class RSShowUI():
         grid = [0, 0]
         for index, entry in enumerate(entries):
             grid[index]  = int(entry[1].get())
-        self._frame._canvas.set_grid(grid)
+        self.get_obj().set_grid(grid)
+        self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_area_event(self, event=None):
-        self._frame._canvas.set_area_event(**self.cbox_area.get())
+        self.get_obj().set_area_event(**self.cbox_area.get())
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def show_help(self):
         """Show help."""
-
         keys = ""
-        for key, description in rsvis.tools.keys.update_key_list([self._keys, self._frame._canvas.get_keys()]).items():
+        for key, description in rsvis.tools.keys.update_key_list([self._keys, self.get_obj().get_keys()]).items():
             keys = "{}\n{}: {}".format(keys, [key], description)
 
         rsvis.tools.widgets.set_popup(self._root, title="Help", dtype="msg", value=keys)
