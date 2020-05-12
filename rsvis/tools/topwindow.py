@@ -59,10 +59,12 @@ class TopWindow(Toplevel):
         self.bind("<w>", self.key_w)
         self.bind("<s>", self.key_s)      
         self.bind("<u>", self.key_u)
+        self.bind("<e>", self.key_e)
 
         self._keys = { 
             "q": "Exit RSVis.",
-            "u": "Update the histogram due to changes in image canvas."
+            "u": "Update the histogram due to changes in image canvas.",
+            "e": "Set current image for processing."
         }
 
         for o in options:
@@ -92,16 +94,6 @@ class TopWindow(Toplevel):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def blubb(self, event):
-        self._canvas.reload()
-        self._canvas.set_img(
-            imgbasictools.get_linear_transformation(self._canvas.get_img(), self._slider_mean.get(), self._slider_std.get(), logger=self._logger
-            )
-        )
-        self.update_histogram()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
     def show_help(self, parent):
         """Show help."""
         keys = ""
@@ -120,11 +112,11 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, value):
-        img = value
-        if isinstance(value,rsvis.utils.imgcontainer.ImgListContainer):
+        self._img = value
+        if isinstance(value, rsvis.utils.imgcontainer.ImgListContainer):
             self._canvas = rsvis.tools.imgconcanvas.ImgConCanvas(self, logger=self._logger)
             self._canvas.set_img_container(value)
-            img = self._canvas.get_img()
+            self._img = self._canvas.get_img()
 
             self._menubar_flag = True
         else:
@@ -134,7 +126,12 @@ class TopWindow(Toplevel):
         self._canvas.grid(row=0, column=0, sticky=N+S+W+E)
 
         if self._histogram_flag:
-            self.set_canvas_histogram(img)
+            self.set_canvas_histogram(self._img)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_img(self):
+        self._img = self._canvas.get_img()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -149,9 +146,9 @@ class TopWindow(Toplevel):
 
         img_mean = np.mean(img)
         img_std = np.std(img)
-        self._slider_mean = Scale(self, from_=-img_mean, to=img_mean, orient=VERTICAL, tickinterval=25.0, command=self.blubb)
+        self._slider_mean = Scale(self, from_=256.-img_mean, to=-img_mean, orient=VERTICAL, tickinterval=25, command=self.update_slider)
         self._slider_mean.grid(row=0, column=self._columns-1, sticky=N+S)
-        self._slider_std = Scale(self, from_=-img_std, to=img_std, orient=VERTICAL, command=self.blubb)
+        self._slider_std = Scale(self, from_=img_std-1, to=-img_std, orient=VERTICAL, command=self.update_slider)
         self._slider_mean.set(0.0)
         self._slider_std.set(0.0)
         self._slider_std.grid(row=0, column=self._columns, sticky=N+S)
@@ -163,6 +160,15 @@ class TopWindow(Toplevel):
             self._canvas_hist.set_img(
                 imgtools.get_histogram(self._canvas.get_img(), logger=self._logger)
             )
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def update_slider(self, event):
+        self._canvas.set_img(
+            imgbasictools.get_linear_transformation(self._img, self._slider_mean.get(), self._slider_std.get(), logger=self._logger
+            )
+        )
+        self.update_histogram()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -182,6 +188,13 @@ class TopWindow(Toplevel):
         """Update the histogram due to changes in image canvas."""
         self.update_histogram()
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_e(self, event, **kwargs):
+        """Exit RSVis."""
+        self.set_img()
+        self.update_histogram()
+        
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_q(self, event, **kwargs):

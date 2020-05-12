@@ -112,10 +112,9 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
 
         #   consider alpha channel
         if self._channel_flag:
-            self._img_draw = Image.fromarray(imgtools.project_and_stack(
-                np.asarray(self._img_draw)[..., self._index_channel()], 
-                    dtype=np.uint8, 
-                    factor=255
+            self._img_draw = Image.fromarray(
+                imgtools.stack_image_dim(
+                    np.asarray(self._img_draw)[..., self._index_channel()]
                 )
             )
 
