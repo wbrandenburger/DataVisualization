@@ -196,6 +196,6 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     def mouse_button_1_released(self, event):
         super(ExtendedCanvas, self).mouse_button_1_released(event)
         self._mouse_selection = self._selection
-        self.clear_selection()
 
-        self.create_image()
+        #self.clear_selection() when removing selection, there is no possibility to delete objects 
+        #self.create_image()
