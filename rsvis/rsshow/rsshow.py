@@ -30,9 +30,9 @@ def run(
 
     #   settings ------------------------------------------------------------
     # -----------------------------------------------------------------------
-    param_label = dict((str(c["label"][0]), c["label"][1]) for c in param_classes if "label" in c.keys())
-    
-    rsio = rsvis.utils.rsioobject.RSIOObject(files, param_specs, param_in, param_out, param_show, label=param_label
+    param_label = [c["label"] for c in param_classes]
+    param_color = [c["color"] for c in param_classes]
+    rsio = rsvis.utils.rsioobject.RSIOObject(files, param_specs, param_in, param_out, param_show, label=param_label, color=param_color
     )
 
     ui = rsvis.tools.rsshowui.RSShowUI(

@@ -71,16 +71,22 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    #########################################################################
     def set_img_from_index(self, index=None, **kwargs):
+        self.set_show(self.get_container_img(index=index, show=False))
         self.set_img(self.get_container_img(index=index), **kwargs)
-
+    #########################################################################
+    
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img_from_spec(self, spec, **kwargs):
+    def get_img_from_spec(self, spec, show=True, **kwargs):
         if not self._img_container:
             return
-            
-        return self._img_container.get_img_from_spec(spec).data
+
+        if not show:
+            return self._img_container.get_img_from_spec(spec).data
+        else:
+            return self._img_container.get_img_from_spec(spec).show
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -114,7 +120,11 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
             return
         
         index = self._idx_spec() if index is None else index
-        return self._img_container[index].data
+        
+        if not show:
+            return self._img_container[index].data
+        else:
+            return self._img_container[index].show
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

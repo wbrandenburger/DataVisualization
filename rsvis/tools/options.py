@@ -7,8 +7,7 @@ from rsvis.utils import imgtools
 from rsvis.utils import imgbasictools
 import rsvis.utils.objindex
 import rsvis.utils.general as gu
-
-import rsvis.lecture.lecture
+import rsvis.utils.imgcv 
 
 import rsvis.tools.heightmap
 
@@ -19,25 +18,14 @@ import numpy as np
 def get_options(param_specs, param_cloud=dict()):
     options = get_general_options()
     options.extend(get_object_options())
-    options.extend(get_basic_options())
+    
+    # options.extend(get_basic_options())
+    
     if "label" in param_specs:
         options.extend(get_label_options())
     if "height" in param_specs:
         if param_cloud:
             options.extend(get_height_options())
-    
-    return options
-
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-def get_lecture_options(param_specs):
-    options = get_general_options()
-    options.extend(get_object_options())
-
-    if "label" in param_specs:
-        options.extend(get_label_options())
-
-    options.extend(rsvis.lecture.lecture.lecture_options)
     
     return options
 
@@ -104,7 +92,7 @@ def get_label_options():
                 imgtools.get_label_image(
                     obj.get_img_from_spec("image"), 
                     obj.get_img_from_spec("label"), 
-                    index=obj.get_class(index=True), # label_index(),
+                    index=obj.get_class(index=True),
                     equal=False)
                 )
         },
@@ -122,50 +110,50 @@ def get_label_options():
         }
     ]
 
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-def get_basic_options():
+# #   function ----------------------------------------------------------------
+# # ---------------------------------------------------------------------------
+# def get_basic_options():
     
-    return [ 
-        { 
-            "label" : "basic",
-            "name" : "Grayscale",
-            "key" : None,
-            "description": "Convert the current image to a grayscale image.",
-            "command": lambda obj: obj.set_img(
-                imgbasictools.get_gray_image(
-                    obj.get_img()
-                )
-            )
-        },
-        { 
-            "label" : "basic",
-            "name" : "Inversion",
-            "key" : None,
-            "description": "Invert the current image.",
-            "command": lambda obj: obj.set_img(
-                imgbasictools.get_inverted_image(
-                    # imgbasictools.get_gray_image(
-                        obj.get_img()
-                    #)
-                )
-            )
-        },
-        { 
-            "label" : "basic",
-            "name" : "Manipulation",
-            "key" : "p",
-            "description": "Manipulate the current image.",
-            "command": lambda obj: obj.set_img(
-                imgbasictools.get_linear_transformation(
-                    obj.get_img(),
-                    dm=20,
-                    ds=10,
-                    logger=obj.get_logger()
-                )
-            )
-        }                
-    ]
+#     return [ 
+#         { 
+#             "label" : "basic",
+#             "name" : "Grayscale",
+#             "key" : None,
+#             "description": "Convert the current image to a grayscale image.",
+#             "command": lambda obj: obj.set_img(
+#                 imgbasictools.get_gray_image(
+#                     obj.get_img()
+#                 )
+#             )
+#         },
+#         { 
+#             "label" : "basic",
+#             "name" : "Inversion",
+#             "key" : None,
+#             "description": "Invert the current image.",
+#             "command": lambda obj: obj.set_img(
+#                 imgbasictools.get_inverted_image(
+#                     # imgbasictools.get_gray_image(
+#                         obj.get_img()
+#                     #)
+#                 )
+#             )
+#         },
+#         { 
+#             "label" : "basic",
+#             "name" : "Manipulation",
+#             "key" : "p",
+#             "description": "Manipulate the current image.",
+#             "command": lambda obj: obj.set_img(
+#                 imgbasictools.get_linear_transformation(
+#                     obj.get_img(),
+#                     dm=20,
+#                     ds=10,
+#                     logger=obj.get_logger()
+#                 )
+#             )
+#         }                
+#     ]
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -201,7 +189,7 @@ def get_height_options(param=dict()):
         { 
             "label" : "height",
             "name" : "Normal image",
-            "key" : None,
+            "key" : "n",
             "description": "Compute and show the normal image.",
             "command": lambda obj: obj.set_img(
                 rsvis.tools.heightmap.get_normal_image(
@@ -210,7 +198,7 @@ def get_height_options(param=dict()):
                     show=True,
                 )
             )
-        },
+        },        
         { 
             "label" : "height",
             "name" : "Open Pointcloud in CloudCompare",

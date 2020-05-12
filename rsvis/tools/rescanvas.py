@@ -115,6 +115,22 @@ class ResizingCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def resize_points(self, points, inversion=False):
+        scale = [float(s)/i for s, i in zip(self.get_size(), self._img_size)]
+
+        if inversion:
+            scale = [1/s for s in scale]
+
+        points = points if isinstance(points[0], list) else [points]
+        return [self.resize_point(point, scale) for point in points]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def resize_point(self, point, scale):  
+        return [int(point[0]*scale[1]), int(point[1]*scale[0])]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def resize_event(self, event):
         ev = [event.y, event.x]
 
@@ -141,9 +157,16 @@ class ResizingCanvas(Canvas):
     def set_img(self, img):
         if not isinstance(img, np.ndarray):
             return
+        img = imgtools.stack_image_dim(img)
         self._img_size = [img.shape[1], img.shape[0]]
         self._img = Image.fromarray(img)
         self.create_image()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_show(self, img):
+        img = imgtools.stack_image_dim(img)
+        self._show = img
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -199,7 +222,6 @@ class ResizingCanvas(Canvas):
     # -----------------------------------------------------------------------
     def mouse_button_1_pressed(self, event):
         self.focus_set()
-        self.clear_selection()
         self._mouse_event = self.resize_event(event)
         self._mouse_point = [self._mouse_event[0], self._mouse_event[1]]
 
@@ -209,3 +231,10 @@ class ResizingCanvas(Canvas):
         self.focus_set()
         self._mouse_event = self.resize_event(event)
         self._mouse_box = self.get_event_box(event)
+
+        mouse_img = self.resize_points(self._mouse_event, inversion=True)[0]
+
+        self._logger("[MOUSE] Pixel: {},  Value: {}".format(mouse_img,
+            self._show[mouse_img[0], mouse_img[1], :]
+            )
+        )

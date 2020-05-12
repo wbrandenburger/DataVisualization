@@ -136,7 +136,8 @@ def copy_image(path, dest, logger=None,):
 def get_image(
         path, 
         spec,
-        label=dict(), 
+        label=list(), 
+        color=list(),
         scale=100, 
         show=False, 
         logger=None,
@@ -153,10 +154,7 @@ def get_image(
 
     if label and spec == "label":
         img = imgtools.labels_to_image(img, label)
-
-    if show:
-        img = imgtools.project_data_to_img(
-            imgtools.stack_image_dim(img), dtype=np.uint8, factor=255
-        )
+        # if color:
+        #     img = imgtools.image_to_labels(img, color)
 
     return img

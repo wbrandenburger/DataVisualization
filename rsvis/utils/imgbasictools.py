@@ -4,19 +4,10 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.__init__
-import rsvis.utils.patches
 from rsvis.utils import imgtools
 
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
-from scipy import ndimage
-from scipy.stats import norm
-from PIL import Image
-from io import BytesIO
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

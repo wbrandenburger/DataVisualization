@@ -12,6 +12,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib.colors as clr
 from scipy import ndimage
 from scipy.stats import norm
 from PIL import Image
@@ -133,6 +134,7 @@ def get_histogram(img, alpha=0.7, logger=None):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def raise_contrast(img):
+    img = stack_image_dim(img)
     for c in range(0, img.shape[2]):
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
         img[:,:,c] = clahe.apply(img[:,:,c])
@@ -141,17 +143,27 @@ def raise_contrast(img):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def labels_to_image(img, labels):
-    img = expand_image_dim(img).astype(int)
-    dim = img.shape
-    label = np.zeros((img.shape[0], img.shape[1]), dtype=int)
-    for c in range(img.shape[-1]):
-        label += img[:, :, c]*int(pow(2, c))
-    
-    lut = lambda x: labels[str(x)]
-    np_lut = np.vectorize(lut, otypes=[np.uint8])
-    label = np_lut(label.astype(int))
+def labels_to_image(img_label, colors):
+    label = np.zeros((img_label.shape[0], img_label.shape[1]), dtype=np.uint8)
+    for idx, color in enumerate(colors):
+        if len(img_label.shape)==3:
+            label += np.uint8(idx+1)*np.all(img_label==color, axis=-1)
+        else:
+            label += np.where(img_label==color, np.uint8(idx+1), np.uint8(0))
     return label
+
+# #   function ----------------------------------------------------------------
+# # ---------------------------------------------------------------------------
+# def image_to_labels(img, colors):
+#     print(np.unique(img))
+#     fig = Figure(figsize=(5, 4), dpi=100)
+#     canvas = FigureCanvas(fig)
+#     colormap = clr.ListedColormap(np.array(colors)/255.)
+#     plt.imshow(img, cmap=colormap, vmin=0, vmax=len(colors)-1)
+#     canvas.draw()
+#     s, (width, height) = canvas.print_to_buffer()
+#     img_label = np.fromstring(s, np.uint8).reshape((height, width, 4))*255
+#     return img_label
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

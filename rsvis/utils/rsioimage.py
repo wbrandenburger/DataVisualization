@@ -21,7 +21,8 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
             images, 
             specs,
             *args,
-            label = dict(),
+            label = list(),
+            color = list(),
             **kwargs
         ):
         super(RSIOImage, self).__init__(*args, **kwargs)
@@ -29,6 +30,7 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
         self._images = images
         self._specs = specs
         self._label = label
+        self._color = color
 
         self._img_name = "image"
 
@@ -37,12 +39,13 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_load_img(self):
-        return lambda path, spec, show=self._param_show, label=self._label: rsvis.utils.imgio.get_image(
+        return lambda path, spec: rsvis.utils.imgio.get_image(
             path,
             spec,
-            label,
+            self._label,
+            color=self._color,
             logger=self._logger,
-            **show
+            **self._param_show
         )
 
     #   method --------------------------------------------------------------

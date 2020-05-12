@@ -4,7 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.utils.objcontainer
+from rsvis.utils import imgtools
 
 import pathlib
 import tifffile
@@ -16,12 +16,11 @@ class ImgListContainer(list):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, default_spec="image", load=None, live=False, obj_flag=True, obj_copy=False, bbox=list(), **kwargs):
+    def __init__(self, default_spec="image", load=None, live=False, obj_flag=False, bbox=list(), **kwargs):
         self._default_spec = default_spec
         self._load = load
         self._live = live            
         self._obj_flag = obj_flag, 
-        self._obj_copy = obj_copy
         self._bbox = bbox  
 
     #   method --------------------------------------------------------------
@@ -30,20 +29,20 @@ class ImgListContainer(list):
 
         self._live = self._live if live is None else live
         self._obj_flag = self._obj_flag if obj_flag is None else obj_flag
-        self._obj_copy = self._obj_copy if obj_copy is None else obj_copy
+        # self._obj_copy = self._obj_copy if obj_copy is None else obj_copy
         self._bbox = self._bbox if bbox  else bbox
         self._load = self._load if load is None else load
         
         spec = self._default_spec if not spec else spec
         super(ImgListContainer, self).append(
-            rsvis.utils.imgcontainer.ImgContainer(
+            ImgContainer(
                 img=img,
                 path=path,
                 spec=spec,
                 load=self._load,
                 live=self._live, 
                 obj_flag=self._obj_flag, 
-                obj_copy=self._obj_copy,
+                # obj_copy=self._obj_copy,
                 bbox = self._bbox
             )
         )
@@ -61,7 +60,7 @@ class ImgListContainer(list):
                 live=item._live, 
                 bbox=item._bbox, 
                 obj_flag=item._obj_flag, 
-                obj_copy=item._obj_copy
+                # obj_copy=item._obj_copy
             )
         return obj
 
@@ -89,7 +88,7 @@ class ImgListContainer(list):
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class ImgContainer(rsvis.utils.objcontainer.ObjContainer):
+class ImgContainer(object):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -100,12 +99,12 @@ class ImgContainer(rsvis.utils.objcontainer.ObjContainer):
             spec="image", 
             load=None,
             live=False,
-            obj_flag=True, 
-            obj_copy=False,
+            obj_flag=False,
             bbox=list(),  
             **kwargs          
         ):
-        super(ImgContainer, self).__init__(obj=img, obj_flag=obj_flag, obj_copy=obj_copy)
+        self._obj_flag = obj_flag
+        self._obj = list()
 
         self._path = None
         if path:
@@ -116,6 +115,19 @@ class ImgContainer(rsvis.utils.objcontainer.ObjContainer):
         self._load = load if load else lambda path, spec: tifffile.imread(path)
      
         self._bbox = bbox
+        self._show = list()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    @property
+    def obj(self):
+        return self._obj
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    @obj.setter
+    def obj(self, obj):
+        self._obj = obj
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -157,16 +169,41 @@ class ImgContainer(rsvis.utils.objcontainer.ObjContainer):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------  
     @property
+    def show(self):
+        if self._live:
+            show = imgtools.project_data_to_img(
+                imgtools.stack_image_dim(self.imread()), dtype=np.uint8, factor=255)
+        else:
+            if not len(self.obj):
+                self.obj = self.imread()
+                
+            if not len(self._show):
+                self._show = imgtools.project_data_to_img(
+                imgtools.stack_image_dim(self.obj), dtype=np.uint8, factor=255)
+            show = self._show    
+
+        return self.get_bbox(show) if self.bbox else show
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------  
+    @property
     def data(self):
         if self._live:
             data = self.imread()
         else:
-            self.obj = self.imread()
-            data = super(ImgContainer, self).data
+            if not len(self.obj):
+                self.obj = self.imread()
+            data = self.obj
 
-        if self.bbox:
+        return self.get_bbox(data) if self.bbox else data
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_bbox(self, data):
+        if len(data.shape)>2:
             return data[self._bbox[0]:self._bbox[1], self._bbox[2]:self. _bbox[3], :]
-        return data
+        else:
+            return data[self._bbox[0]:self._bbox[1], self._bbox[2]:self. _bbox[3]]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

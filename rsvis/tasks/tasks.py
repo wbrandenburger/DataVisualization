@@ -10,7 +10,6 @@ import rsvis.utils.format
 import rsvis.utils.general as gu
 
 import rsvis.rsshow.rsshow
-import rsvis.lecture.rsshow
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -34,23 +33,6 @@ def task_rsshow(setting="training"):
         param_show=gu.get_value(
             rsvis.config.settings._SETTINGS,"param_show", dict()),        
       
-    )
-
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-def task_lecture(setting="training"):
-    rsvis.lecture.rsshow.run(
-        rsvis.config.settings.get_data(setting),
-        rsvis.config.settings._SETTINGS["param_specs"],
-        rsvis.config.settings._SETTINGS["param_in"], 
-        param_in=gu.get_value(
-            rsvis.config.settings._SETTINGS,"param_in", dict()),   
-        param_out=gu.get_value(
-            rsvis.config.settings._SETTINGS,"param_out", dict()), 
-        param_classes=gu.get_value(
-            rsvis.config.settings._SETTINGS,"param_classes", list()),          
-        param_show=gu.get_value(
-            rsvis.config.settings._SETTINGS,"param_show", dict()),
     )
 
 #   function ----------------------------------------------------------------

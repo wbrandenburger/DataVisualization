@@ -187,7 +187,15 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def mouse_button_1_pressed(self, event):
+        super(ExtendedCanvas, self).mouse_button_1_pressed(event)
+        self.clear_selection
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def mouse_button_1_released(self, event):
         super(ExtendedCanvas, self).mouse_button_1_released(event)
         self._mouse_selection = self._selection
         self.clear_selection()
+
+        self.create_image()
