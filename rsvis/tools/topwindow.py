@@ -146,6 +146,7 @@ class TopWindow(Toplevel):
 
         img_mean = np.mean(img)
         img_std = np.std(img)
+        
         self._slider_mean = Scale(self, from_=256.-img_mean, to=-img_mean, orient=VERTICAL, tickinterval=25, command=self.update_slider)
         self._slider_mean.grid(row=0, column=self._columns-1, sticky=N+S)
         self._slider_std = Scale(self, from_=img_std-1, to=-img_std, orient=VERTICAL, command=self.update_slider)

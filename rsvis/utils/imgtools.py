@@ -106,7 +106,6 @@ def get_histogram(img, alpha=0.7, logger=None):
     log_mean = "[MEAN]"
     log_std = "[STD]"
     for channel, col in enumerate(color):
-        logger(img.shape)
         hist_channel = cv2.calcHist([img], [channel], None, [256], [0,256]) / get_area(img)
         ax.plot(hist_channel, color=col)
         
