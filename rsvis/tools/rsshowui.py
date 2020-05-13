@@ -148,8 +148,7 @@ class RSShowUI():
             title=title, 
             dtype=dtype, 
             value=value, 
-            options=[o for o in self._options if o["label"] in ["image", "basic", "label", "height"]], 
-            label=self.cbox_class, 
+            options=[o for o in self._options if o["label"] in ["image", "basic", "label", "height"]],
             logger=self._logger,
             **kwargs
         )

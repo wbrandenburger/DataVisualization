@@ -55,7 +55,7 @@ def add_info_menu(menubar, parent, obj, command):
 def set_popup(parent, **kwargs):
     t = rsvis.tools.topwindow.TopWindow(
         parent, 
-        command=rsvis.tools.widgets.quit, 
+        q_cmd=rsvis.tools.widgets.quit, 
         **kwargs
     )
     t.mainloop()
