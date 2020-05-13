@@ -12,13 +12,10 @@ import rsvis.tools.extcanvas
 import rsvis.tools.imgconcanvas
 import rsvis.tools.keys
 import rsvis.tools.rescanvas
-import rsvis.tools.widgets
-
-import rsvis.tools.rscanvasframe
 
 import numpy as np
 from PIL import Image, ImageTk
-from tkinter import Toplevel, ttk, Scale, Button, Canvas, Label, Menu, TOP, X, NW, N, W, S, E, CENTER, VERTICAL
+from tkinter import Toplevel, ttk, Button, Canvas, Label, Menu, TOP, X, NW, N, W, S, E, CENTER
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -62,6 +59,13 @@ class TopWindow(Toplevel):
             if o["key"] is not None:
                 self._keys.update({o["key"]: o["description"]}) 
 
+        #   button (Quit) ---------------------------------------------------
+        self._q_cmd = lambda toplevel=self, title=title: q_cmd(toplevel, title)
+        self._button = ttk.Button(self, text="OK", 
+            command=self._q_cmd
+        )
+        self._button.grid(row=1, column=0, columnspan=1)
+
         #   main image window -----------------------------------------------
         if dtype=="msg":
             self.set_msg(value)
@@ -75,13 +79,14 @@ class TopWindow(Toplevel):
             rsvis.tools.widgets.add_info_menu(self._menubar, self, self, lambda obj=self, parent=parent: self.show_help(parent))
             self.config(menu=self._menubar)
 
-        #   button (Quit) ---------------------------------------------------
-        if q_cmd is not None:
-            self._q_cmd = lambda toplevel=self, title=title: q_cmd(toplevel, title)
-            self._button = ttk.Button(self, text="OK", 
-                command=self._q_cmd
-            )
-            self._button.grid(row=1, column=0, columnspan=1)
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_popup(self, dtype="msg", histogram=False, **kwargs):
+        kwargs.update(
+            {"dtype": dtype, "q_cmd": self._q_cmd, "logger": self._logger}
+        )
+        t = TopWindow(self, **kwargs)
+        t.mainloop()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -91,7 +96,7 @@ class TopWindow(Toplevel):
         for key, description in rsvis.tools.keys.update_key_list([self._keys, self._canvas.get_keys()]).items():
             keys = "{}\n{}: {}".format(keys, [key], description)
 
-        rsvis.tools.widgets.set_popup(parent, title="Help", dtype="msg", value=keys)
+        self.set_popup(parent, title="Help", dtype="msg", value=keys)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

@@ -13,7 +13,8 @@ import rsvis.utils.yaml
 import rsvis.tools.combobox
 import rsvis.tools.rscanvasframe
 import rsvis.tools.settingsbox
-import rsvis.tools.topwindow
+from rsvis.tools.topwindow import TopWindow
+from rsvis.tools.topwindowhist import TopWindowHist
 import rsvis.tools.widgets
 
 from tkinter import *
@@ -142,16 +143,22 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_popup(self, title="Box", dtype="msg", value="", **kwargs):
-        rsvis.tools.widgets.set_popup(
-            self._root, 
-            title=title, 
-            dtype=dtype, 
-            value=value, 
-            options=[o for o in self._options if o["label"] in ["image", "basic", "label", "height"]],
-            logger=self._logger,
-            **kwargs
+    def set_popup(self, dtype="msg", histogram=False, **kwargs):
+        kwargs.update(
+            {"dtype": dtype, "q_cmd": self.quit, "logger": self._logger}
         )
+
+        if dtype=="img":
+            kwargs.update( 
+                {"options": [o for o in self._options if o["label"] in ["image", "basic", "label", "height"]]}
+            )
+            if histogram:
+                t = TopWindowHist( self._root, **kwargs)
+            else:
+                t = TopWindow(self._root, **kwargs)
+        else:
+            t = TopWindow(self._root, **kwargs)
+        t.mainloop()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -176,16 +183,25 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def quit(self, window, title=None, **kwargs):
+        """Exit Window."""   
+        # if title=="Help":
+        #     self._popup_help = 0
+        window.quit()
+        window.destroy()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def show_help(self):
         """Show help."""
         keys = ""
         for key, description in rsvis.tools.keys.update_key_list([self._keys, self.get_obj().get_keys()]).items():
             keys = "{}\n{}: {}".format(keys, [key], description)
 
-        rsvis.tools.widgets.set_popup(self._root, title="Help", dtype="msg", value=keys)
+        self.set_popup(title="Help", dtype="msg", value=keys)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_q(self, event, **kwargs):
         """Exit RSVis."""
-        rsvis.tools.widgets.quit(self._root)
+        self.quit(self._root)

@@ -4,8 +4,6 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.tools.topwindow
-
 from tkinter import *
 
 # If you program Tk using the Tcl language, you can ask the system to let you know when a variable is changed. The Tk toolkit can use this feature, called tracing, to update certain widgets when an associated variable is modified.
@@ -49,13 +47,3 @@ def add_info_menu(menubar, parent, obj, command):
         "command": command
     }]
     add_option_menu(menubar, options, parent, obj, label="Information")
-
-#   method --------------------------------------------------------------
-# -----------------------------------------------------------------------
-def set_popup(parent, **kwargs):
-    t = rsvis.tools.topwindow.TopWindow(
-        parent, 
-        q_cmd=rsvis.tools.widgets.quit, 
-        **kwargs
-    )
-    t.mainloop()

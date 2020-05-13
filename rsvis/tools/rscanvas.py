@@ -178,7 +178,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
         if bbox:
             img_container = self._img_container.copy()
             img_container.set_bbox(bbox)
-            self._set_popup(title="Histogram", dtype="img", value=img_container, histogram=histogram) 
+            self._set_popup(title="Histogram Canvas" if histogram else "Patch Canvas", dtype="img", value=img_container, histogram=histogram) 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

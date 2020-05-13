@@ -25,7 +25,7 @@ def get_linear_transformation(img, dm=0, ds=0, logger=None):
     img_mean_old = np.mean(img)
     img_std_old = np.std(img)
 
-    param_b = (img_std_old + ds) / img_std_old
+    param_b = (img_std_old + ds) / (img_std_old)
     param_a = img_mean_old + dm - param_b * img_mean_old
 
     img_new = (param_a+img.astype(np.float)*param_b)

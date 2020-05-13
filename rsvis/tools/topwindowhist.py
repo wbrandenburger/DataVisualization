@@ -14,75 +14,59 @@ import rsvis.tools.keys
 import rsvis.tools.rescanvas
 import rsvis.tools.widgets
 
-import rsvis.tools.rscanvasframe
-
 import numpy as np
 from PIL import Image, ImageTk
-from tkinter import Toplevel, ttk, Scale, Button, Canvas, Label, Menu, TOP, X, NW, N, W, S, E, CENTER, VERTICAL
+from tkinter import ttk, Scale, Button, Canvas, Label, Menu, TOP, X, NW, N, W, S, E, CENTER, VERTICAL, HORIZONTAL
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class TopWindowHist(Toplevel):
+class TopWindowHist(rsvis.tools.topwindow.TopWindow):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __init__(
             self, 
             parent, 
-            command=None,
-            options=list(),
-            label=None,
-            logger=None,
             **kwargs
         ):
 
         #   settings --------------------------------------------------------
-        super(TopWindowHist, self).__init__(parent, title="Historam Canvas", dtype="img", **kwargs)
+        super(TopWindowHist, self).__init__(parent, **kwargs)
         
-        #   general window settings -----------------------------------------
-        self._b_col = 2 
-
         #   key bindings ----------------------------------------------------
-        self.bind("<q>", self.key_q)
         self.bind("<w>", self.key_w)
-        self.bind("<s>", self.key_s)      
+        self.bind("<s>", self.key_s)
         self.bind("<u>", self.key_u)
-        self.bind("<e>", self.key_e)
 
-        self._keys = { 
-            "q": "Exit RSVis.",
-            "u": "Update the histogram due to changes in image canvas.",
-            "e": "Set current image for processing."
-        }
-
-        for o in options:
-            if o["key"] is not None:
-                self._keys.update({o["key"]: o["description"]}) 
-        
-        #   menubar (Options) -----------------------------------------------
-        if self._menubar_flag and options:
-            self._menubar = Menu(self)
-            rsvis.tools.widgets.add_option_menu(self._menubar, options, self, self._canvas, label="Options")
-            rsvis.tools.widgets.add_info_menu(self._menubar, self, self, lambda obj=self, parent=parent: self.show_help(parent))
-            self.config(menu=self._menubar)
+        self._keys.update({ 
+                "u": "Update the histogram due to changes in image canvas.",
+            }
+        )
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_canvas(self, *args):
-        super(TopWindowHist, self).set_canvas(self, *args)
+    def set_canvas(self, img):
+        super(TopWindowHist, self).set_canvas(img)
 
         self.columnconfigure(1, weight=1)
 
-        self._canvas.grid(row=0, column=0, columnspan=2, sticky=N+S+W+E)
-        self._button.grid(row=1, column=0, columnspan=2)
+        self._canvas.grid(row=0, column=0, rowspan=3, sticky=N+S+W+E)
+        self._button.grid(row=3, column=0, columnspan=2)
 
         self._canvas_hist = rsvis.tools.rescanvas.ResizingCanvas(self)
         self.update_histogram()
-        self._canvas_hist(row=0, column=1, columnspan=2, sticky=N+S+W+E)
+        self._canvas_hist.grid(row=0, column=1, columnspan=1, sticky=N+S+W+E)
 
+        img_mean = np.mean(self._canvas.get_img())
+        img_std = np.std(self._canvas.get_img())
+        
+        self._slider_mean = Scale(self, from_=256.-img_mean, to=-img_mean, orient=HORIZONTAL, command=self.update_slider)
+        self._slider_std = Scale(self, from_=img_std-1, to=-img_std+1, orient=HORIZONTAL, command=self.update_slider)
         self._slider_mean.set(0.0)
         self._slider_std.set(0.0)
-        self._slider_std.grid(row=0, column=2, sticky=N+S)
+
+        self._slider_mean.grid(row=1, column=1, sticky=W+E)
+        self._slider_std.grid(row=2, column=1, sticky=W+E)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -122,13 +106,6 @@ class TopWindowHist(Toplevel):
     # -----------------------------------------------------------------------
     def key_e(self, event, **kwargs):
         """Exit RSVis."""
-        self.set_img()
+        super(TopWindowHist, self).key_e(event, **kwargs)
         self.update_histogram()
-        
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def key_q(self, event, **kwargs):
-        """Exit RSVis."""
-        self._command()
-
     
