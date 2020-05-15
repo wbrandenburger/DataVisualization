@@ -19,7 +19,7 @@ def get_options(param_specs, param_cloud=dict()):
     options = get_general_options()
     options.extend(get_object_options())
     
-    # options.extend(get_basic_options())
+    options.extend(get_basic_options())
     
     if "label" in param_specs:
         options.extend(get_label_options())
