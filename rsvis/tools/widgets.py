@@ -23,27 +23,36 @@ def quit(window, title=None, **kwargs):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def add_option_menu(menubar, options, parent, obj, label="Default"):
-    menu = Menu(menubar, tearoff=0)
-    for option in options: 
-        name = option["name"]
-        if option["key"] is not None:
-            name = "{} ({})".format(name, option["key"])
-        menu.add_command(label=name, command=lambda cmd=option["command"]: cmd(obj))
-    
-    menubar.add_cascade(label=label, menu=menu)
+def add_option_menu(menubar, options, parent, obj):
 
-    #   key bindings ------------------------------------------------
-    for option in options:
-        if option["key"] is not None:
-            parent.bind("<{}>".format(option["key"]), lambda event, cmd=option["command"]: cmd(obj))
+    labels = list()
+    for o in options:
+        if o["label"] not in labels:
+            labels.append(o["label"])
+
+    for l in labels:
+        menu = Menu(menubar, tearoff=0)
+        for o in options:
+            if not o["label"] == l:
+                continue
+
+            name = o["name"]
+            if o["key"] is not None:
+                name = "{} ({})".format(name, o["key"])
+                #   key bindings --------------------------------------------
+                parent.bind("<{}>".format(o["key"]), lambda event, cmd=o["command"]: cmd(obj))
+
+            menu.add_command(label=name, command=lambda cmd=o["command"]: cmd(obj))
+        
+        menubar.add_cascade(label=l, menu=menu)
 
 # ---------------------------------------------------------------------------
 def add_info_menu(menubar, parent, obj, command):
     options = [{ 
         "name" : "Help",
         "key" : "F1",
+        "label": "Information",
         "description": "Show help.",
         "command": command
     }]
-    add_option_menu(menubar, options, parent, obj, label="Information")
+    add_option_menu(menubar, options, parent, obj)

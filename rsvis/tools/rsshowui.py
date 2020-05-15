@@ -112,7 +112,7 @@ class RSShowUI():
         self._menubar.add_cascade(label="File", menu=filemenu)
 
         #   menubar "Options"
-        rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self._root, self.get_obj(), label="Options")
+        rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self._root, self.get_obj())
 
         #   menubar "Information"
         rsvis.tools.widgets.add_info_menu(self._menubar, self._root, self._root, lambda obj=self: self.show_help())
@@ -150,7 +150,7 @@ class RSShowUI():
 
         if dtype=="img":
             kwargs.update( 
-                {"options": [o for o in self._options if o["label"] in ["image", "basic", "label", "height"]]}
+                {"options": [o for o in self._options if o["require"] in ["image", "basic", "label", "height"]]}
             )
             if histogram:
                 t = TopWindowHist( self._root, **kwargs)

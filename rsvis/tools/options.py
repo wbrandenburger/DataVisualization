@@ -35,28 +35,32 @@ def get_object_options():
 
     return [
         { 
-            "label" : "objects",
+            "require" : "objects",
+            "label" : "Objects",
             "name" : "Grid On/Off",
             "key" : None,
             "description": "Show a grid in the currently displayed image.",
             "command": lambda obj: obj.show_grid()
         },      
         { 
-            "label" : "objects",
+            "require" : "objects",
+            "label" : "Objects",
             "name" : "Objects On/Off",
             "key" : None,
             "description": "Show the bounding boxes in the currently displayed image.",
             "command": lambda obj: obj.show_objects()
         },
         { 
-            "label" : "objects",
+            "require" : "objects",
+            "label" : "Objects",
             "name" : "Save objects",
             "key" : None,
             "description": "Save displayed objects.",
             "command": lambda obj: obj.write_object()
         },
         { 
-            "label" : "objects",
+            "require" : "objects",
+            "label" : "Objects",
             "name" : "Remove selected object",
             "key" : None,
             "description": "Remove the selected object.",
@@ -70,7 +74,8 @@ def get_general_options():
 
     return [ 
         { 
-            "label" : "image",
+            "require" : "image",
+            "label" : "Image",
             "name" : "Contrast",
             "key" : "r",
             "description": "Raise the contrast of the currently displayed image.",
@@ -84,7 +89,8 @@ def get_label_options():
     
     return [ 
         { 
-            "label" : "label",
+            "require" : "label",
+            "label" : "Image",
             "name" : "Projection ",
             "key" : "t",
             "description": "Show the mask of one label in current image.",
@@ -97,7 +103,8 @@ def get_label_options():
                 )
         },
         { 
-            "label" : "label",
+            "require" : "label",
+            "label" : "Image",
             "name" : "Distance Transform",
             "key" : "z",
             "description": "Compute the distance transform map of a label given by current label index.",
@@ -116,7 +123,8 @@ def get_basic_options():
     
     return [ 
         { 
-            "label" : "basic",
+            "require" : "basic",
+            "label" : "Image",
             "name" : "Grayscale",
             "key" : None,
             "description": "Convert the current image to a grayscale image.",
@@ -127,7 +135,8 @@ def get_basic_options():
             )
         },
         { 
-            "label" : "basic",
+            "require" : "basic",
+            "label" : "Image",
             "name" : "Inversion",
             "key" : None,
             "description": "Invert the current image.",
@@ -140,7 +149,8 @@ def get_basic_options():
             )
         },
         { 
-            "label" : "basic",
+            "require" : "basic",
+            "label" : "Image",
             "name" : "Manipulation",
             "key" : "p",
             "description": "Manipulate the current image.",
@@ -161,7 +171,8 @@ def get_height_options(param=dict()):
 
     return [
         { 
-            "label" : "height",
+            "require" : "height",
+            "label" : "Image",
             "name" : "Open Pointcloud in ccViewer",
             "key" : "c",
             "description": "Open the currently displayed image in ccViewer as pointcloud.",
@@ -174,7 +185,8 @@ def get_height_options(param=dict()):
             ), 
         },
         { 
-            "label" : "height",
+            "require" : "height",
+            "label" : "Image",
             "name" : "Open Mesh in ccViewer",
             "key" : "v",
             "description": "Open the currently displayed image in ccViewer as mesh.",
@@ -187,7 +199,8 @@ def get_height_options(param=dict()):
             ), 
         },
         { 
-            "label" : "height",
+            "require" : "height",
+            "label" : "Image",
             "name" : "Normal image",
             "key" : "n",
             "description": "Compute and show the normal image.",
@@ -200,7 +213,8 @@ def get_height_options(param=dict()):
             )
         },        
         { 
-            "label" : "height",
+            "require" : "height",
+            "label" : "Image",
             "name" : "Open Pointcloud in CloudCompare",
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
@@ -215,7 +229,8 @@ def get_height_options(param=dict()):
             ),
         },        
         { 
-            "label" : "height",
+            "require" : "height",
+            "label" : "Image",
             "name" : "Open Mesh in CloudCompare",
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",

@@ -146,6 +146,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     # -----------------------------------------------------------------------
     def show_grid(self):
         self._grid_flag = 0 if self._grid_flag else 1
+        self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

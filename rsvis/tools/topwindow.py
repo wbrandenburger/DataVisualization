@@ -75,7 +75,7 @@ class TopWindow(Toplevel):
         #   menubar (Options) -----------------------------------------------
         if self._menubar_flag and options:
             self._menubar = Menu(self)
-            rsvis.tools.widgets.add_option_menu(self._menubar, options, self, self._canvas, label="Options")
+            rsvis.tools.widgets.add_option_menu(self._menubar, options, self, self._canvas)
             rsvis.tools.widgets.add_info_menu(self._menubar, self, self, lambda obj=self, parent=parent: self.show_help(parent))
             self.config(menu=self._menubar)
 
