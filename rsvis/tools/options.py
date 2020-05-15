@@ -110,50 +110,50 @@ def get_label_options():
         }
     ]
 
-# #   function ----------------------------------------------------------------
-# # ---------------------------------------------------------------------------
-# def get_basic_options():
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_basic_options():
     
-#     return [ 
-#         { 
-#             "label" : "basic",
-#             "name" : "Grayscale",
-#             "key" : None,
-#             "description": "Convert the current image to a grayscale image.",
-#             "command": lambda obj: obj.set_img(
-#                 imgbasictools.get_gray_image(
-#                     obj.get_img()
-#                 )
-#             )
-#         },
-#         { 
-#             "label" : "basic",
-#             "name" : "Inversion",
-#             "key" : None,
-#             "description": "Invert the current image.",
-#             "command": lambda obj: obj.set_img(
-#                 imgbasictools.get_inverted_image(
-#                     # imgbasictools.get_gray_image(
-#                         obj.get_img()
-#                     #)
-#                 )
-#             )
-#         },
-#         { 
-#             "label" : "basic",
-#             "name" : "Manipulation",
-#             "key" : "p",
-#             "description": "Manipulate the current image.",
-#             "command": lambda obj: obj.set_img(
-#                 imgbasictools.get_linear_transformation(
-#                     obj.get_img(),
-#                     dm=20,
-#                     ds=10,
-#                     logger=obj.get_logger()
-#                 )
-#             )
-#         }                
-#     ]
+    return [ 
+        { 
+            "label" : "basic",
+            "name" : "Grayscale",
+            "key" : None,
+            "description": "Convert the current image to a grayscale image.",
+            "command": lambda obj: obj.set_img(
+                imgbasictools.get_gray_image(
+                    obj.get_img()
+                )
+            )
+        },
+        { 
+            "label" : "basic",
+            "name" : "Inversion",
+            "key" : None,
+            "description": "Invert the current image.",
+            "command": lambda obj: obj.set_img(
+                imgbasictools.get_inverted_image(
+                    # imgbasictools.get_gray_image(
+                        obj.get_img()
+                    #)
+                )
+            )
+        },
+        { 
+            "label" : "basic",
+            "name" : "Manipulation",
+            "key" : "p",
+            "description": "Manipulate the current image.",
+            "command": lambda obj: obj.set_img(
+                imgbasictools.get_linear_transformation(
+                    obj.get_img(),
+                    dm=20,
+                    ds=10,
+                    logger=obj.get_logger()
+                )
+            )
+        }                
+    ]
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
