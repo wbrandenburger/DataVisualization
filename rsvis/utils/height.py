@@ -31,11 +31,11 @@ class Height():
         self._logger = logger
         self._opener = opener.Opener(param["opener"], logger=self._logger)
 
-        self._stock={"pointcloud": False, "normal": False, "mesh": False}
+        self._stock = [0] * 3
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def add_height(self, heightmap, dtype=np.float32, show=False):
+    def add_height(self, heightmap, dtype=np.float64, show=False):
         if not len(heightmap):
             return
 
@@ -43,10 +43,11 @@ class Height():
         self._shape = heightmap.shape[0:2]
         heightmap = imgtools.expand_image_dim(heightmap.astype(dtype))
 
-        if show:
-            heightmap = heightmap - np.min(heightmap)
-            height_factor = float(np.max(heightmap))/(float(np.max(self._shape)) / 6.0)
-            heightmap = heightmap/height_factor
+        # if show:
+        heightmap = (heightmap - np.min(heightmap))/0.5
+        # height_factor = float(np.max(heightmap))/(float(np.max(self._shape)) / 6.0)
+        # height_factor = 0.5
+        # heightmap = heightmap/height_factor
 
         grid = np.indices((self._shape), dtype=dtype)
 
@@ -63,7 +64,7 @@ class Height():
         if not len(colormap):
             return
             
-        colormap= imgtools.stack_image_dim(colormap)
+        colormap = imgtools.stack_image_dim(colormap)
 
         self._height.update({
                 'red': colormap[:,:,0].reshape(self._num_points).T, 
@@ -87,13 +88,28 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def set_level(self, level = 0):
+        self._stock[level:end] = 0
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_level(self, level):
+        level=0
+        if level=="normal":
+            level = 1
+        elif level=="mesh":
+            level = 2
+        return level
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_pointcloud(self, maps):
         self.add_height(maps[0])
         self.add_color(maps[1])
         self.add_intensity(maps[2])
 
         self.write()
-        self._stock["pointcloud"] = True
+        self._stock[0] = True
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -111,10 +127,10 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def read(self, style="points"):
+    def read(self, level="points"):
         imgio.show_read_str(self._path, logger=self._logger)
         data = ply.read_ply(self._path)
-        return data[style] if style else data
+        return data[level] if level else data
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -125,8 +141,8 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def open(self, style, maps, opener="viewer"):
-        method = getattr(self, "set_{}".format(style), lambda: "Invalid method")
+    def open(self, level, maps, opener="viewer"):
+        method = getattr(self, "set_{}".format(level), lambda: "Invalid method")
         method(maps)
         self._opener(opener, self._path)
 

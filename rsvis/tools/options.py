@@ -4,7 +4,7 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 from rsvis.utils import imgtools, imgbasictools
-from rsvis.tools.height import Height
+from rsvis.utils.height import Height
 
 import numpy as np
 
@@ -177,7 +177,7 @@ def get_height_options(param=dict()):
         { 
             "require" : "height",
             "label" : "Pointcloud",
-            "name" : "Open Pointcloud in CloudCompare",
+            "name" : "Open Pointcloud in CC",
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: Height(param).open("pointcloud",
@@ -198,7 +198,7 @@ def get_height_options(param=dict()):
         { 
             "require" : "height",
             "label" : "Pointcloud",
-            "name" : "Open Mesh in CloudCompare",
+            "name" : "Open Mesh in CC",
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: Height(param).open("mesh",
@@ -215,7 +215,16 @@ def get_height_options(param=dict()):
             "command": lambda obj: obj.set_img(
                 Height(param).get_normal_img(obj.get_img_from_spec("height"))
             )
-        },               
+        },
+        { 
+            "require" : "height",
+            "label" : "Pointcloud",
+            "name" : "Open Pointcloud with normals in CC",
+            "key" : None,
+            "description": "Compute and show the normal image.",
+            "command": lambda obj: Height(param).open("normal", [obj.get_img_from_spec("height"),[],[]], opener="editor"
+            )
+        },                 
     ]
 
 #   function ----------------------------------------------------------------

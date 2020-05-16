@@ -60,9 +60,10 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
         img_mean = np.mean(self._canvas.get_img())
         img_std = np.std(self._canvas.get_img())
         
-        self._slider_mean = Scale(self, from_=255., to=-255, orient=HORIZONTAL, command=self.update_slider)
-        self._slider_std = Scale(self, from_=img_std-1, to=-img_std+1, orient=HORIZONTAL, command=self.update_slider)
+        self._slider_mean = Scale(self, from_=255. - img_mean, to=-img_mean, orient=HORIZONTAL, command=self.update_slider_mean, label="Mean", resolution=5.0)
         self._slider_mean.set(0.0)
+        
+        self._slider_std = Scale(self, from_=img_std-1, to=-img_std+1, orient=HORIZONTAL, command=self.update_slider_std, label="Std", resolution=3.0)
         self._slider_std.set(0.0)
 
         self._slider_mean.grid(row=1, column=1, sticky=W+E)
@@ -77,7 +78,17 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def update_slider(self, event):
+    def update_slider_mean(self, event):
+        self.update_img_linear_transformation(event)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def update_slider_std(self, event):
+        self.update_img_linear_transformation(event)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def update_img_linear_transformation(self, event):
         self._canvas.set_img(
             imgbasictools.get_linear_transformation(self._img, self._slider_mean.get(), self._slider_std.get(), logger=self._logger
             )
