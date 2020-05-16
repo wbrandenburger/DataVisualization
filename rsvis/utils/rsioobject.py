@@ -6,7 +6,7 @@
 # ---------------------------------------------------------------------------
 from rsvis.__init__ import _logger
 import rsvis.utils.imgcontainer
-import rsvis.utils.imgio 
+from rsvis.utils import imgio 
 import rsvis.utils.general as gu
 import rsvis.utils.rsioimage
 
@@ -30,7 +30,7 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
     # -----------------------------------------------------------------------
     def get_object_in(self, path, default=list(), **kwargs):
         if self._param_obj_in:
-            return rsvis.utils.imgio.get_object(
+            return imgio.get_object(
                 self._io(path, **self._param_obj_in, **kwargs), 
                 default=default, 
                 logger=self._logger, 
@@ -42,7 +42,7 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
     # -----------------------------------------------------------------------
     def set_object_in(self, path, obj, **kwargs):
         if self._param_obj_in:
-            rsvis.utils.imgio.set_object(
+            imgio.set_object(
                 self._io(path, **self._param_obj_in, **kwargs), 
                 obj,
                 logger=self._logger,
@@ -53,7 +53,7 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
     # -----------------------------------------------------------------------
     def set_files_out(self, path, obj, **kwargs):
         if self._param_obj_out:
-            rsvis.utils.imgio.write_object(
+            imgio.write_object(
                 self._io(path, **self._param_obj_out, **kwargs), 
                 obj,
                 logger=self._logger

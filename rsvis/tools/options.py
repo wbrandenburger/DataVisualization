@@ -10,6 +10,7 @@ import rsvis.utils.general as gu
 import rsvis.utils.imgcv 
 
 import rsvis.tools.heightmap
+from rsvis.tools.height import Height
 
 import numpy as np
 
@@ -25,14 +26,13 @@ def get_options(param_specs, param_cloud=dict()):
         options.extend(get_label_options())
     if "height" in param_specs:
         if param_cloud:
-            options.extend(get_height_options())
+            options.extend(get_height_options(param_cloud))
     
     return options
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_object_options():
-
     return [
         { 
             "require" : "objects",
@@ -176,13 +176,17 @@ def get_height_options(param=dict()):
             "name" : "Open Pointcloud in ccViewer",
             "key" : "c",
             "description": "Open the currently displayed image in ccViewer as pointcloud.",
-            "command": lambda obj: rsvis.tools.heightmap.main(
-                obj.get_img(), 
-                obj.get_img_from_spec("height"),
-                normals=False,
-                mesh=False,
-                show=True
-            ), 
+            "command": lambda obj: Height(param).open(
+                [obj.get_img_from_spec("height"), obj.get_img(), []],
+                opener="viewer"
+            )
+            # "command": lambda obj: rsvis.tools.heightmap.main(
+            #     obj.get_img(), 
+            #     obj.get_img_from_spec("height"),
+            #     normals=False,
+            #     mesh=False,
+            #     show=True
+            # ), 
         },
         { 
             "require" : "height",
@@ -248,7 +252,7 @@ def get_height_options(param=dict()):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-# img_cpy = lambda path: rsvis.utils.imgio.copy_image(path, get_path(path))
+# img_cpy = lambda path: imgio.copy_image(path, get_path(path))
 # if param_msi:
 #   msi_index = rsvis.utils.objindex.ObjIndex(param_msi.copy())
 # "key_r": lambda obj: obj.set_img(

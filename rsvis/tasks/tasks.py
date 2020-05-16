@@ -31,8 +31,9 @@ def task_rsshow(setting="training"):
         param_cloud=gu.get_value(
             rsvis.config.settings._SETTINGS,"param_cloud", dict()),
         param_show=gu.get_value(
-            rsvis.config.settings._SETTINGS,"param_show", dict()),        
-      
+            rsvis.config.settings._SETTINGS,"param_show", dict()),
+        param_temp=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_temp", dict())        
     )
 
 #   function ----------------------------------------------------------------

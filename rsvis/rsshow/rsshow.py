@@ -6,7 +6,7 @@
 # ---------------------------------------------------------------------------
 from rsvis.__init__ import _logger
 from rsvis.utils import imgtools
-import rsvis.utils.imgio
+from rsvis.utils import imgio
 import rsvis.utils.rsioimage
 import rsvis.utils.rsioobject
 import rsvis.utils.objindex
@@ -23,7 +23,8 @@ def run(
         param_out=dict(),
         param_classes=list(),
         param_cloud=dict(),
-        param_show=dict(),  
+        param_show=dict(),
+        param_temp=dict()  
     ):
         
     _logger.debug("Start training multi task classification and regression model with settings:\nparam_specs:\t{}\nparam_in:\t{}\nparam_out:\t{}\nparam_classes:\t{}\nparam_cloud:\t{}\nparam_show:\t{}".format(param_specs, param_in, param_out, param_classes, param_cloud, param_show))

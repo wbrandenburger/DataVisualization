@@ -16,21 +16,27 @@ import tifffile
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def show_copy_str(path, logger=None):
+    copy_str = "[COPY] {}".format(path)
+    show_io_str(copy_str, logger=logger)
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def show_info_str(info, logger=None):
     info_str = "[INFO] {}".format(info)
     show_io_str(info_str, logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def show_read_str(path, logger=None):
-    read_str = "[READ] {}".format(path)
-    show_io_str(read_str, logger=logger)
+def show_open_str(path, logger=None):
+    open_str = "[OPEN] {}".format(path)
+    show_io_str(open_str, logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def show_copy_str(path, logger=None):
-    copy_str = "[COPY] {}".format(path)
-    show_io_str(copy_str, logger=logger)
+def show_read_str(path, logger=None):
+    read_str = "[READ] {}".format(path)
+    show_io_str(read_str, logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

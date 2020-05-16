@@ -7,7 +7,7 @@
 import rsvis.__init__
 import rsvis.utils.general as gu
 import rsvis.utils.index
-import rsvis.utils.imgio
+from rsvis.utils import opener
 from rsvis.utils import imgtools
 import rsvis.utils.logger
 import rsvis.utils.yaml
@@ -23,7 +23,6 @@ from tkinter import *
 import numpy as np
 import pandas as pd
 import pathlib 
-import subprocess 
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -86,6 +85,7 @@ class RSShowUI():
         #   set the input / output logger
         self._logger =  rsvis.utils.logger.Logger(logger=lambda log: self._textbox.insert("1.0", "{}\n".format(log)))
         self._data.logger = self._logger
+        self._opener = opener.GeneralOpener(logger=self._logger)
 
         #   comboboxes (mouse behavior/ classes) ----------------------------
         self._cbox_area = rsvis.tools.combobox.ComboBox(self._root, "Histogram", ["Grid", "Objects"], self.set_area_event)
@@ -138,9 +138,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def open(self, path):
-        path = pathlib.Path(path)
-        self._logger("[OPEN] {}".format(path.parent))
-        subprocess.Popen("explorer.exe {}".format(pathlib.Path(path).parent))
+        self._opener("files", path=str(pathlib.Path(path).parent))
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

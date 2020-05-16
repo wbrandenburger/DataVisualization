@@ -7,20 +7,21 @@
 from rsvis.__init__ import _logger
 import rsvis.utils.ply
 import rsvis.config.settings
+from rsvis.utils import imgio
 from rsvis.utils import imgtools
-
-import tempfile
-import subprocess
-import pandas
-import pathlib
+from rsvis.utils import opener
 
 import cv2
 import numpy as np
+import pandas
+import pathlib
+import subprocess
+import tempfile
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_height_map(img, height=dict(), show=False):
-    dim_new = (img.shape[0]*img.shape[1])
+def get_height_map(img, height=dict(), show=True): #########################
+    dim_new = img.shape[0]*img.shape[1]
     img = imgtools.expand_image_dim(img.astype(float))
     
     img = img.astype(float)
@@ -42,7 +43,7 @@ def get_height_map(img, height=dict(), show=False):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def colorize_height_map(img, height=dict()):
+def colorize_height_map(img, height=dict()): ################################
     img = imgtools.stack_image_dim(img)
     dim_new = (img.shape[0]*img.shape[1])
 
@@ -57,7 +58,7 @@ def colorize_height_map(img, height=dict()):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def add_intensity_to_height_map(img, height=dict()):
+def add_intensity_to_height_map(img, height=dict()): ########################
     try:
         img_width, img_height, _ = img.shape
         dim_new =(img_width*img_height)
@@ -73,7 +74,7 @@ def add_intensity_to_height_map(img, height=dict()):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_colorized_height_map(img, height, label=None, show=False):
+def get_colorized_height_map(img, height, label=None, show=False): ##########
     data = get_height_map(height, show=show)
     data = colorize_height_map(img, data)
     try:
@@ -84,7 +85,7 @@ def get_colorized_height_map(img, height, label=None, show=False):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def write_height_map(img, height, path):
+def write_height_map(img, height, path): ####################################
     data = pandas.DataFrame(height, index=range(img.shape[0]*img.shape[1]))
 
     # write to temporary file
@@ -93,7 +94,7 @@ def write_height_map(img, height, path):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def read_height_map(path):
+def read_height_map(path): ##################################################
     return rsvis.utils.ply.read_ply(path)["points"]
 
 #   function ----------------------------------------------------------------
@@ -183,7 +184,7 @@ def main(img, height, label=None, verbose=False, normals=False, mesh=False, ccvi
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------   
-def get_args(cmd, *args):
+def get_args(cmd, *args): ###################################################
     cmd = cmd.copy() if isinstance(cmd, list) else [cmd]
     for a in args:
         cmd.extend(*to_list(a))
@@ -192,5 +193,5 @@ def get_args(cmd, *args):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def to_list(*args):
+def to_list(*args): #########################################################
     return (x if isinstance(x, list) or x is None else [x] for x in args)

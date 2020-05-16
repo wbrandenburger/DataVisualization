@@ -7,7 +7,7 @@
 from rsvis.__init__ import _logger
 import rsvis.utils.general as gu
 import rsvis.utils.imgcontainer
-import rsvis.utils.imgio 
+from rsvis.utils import imgio 
 import rsvis.utils.rsio
 
 #   class -------------------------------------------------------------------
@@ -39,7 +39,7 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_load_img(self):
-        return lambda path, spec: rsvis.utils.imgio.get_image(
+        return lambda path, spec: imgio.get_image(
             path,
             spec,
             self._label,
@@ -73,7 +73,7 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_img_out(self):
-        return lambda path, img, logger=self._logger, **kwargs: rsvis.utils.imgio.write_image(
+        return lambda path, img, logger=self._logger, **kwargs: imgio.write_image(
             self._io(path, **self._param_out[self._img_name], **kwargs), 
             img,
             logger=self._logger
@@ -88,7 +88,7 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     # -----------------------------------------------------------------------
     def get_log_in(self, path, default="", **kwargs):
         if self._log_io:
-            return rsvis.utils.imgio.get_log(
+            return imgio.get_log(
                 self._log_io(path, **kwargs), 
                 default="", 
                 logger=self._logger
