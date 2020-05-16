@@ -6,6 +6,7 @@
 # ---------------------------------------------------------------------------
 import rsvis.utils.imgtools as imgtools
 
+import logging
 import numpy as np
 from PIL import Image, ImageTk
 from tkinter import Canvas, NW
@@ -46,27 +47,6 @@ class ResizingCanvas(Canvas):
         
         self.bind("<Button-1>", self.mouse_button_1_pressed)
         self.bind("<ButtonRelease-1>", self.mouse_button_1_released)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def mouse_button_1_pressed(self, event):
-        self.focus_set()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_logger(self):
-        return self._logger
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def logger(self, log_str, stream="info"):
-        if self._logger is None:
-            return
-
-        if stream == "info":
-            self._logger.info(log_str)
-        elif stream == "debug":
-            self._logger.debug(log_str)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

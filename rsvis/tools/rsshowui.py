@@ -4,10 +4,12 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
+import rsvis.__init__
 import rsvis.utils.general as gu
 import rsvis.utils.index
 import rsvis.utils.imgio
 from rsvis.utils import imgtools
+import rsvis.utils.logger
 import rsvis.utils.yaml
 
 import rsvis.tools.combobox
@@ -30,7 +32,6 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __init__(self, data, options=list(), show=dict(), classes=dict, logger=None, **kwargs):
-        
         self._data = data
         self._options = options
 
@@ -83,7 +84,7 @@ class RSShowUI():
         self._textbox.config(yscrollcommand=self._textbox_scrollbar.set)
         
         #   set the input / output logger
-        self._logger = lambda log: self._textbox.insert("1.0", "{}\n".format(log))
+        self._logger =  rsvis.utils.logger.Logger(logger=lambda log: self._textbox.insert("1.0", "{}\n".format(log)))
         self._data.logger = self._logger
 
         #   comboboxes (mouse behavior/ classes) ----------------------------
