@@ -60,7 +60,7 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
         img_mean = np.mean(self._canvas.get_img())
         img_std = np.std(self._canvas.get_img())
         
-        self._slider_mean = Scale(self, from_=256.-img_mean, to=-img_mean, orient=HORIZONTAL, command=self.update_slider)
+        self._slider_mean = Scale(self, from_=255., to=-255, orient=HORIZONTAL, command=self.update_slider)
         self._slider_std = Scale(self, from_=img_std-1, to=-img_std+1, orient=HORIZONTAL, command=self.update_slider)
         self._slider_mean.set(0.0)
         self._slider_std.set(0.0)

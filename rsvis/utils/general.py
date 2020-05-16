@@ -104,7 +104,7 @@ class PathCreator():
             name = "{}-{}".format(prefix, self._name.format(self._regex(pathlib.Path(path).stem)))
 
         if ext is None:
-            ext = self._ext
+            ext = pathlib.Path(path).suffix if not self._ext else self._ext
             
         name = "".join([name, ext])
         return str(pathlib.Path.joinpath(path_dir, name))

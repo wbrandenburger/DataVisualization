@@ -20,9 +20,10 @@ class Opener():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __call__(self, opener, *args, path=""):
-        imgio.show_open_str(path, self._logger)
-        subprocess.Popen(self.get_args(self._opener[opener], path, *args))
+    def __call__(self, opener, *args, wait=False):
+        process = subprocess.Popen(self.get_args(self._opener[opener], *args))
+        if wait:
+            process.wait()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -53,3 +54,10 @@ class GeneralOpener(Opener):
 
         super(GeneralOpener, self).__init__(opener, **kwargs)
         
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def __call__(self, opener, path, wait=False):
+        imgio.show_open_str(path, self._logger)
+        process = subprocess.Popen(self.get_args(self._opener[opener], path))
+        if wait:
+            process.wait()

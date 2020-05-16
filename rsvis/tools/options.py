@@ -3,13 +3,7 @@
 # ===========================================================================    
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-from rsvis.utils import imgtools
-from rsvis.utils import imgbasictools
-import rsvis.utils.objindex
-import rsvis.utils.general as gu
-import rsvis.utils.imgcv 
-
-import rsvis.tools.heightmap
+from rsvis.utils import imgtools, imgbasictools
 from rsvis.tools.height import Height
 
 import numpy as np
@@ -172,82 +166,56 @@ def get_height_options(param=dict()):
     return [
         { 
             "require" : "height",
-            "label" : "Image",
+            "label" : "Pointcloud",
             "name" : "Open Pointcloud in ccViewer",
             "key" : "c",
             "description": "Open the currently displayed image in ccViewer as pointcloud.",
-            "command": lambda obj: Height(param).open(
-                [obj.get_img_from_spec("height"), obj.get_img(), []],
-                opener="viewer"
+            "command": lambda obj: Height(param).open("pointcloud",
+                [obj.get_img_from_spec("height"), obj.get_img(), []]
             )
-            # "command": lambda obj: rsvis.tools.heightmap.main(
-            #     obj.get_img(), 
-            #     obj.get_img_from_spec("height"),
-            #     normals=False,
-            #     mesh=False,
-            #     show=True
-            # ), 
         },
         { 
             "require" : "height",
-            "label" : "Image",
+            "label" : "Pointcloud",
+            "name" : "Open Pointcloud in CloudCompare",
+            "key" : None,
+            "description": "Open the currently displayed image in CloudCompare as mesh.",
+            "command": lambda obj: Height(param).open("pointcloud",
+                [obj.get_img_from_spec("height"), obj.get_img(), obj.get_img_from_spec("label")],
+                opener="editor"
+            )
+        },           
+        { 
+            "require" : "height",
+            "label" : "Pointcloud",
             "name" : "Open Mesh in ccViewer",
             "key" : "v",
             "description": "Open the currently displayed image in ccViewer as mesh.",
-            "command": lambda obj: rsvis.tools.heightmap.main(
-                obj.get_img(), 
-                obj.get_img_from_spec("height"),
-                normals=True,
-                mesh=True,
-                show=True
-            ), 
+            "command": lambda obj: Height(param).open("mesh",
+                [obj.get_img_from_spec("height"), obj.get_img(), []]
+            )
         },
         { 
             "require" : "height",
-            "label" : "Image",
+            "label" : "Pointcloud",
+            "name" : "Open Mesh in CloudCompare",
+            "key" : None,
+            "description": "Open the currently displayed image in CloudCompare as mesh.",
+            "command": lambda obj: Height(param).open("mesh",
+                [obj.get_img_from_spec("height"), obj.get_img(), obj.get_img_from_spec("label")],
+                opener="editor"
+            )
+        },
+        { 
+            "require" : "height",
+            "label" : "Pointcloud",
             "name" : "Normal image",
             "key" : "n",
             "description": "Compute and show the normal image.",
             "command": lambda obj: obj.set_img(
-                rsvis.tools.heightmap.get_normal_image(
-                    obj.get_img(), 
-                    obj.get_img_from_spec("height"),
-                    show=True,
-                )
+                Height(param).get_normal_img(obj.get_img_from_spec("height"))
             )
-        },        
-        { 
-            "require" : "height",
-            "label" : "Image",
-            "name" : "Open Pointcloud in CloudCompare",
-            "key" : None,
-            "description": "Open the currently displayed image in CloudCompare as mesh.",
-            "command": lambda obj: rsvis.tools.heightmap.main(
-                obj.get_img(),
-                obj.get_img_from_spec("height"), 
-                obj.get_img_from_spec("label"),
-                normals=False,
-                mesh=False,
-                ccviewer=False,
-                show=True
-            ),
-        },        
-        { 
-            "require" : "height",
-            "label" : "Image",
-            "name" : "Open Mesh in CloudCompare",
-            "key" : None,
-            "description": "Open the currently displayed image in CloudCompare as mesh.",
-            "command": lambda obj: rsvis.tools.heightmap.main(
-                obj.get_img(),
-                obj.get_img_from_spec("height"), 
-                obj.get_img_from_spec("label"),
-                normals=True,
-                mesh=True,
-                ccviewer=False,
-                show=True
-            ),
-        }
+        },               
     ]
 
 #   function ----------------------------------------------------------------
