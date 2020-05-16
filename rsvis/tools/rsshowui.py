@@ -87,17 +87,17 @@ class RSShowUI():
         self._data.logger = self._logger
 
         #   comboboxes (mouse behavior/ classes) ----------------------------
-        self.cbox_area = rsvis.tools.combobox.ComboBox(self._root, "Histogram", ["Grid", "Objects"], self.set_area_event)
-        self.cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
-        self.cbox_class = rsvis.tools.combobox.ComboBox(self._root, "Class", [c["name"] for c in classes], self.set_class )
-        self.cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
+        self._cbox_area = rsvis.tools.combobox.ComboBox(self._root, "Histogram", ["Grid", "Objects"], self.set_area_event)
+        self._cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
+        self._cbox_class = rsvis.tools.combobox.ComboBox(self._root, "Class", [c["name"] for c in classes], self.set_class )
+        self._cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (grid) --------------------------------------------
         self.grid_settingsbox = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=show["grid"])
         self.grid_settingsbox.grid(row=3, column=0, sticky=N+W+S+E)
     
         #   main image window -----------------------------------------------
-        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, logger=self._logger, **show)
+        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, variables={"class": lambda index=False: self._cbox_class.get(index=index)}, logger=self._logger, **show)
         self._frame.grid(row=0, column=0, columnspan=3, sticky=N+S+W+E)
         
         #   menubar (File / Options / Information) --------------------------
@@ -150,8 +150,14 @@ class RSShowUI():
 
         if dtype=="img":
             kwargs.update( 
-                {"options": [o for o in self._options if o["require"] in ["image", "basic", "label", "height"]]}
+                {
+                    "options": [o for o in self._options if o["require"] in ["image", "basic", "label", "height"]],
+                    "canvas":{
+                        "variables": {"class": lambda index=False: self._cbox_class.get(index=index)}
+                    }
+                }
             )
+
             if histogram:
                 t = TopWindowHist( self._root, **kwargs)
             else:
@@ -163,8 +169,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_class(self, event=None):
-        self.get_obj().set_class(self.cbox_class.get()["label"])
-        self.cbox_area.set_choice("Objects")
+        self._cbox_area.set_variable("Objects")
         self.set_area_event()
 
     #   method --------------------------------------------------------------
@@ -179,7 +184,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_area_event(self, event=None):
-        self.get_obj().set_area_event(**self.cbox_area.get())
+        self.get_obj().set_area_event(index=self._cbox_area.get(index=True))
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

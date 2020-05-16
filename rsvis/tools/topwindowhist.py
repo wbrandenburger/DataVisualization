@@ -45,8 +45,8 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_canvas(self, img):
-        super(TopWindowHist, self).set_canvas(img)
+    def set_canvas(self, img, **kwargs):
+        super(TopWindowHist, self).set_canvas(img, **kwargs)
 
         self.columnconfigure(1, weight=1)
 

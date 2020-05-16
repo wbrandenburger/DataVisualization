@@ -4,6 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
+import rsvis.utils.general as gu
 import rsvis.utils.index
 
 import rsvis.tools.extcanvas
@@ -22,6 +23,7 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         self, 
         parent,
         multi_modal=True,
+        variables=dict(),         
         **kwargs
     ):
 
@@ -33,6 +35,8 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         self._idx_spec = rsvis.utils.index.Index(0)
 
         self._multi_modal_flag = multi_modal
+
+        self._variables = variables
 
         #   key bindings ----------------------------------------------------
         self.bind("<w>", self.key_w)
@@ -128,6 +132,13 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def get_class(self, index=False, **kwargs):
+        cl = gu.get_value(self._variables, "class", None)
+        print(cl())
+        return None if cl is None else cl(index=index)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
         """Show the next image of the given image set."""
         self._idx_current = self._idx_spec.next() 
@@ -145,8 +156,3 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     def key_ctrl_e(self, event, **kwargs):
         """Show the current original image."""
         self.reload()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_class(self, **kwargs):
-        pass

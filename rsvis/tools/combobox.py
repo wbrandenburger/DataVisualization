@@ -17,31 +17,37 @@ class ComboBox(Frame):
 
         self.makeform(label, fields, default)
 
-        self.cbox.bind("<<ComboboxSelected>>", func) 
+        self._cbox.bind("<<ComboboxSelected>>", func) 
         # self.func = func
         # self.button_set = Button(parent, text="Set", command=lambda e=entries: self.func(e))
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def makeform(self, label, fields, default=0):
-        self.variable = StringVar(self)
-        self.variable.set(fields[default])
+        self._variable = StringVar(self)
+        self._variable.set(fields[default])
  
         row = Frame(self)
         lab = Label(row, width=13, text=label, anchor='w')
-        self.cbox = ttk.Combobox(row, textvariable=self.variable, values=fields, state="readonly")
-        self.cbox.current(0)
+        self._cbox = ttk.Combobox(row, textvariable=self._variable, values=fields, state="readonly")
+        self._cbox.current(0)
         # cbox.bind("<Return>", (lambda event, e=entries: self.func(e))) 
         row.pack(side=TOP, fill=X, padx=2, pady=2)
         lab.pack(side=LEFT)
-        self.cbox.pack(side=RIGHT, expand=YES, fill=X)
+        self._cbox.pack(side=RIGHT, expand=YES, fill=X)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get(self):
-        return {"index": self.cbox.current(), "label": self.cbox.get()}
+    def get(self, index=False):
+        return self._cbox.current() if index else self._cbox.get()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_choice(self, choice):
-        self.variable.set(choice)
+    def set_variable(self, choice):
+        self._variable.set(choice)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_variable(self):
+        return self._variable
+    

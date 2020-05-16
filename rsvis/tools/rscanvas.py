@@ -4,6 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
+import rsvis.utils.general as gu
 import rsvis.utils.imgtools as imgtools
 import rsvis.utils.patches_ordered
 import rsvis.utils.patches_unordered
@@ -27,7 +28,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
         images,
         data,
         popup=None, 
-        classes=dict(), 
+        classes=dict(),
         **kwargs
     ):
 
@@ -41,7 +42,6 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
         self._index_list = rsvis.utils.index.Index(len(self._images))
 
         self._area_event = 0
-
         self._object_flag = 0
 
         self._patches_bbox = None
@@ -128,16 +128,6 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
         if self._area_event==1:
             self._object_flag = 0
             self.show_objects()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_class(self, index=False):
-        return list(self._color.keys()).index(self._label) if index else self._label
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def set_class(self, label):
-        self._label = label
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

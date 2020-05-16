@@ -31,6 +31,7 @@ class TopWindow(Toplevel):
             value="",
             q_cmd=None,
             options=list(),
+            canvas=dict(),
             logger=None,
             **kwargs
         ):
@@ -38,8 +39,7 @@ class TopWindow(Toplevel):
         #   settings --------------------------------------------------------
         Toplevel.__init__(self, parent)
         self.wm_title(title)
-
-        self._menubar_flag = False
+        
         self._logger = logger
         
         #   general window settings -----------------------------------------
@@ -70,10 +70,10 @@ class TopWindow(Toplevel):
         if dtype=="msg":
             self.set_msg(value)
         elif dtype=="img":
-            self.set_canvas(value)
+            self.set_canvas(value, **canvas)
         
         #   menubar (Options) -----------------------------------------------
-        if self._menubar_flag and options:
+        if options:
             self._menubar = Menu(self)
             rsvis.tools.widgets.add_option_menu(self._menubar, options, self, self._canvas)
             rsvis.tools.widgets.add_info_menu(self._menubar, self, self, lambda obj=self, parent=parent: self.show_help(parent))
@@ -112,14 +112,12 @@ class TopWindow(Toplevel):
         
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_canvas(self, value):
+    def set_canvas(self, value, **kwargs):
         self._img = value
         if isinstance(value, rsvis.utils.imgcontainer.ImgListContainer):
-            self._canvas = rsvis.tools.imgconcanvas.ImgConCanvas(self, logger=self._logger)
+            self._canvas = rsvis.tools.imgconcanvas.ImgConCanvas(self, logger=self._logger, **kwargs)
             self._canvas.set_img_container(value)
             self._img = self._canvas.get_img()
-
-            self._menubar_flag = True
         else:
             self._canvas = rsvis.tools.extcanvas.ExtendedCanvas(self)
             self._canvas.set_img(value)
