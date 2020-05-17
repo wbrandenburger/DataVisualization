@@ -87,7 +87,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_object_boxes(self, box, resize=True, append=True):
+    def set_object_boxes(self, box, resize=False, append=True):
         box = self.resize_boxes(box, inversion=True)[0] if resize else box
         if append:
             self._boxes.append({"box": box, "label": self._label})
@@ -195,7 +195,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
             if self._area_event==0:
                 self.set_popup(self._mouse_selection)
             elif self._area_event==1:
-                self.set_object_boxes(self._mouse_box)
+                self.set_object_boxes(self._mouse_box, resize=True)
                 self.create_image()
 
     #   method --------------------------------------------------------------

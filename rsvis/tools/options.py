@@ -73,7 +73,6 @@ def get_object_options():
                     label=obj.get_class(),
                     margin=10
                 ),
-                resize=False,
                 append=False
             )
         }  

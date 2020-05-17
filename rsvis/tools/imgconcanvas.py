@@ -134,7 +134,6 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     # -----------------------------------------------------------------------
     def get_class(self, index=False, **kwargs):
         cl = gu.get_value(self._variables, "class", None)
-        print(cl())
         return None if cl is None else cl(index=index)
 
     #   method --------------------------------------------------------------
