@@ -40,11 +40,11 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
         super(TopWindowHistNormal, self).set_canvas(img, **kwargs)
 
         self._param_normal_model = "LS"
-        self._cbox_normal_model = rsvis.tools.combobox.ComboBox(self, "Local Model",  ["LS", "TRI", "QUADRIC"], self.update_cbox_normal_model, default=1)
+        self._cbox_normal_model = rsvis.tools.combobox.ComboBox(self, "Local Model",  ["LS", "TRI", "QUADRIC"], self.update_cbox_normal_model, default=0)
         self._cbox_normal_model.grid(row=2, column=0, sticky=W+E)
         
         self._param_normal_radius = 3.0
-        self._sbox_normal_radius = rsvis.tools.settingsbox.SettingsBox(self, ["Radius"], self.update_sbox_normal_radius, default=[0.0])
+        self._sbox_normal_radius = rsvis.tools.settingsbox.SettingsBox(self, ["Radius"], self.update_sbox_normal_radius, default=[3.0])
         self._sbox_normal_radius.grid(row=3, column=0, sticky=W+E)
 
         self._param_height_factor = 1.0

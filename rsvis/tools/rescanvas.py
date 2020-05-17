@@ -214,7 +214,8 @@ class ResizingCanvas(Canvas):
 
         mouse_img = self.resize_points(self._mouse_event, inversion=True)[0]
 
-        self._logger("[MOUSE] Pixel: {},  Value: {}".format(mouse_img,
-            self._show[mouse_img[0], mouse_img[1], :]
+        if hasattr(self, "_show"):
+            self._logger("[MOUSE] Pixel: {},  Value: {}".format(mouse_img,
+                self._show[mouse_img[0], mouse_img[1], :]
+                )
             )
-        )

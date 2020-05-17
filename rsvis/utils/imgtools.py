@@ -208,6 +208,7 @@ def get_label_mask(label, label_list=None, equal=True):
 # ---------------------------------------------------------------------------
 def get_connected_components(img, connectivity=8):
     # The components are encoded in result[1]
+    # num_labels, labels, stats, centroids =  cv2.connectedComponentsWithStats(img, connectivity, cv2.CV_32S)
     return cv2.connectedComponentsWithStats(img, connectivity, cv2.CV_32S)
 
 #   function ----------------------------------------------------------------

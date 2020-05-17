@@ -87,9 +87,13 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_object_boxes(self, box, resize=True):
+    def set_object_boxes(self, box, resize=True, append=True):
         box = self.resize_boxes(box, inversion=True)[0] if resize else box
-        self._boxes.append({"box": box, "label": self._label})
+        if append:
+            self._boxes.append({"box": box, "label": self._label})
+        else:
+            self._boxes = box
+        self.show_objects(force=True)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -131,8 +135,10 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def show_objects(self):
-        self._object_flag = 0 if self._object_flag  else 1
+    def show_objects(self, force=False):
+        self._object_flag = 0 if self._object_flag else 1
+        if force:
+            self._object_flag = 1
         self.create_image()
 
     #   method --------------------------------------------------------------

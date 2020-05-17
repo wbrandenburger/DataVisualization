@@ -3,7 +3,7 @@
 # ===========================================================================    
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-from rsvis.utils import imgtools, imgbasictools
+from rsvis.utils import imgtools, imgbasictools, imgcv
 from rsvis.utils.height import Height
 
 import numpy as np
@@ -59,7 +59,24 @@ def get_object_options():
             "key" : None,
             "description": "Remove the selected object.",
             "command": lambda obj: obj.remove_object()
-        }
+        },
+        { 
+            "require" : "objects",
+            "label" : "Objects",
+            "name" : "Bounding Box",
+            "key" : "m",
+            "description": "Get the bounding boxes of connected image compenents which belongs to an object class.",
+            "command": lambda obj: obj.set_object_boxes(
+                imgcv.get_bbox(
+                    obj.get_img_from_spec("label")[...,0], 
+                    obj.get_class(index=True),
+                    label=obj.get_class(),
+                    margin=10
+                ),
+                resize=False,
+                append=False
+            )
+        }  
     ]
 
 #   function ----------------------------------------------------------------
@@ -85,7 +102,7 @@ def get_label_options():
         { 
             "require" : "label",
             "label" : "Image",
-            "name" : "Projection ",
+            "name" : "Projection",
             "key" : "t",
             "description": "Show the mask of one label in current image.",
             "command": lambda obj: obj.set_img(
@@ -108,7 +125,7 @@ def get_label_options():
                         index=obj.get_class(index=True),
                     ), dtype=np.uint8, factor=255)
                 )
-        }
+        }     
     ]
 
 #   function ----------------------------------------------------------------
