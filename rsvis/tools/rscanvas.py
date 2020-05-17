@@ -203,12 +203,11 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     # -----------------------------------------------------------------------
     def mouse_button_2_released(self, event, histogram=True):
         self.focus_set()
-        ev = self.resize_event(event)
         if self._area_event==0:
             bbox = self.resize_boxes(self.get_grid_bbox(event), inversion=True)[0]
         elif self._area_event==1:
             boxes = list()
-            self._patches_bbox.get_bbox_from_point(ev, boxes=boxes)
+            self._patches_bbox.get_bbox_from_point(self.resize_event(event), boxes=boxes)
             bbox = self.resize_boxes(boxes, inversion=True)[0] if len(boxes) else None
         self.set_popup(bbox, histogram=histogram)
 

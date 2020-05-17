@@ -7,8 +7,7 @@
 import rsvis.__init__
 import rsvis.utils.general as gu
 import rsvis.utils.index
-from rsvis.utils import opener
-from rsvis.utils import imgtools
+from rsvis.utils import opener, imgtools
 import rsvis.utils.logger
 import rsvis.utils.yaml
 
@@ -17,6 +16,7 @@ import rsvis.tools.rscanvasframe
 import rsvis.tools.settingsbox
 from rsvis.tools.topwindow import TopWindow
 from rsvis.tools.topwindowhist import TopWindowHist
+from rsvis.tools.topwindowhist_normal import TopWindowHistNormal
 import rsvis.tools.widgets
 
 from tkinter import *
@@ -30,9 +30,12 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, data, options=list(), show=dict(), classes=dict, logger=None, **kwargs):
+    def __init__(self, data, options=list(), show=dict(), classes=dict, param=dict(), logger=None, **kwargs):
+        
         self._data = data
         self._options = options
+
+        self._param = param
 
         self.initialize_window(show=show, classes=classes, logger=logger)
 
@@ -78,7 +81,7 @@ class RSShowUI():
         self._textbox_scrollbar = Scrollbar(self._root)
         self._textbox = Text(self._root, height=3, font=("Courier", 8))
         self._textbox_scrollbar.grid(row=1, column=2, rowspan=3, sticky=N+S)
-        self._textbox.grid(row=1, column=1, rowspan=3, sticky=N+S+W+E)
+        self._textbox.grid(row=1, column=1, rowspan=4, sticky=N+S+W+E)
         self._textbox_scrollbar.config(command=self._textbox.yview)
         self._textbox.config(yscrollcommand=self._textbox_scrollbar.set)
         
@@ -92,10 +95,12 @@ class RSShowUI():
         self._cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
         self._cbox_class = rsvis.tools.combobox.ComboBox(self._root, "Class", [c["name"] for c in classes], self.set_class )
         self._cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
+        self._cbox_test = rsvis.tools.combobox.ComboBox(self._root, "Test",  ["Histogram", "Normal"], lambda event: None )
+        self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (grid) --------------------------------------------
-        self.grid_settingsbox = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=show["grid"])
-        self.grid_settingsbox.grid(row=3, column=0, sticky=N+W+S+E)
+        self._sbox_grid = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=show["grid"])
+        self._sbox_grid.grid(row=4, column=0, sticky=N+W+S+E)
     
         #   main image window -----------------------------------------------
         self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, variables={"class": lambda index=False: self._cbox_class.get(index=index)}, logger=self._logger, **show)
@@ -158,7 +163,10 @@ class RSShowUI():
             )
 
             if histogram:
-                t = TopWindowHist( self._root, **kwargs)
+                if self._cbox_test.get() == "Histogram":
+                    t = TopWindowHist(self._root, **kwargs)
+                elif self._cbox_test.get() == "Normal":
+                    t = TopWindowHistNormal(self._root, self._param["cloud"], **kwargs)
             else:
                 t = TopWindow(self._root, **kwargs)
         else:

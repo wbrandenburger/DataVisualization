@@ -4,19 +4,13 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.utils.imgtools as imgtools
-from rsvis.utils import imgbasictools
-import rsvis.utils.imgcontainer
+from rsvis.utils import imgbasictools, imgtools
 
-import rsvis.tools.extcanvas
-import rsvis.tools.imgconcanvas
-import rsvis.tools.keys
 import rsvis.tools.rescanvas
-import rsvis.tools.widgets
+import rsvis.tools.topwindow
 
 import numpy as np
-from PIL import Image, ImageTk
-from tkinter import ttk, Scale, Button, Canvas, Label, Menu, TOP, X, NW, N, W, S, E, CENTER, VERTICAL, HORIZONTAL
+from tkinter import *
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -60,10 +54,10 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
         img_mean = np.mean(self._canvas.get_img())
         img_std = np.std(self._canvas.get_img())
         
-        self._slider_mean = Scale(self, from_=255. - img_mean, to=-img_mean, orient=HORIZONTAL, command=self.update_slider_mean, label="Mean", resolution=5.0)
+        self._slider_mean = Scale(self, from_=-img_mean, to=255.-img_mean, orient=HORIZONTAL, command=self.update_slider_mean, resolution=5.0) #label="Mean", 
         self._slider_mean.set(0.0)
         
-        self._slider_std = Scale(self, from_=img_std-1, to=-img_std+1, orient=HORIZONTAL, command=self.update_slider_std, label="Std", resolution=3.0)
+        self._slider_std = Scale(self, from_=-img_std+1, to=img_std-1, orient=HORIZONTAL, command=self.update_slider_std, resolution=3.0) #label="Std",
         self._slider_std.set(0.0)
 
         self._slider_mean.grid(row=1, column=1, sticky=W+E)

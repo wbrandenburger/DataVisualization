@@ -17,7 +17,7 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, param, dtype=np.float32, logger=None):
+    def __init__(self, param, logger=None):
         self._height= dict()
         self._num_points = None
         self._shape = list()
@@ -35,21 +35,17 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def add_height(self, heightmap, dtype=np.float64, show=False):
+    def add_height(self, heightmap, factor=1.0):
         if not len(heightmap):
             return
-
+        print(factor)
         self._num_points = heightmap.shape[0]*heightmap.shape[1]
         self._shape = heightmap.shape[0:2]
-        heightmap = imgtools.expand_image_dim(heightmap.astype(dtype))
+        heightmap = imgtools.expand_image_dim(heightmap.astype(np.float32))
 
-        # if show:
-        heightmap = (heightmap - np.min(heightmap))/0.5
-        # height_factor = float(np.max(heightmap))/(float(np.max(self._shape)) / 6.0)
-        # height_factor = 0.5
-        # heightmap = heightmap/height_factor
+        heightmap = (heightmap - np.min(heightmap))/np.float32(factor)
 
-        grid = np.indices((self._shape), dtype=dtype)
+        grid = np.indices((self._shape), dtype=np.float32)
 
         self._height.update( {
                 'x': grid[0,...].reshape(self._num_points).T, 
@@ -60,7 +56,7 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def add_color(self, colormap):
+    def add_color(self, colormap, **kwargs):
         if not len(colormap):
             return
             
@@ -75,7 +71,7 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def add_intensity(self, intensitymap):
+    def add_intensity(self, intensitymap, **kwargs):
         if not len(intensitymap):
             return
 
@@ -89,7 +85,8 @@ class Height():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_level(self, level = 0):
-        self._stock[level:end] = 0
+        for idx in range(level, len(self._stock)):
+            self._stock[idx] = 0
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -103,27 +100,27 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_pointcloud(self, maps):
-        self.add_height(maps[0])
-        self.add_color(maps[1])
-        self.add_intensity(maps[2])
+    def set_pointcloud(self, maps, **kwargs):
+        self.add_height(maps[0], **kwargs)
+        self.add_color(maps[1], **kwargs)
+        self.add_intensity(maps[2], **kwargs)
 
         self.write()
         self._stock[0] = True
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_normal(self, maps):
-        if not self._stock["pointcloud"]: self.set_pointcloud(maps)
+    def set_normal(self, maps, **kwargs):
+        if not self._stock[0]: self.set_pointcloud(maps, **kwargs)
         self._opener("editor", *self.get_normal_cmd(), wait=True)
-        self._stock["normal"] = True
+        self._stock[1] = True
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_mesh(self, maps):
-        if not self._stock["normal"]: self.set_pointcloud(maps)
+    def set_mesh(self, maps, **kwargs):
+        if not self._stock[1]: self.set_pointcloud(maps, **kwargs)
         self._opener("editor", *self.get_normal_cmd(), wait=True)
-        self._stock["mesh"] = True
+        self._stock[2] = True
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -141,9 +138,9 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def open(self, level, maps, opener="viewer"):
+    def open(self, level, maps, opener="viewer", **kwargs):
         method = getattr(self, "set_{}".format(level), lambda: "Invalid method")
-        method(maps)
+        method(maps, **kwargs)
         self._opener(opener, self._path)
 
     #   method --------------------------------------------------------------
@@ -163,8 +160,8 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_normal_img(self, heightmap):
-        self.set_normal([heightmap, [], []])
+    def get_normal_img(self, heightmap, **kwargs):
+        self.set_normal([heightmap, [], []], **kwargs)
         normals = self.read()["nz"].to_numpy().reshape(self._shape)
         normals = imgtools.project_data_to_img(normals, dtype=np.uint8, factor=255)
         return normals

@@ -43,6 +43,7 @@ def run(
         classes = param_classes,
         objects = rsio,
         logger=_logger,
+        param={"cloud": param_cloud},
         show=param_show
     )
 

@@ -15,10 +15,10 @@ class SettingsBox(Frame):
     def __init__(self, parent, fields, func, default=list(), **kwargs):
         Frame.__init__(self, parent, **kwargs)
 
-        entries = self.makeform(fields, default)
+        self._entries = self.makeform(fields, default)
 
         self.func = func
-        self.button_set = Button(parent, text="Set", command=lambda e=entries: self.func(e))
+        self.button_set = Button(parent, text="Set", command=lambda e=self._entries: self.func(e))
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -36,7 +36,12 @@ class SettingsBox(Frame):
             entries.append((field, ent))
 
         return entries
-        
+    
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_entry(self, index=None):
+        return self._entries[0][1].get() if index is None else self._entries[index][1].get()
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def fetch(self, entries):

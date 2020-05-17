@@ -4,18 +4,15 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.utils.imgtools as imgtools
-from rsvis.utils import imgbasictools
+from rsvis.utils import imgbasictools, imgtools
 import rsvis.utils.imgcontainer
 
 import rsvis.tools.extcanvas
 import rsvis.tools.imgconcanvas
-import rsvis.tools.keys
-import rsvis.tools.rescanvas
 
 import numpy as np
-from PIL import Image, ImageTk
-from tkinter import Toplevel, ttk, Button, Canvas, Label, Menu, TOP, X, NW, N, W, S, E, CENTER
+from tkinter import ttk
+from tkinter import *
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -97,6 +94,11 @@ class TopWindow(Toplevel):
             keys = "{}\n{}: {}".format(keys, [key], description)
 
         self.set_popup(parent, title="Help", dtype="msg", value=keys)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_obj(self):
+        return self._canvas
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
