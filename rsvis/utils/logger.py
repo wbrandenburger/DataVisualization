@@ -21,6 +21,6 @@ class Logger():
     # -----------------------------------------------------------------------
     def __call__(self, log, stream="info"):
         if isinstance(self._logger, logging.Logger):
-            self._logger.log(0, log)
+            self._logger.info(log)
         else:
             self._logger(log)

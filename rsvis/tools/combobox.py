@@ -15,7 +15,7 @@ class ComboBox(Frame):
     def __init__(self, parent, label, fields, func, default=0, **kwargs):
         Frame.__init__(self, parent, **kwargs)
 
-        self.makeform(label, fields, default)
+        self.makeform(label, fields, default=default)
 
         self._cbox.bind("<<ComboboxSelected>>", func) 
         # self.func = func
@@ -25,8 +25,7 @@ class ComboBox(Frame):
     # -----------------------------------------------------------------------
     def makeform(self, label, fields, default=0):
         self._variable = StringVar(self)
-        self._variable.set(fields[default])
- 
+        
         row = Frame(self)
         lab = Label(row, width=13, text=label, anchor='w')
         self._cbox = ttk.Combobox(row, textvariable=self._variable, values=fields, state="readonly")
@@ -36,6 +35,8 @@ class ComboBox(Frame):
         lab.pack(side=LEFT)
         self._cbox.pack(side=RIGHT, expand=YES, fill=X)
 
+        self._variable.set(fields[default])
+        
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get(self, index=False):

@@ -58,10 +58,10 @@ class TopWindow(Toplevel):
 
         #   button (Quit) ---------------------------------------------------
         self._q_cmd = lambda toplevel=self, title=title: q_cmd(toplevel, title)
-        self._button = ttk.Button(self, text="OK", 
+        self._button_quit = ttk.Button(self, text="OK", 
             command=self._q_cmd
         )
-        self._button.grid(row=1, column=0, columnspan=1)
+        self._button_quit.grid(row=1, column=0, columnspan=1)
 
         #   main image window -----------------------------------------------
         if dtype=="msg":

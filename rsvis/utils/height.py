@@ -6,10 +6,16 @@
 # ---------------------------------------------------------------------------
 import rsvis.utils.general as gu
 from rsvis.utils import imgio, imgtools, opener, ply
+import rsvis.utils.logger
 
 import numpy as np
 import pandas
 import tempfile
+
+#   method --------------------------------------------------------------
+# -----------------------------------------------------------------------
+def get_array_info(height, verbose=False):
+    return "[PCL] Shape: {}, Type: {}, Range: {:.3f}, {:.3f}".format(height.shape, height.dtype, np.min(height), np.max(height))
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -24,11 +30,11 @@ class Height():
 
         io = gu.PathCreator(**gu.get_value(param["temp"], "temp", dict()))
         self._path = io(tempfile.mkstemp(prefix="shdw-", suffix=".ply")[1])
-
+        
         self._param = param["process"]
-        self._param_format = {"obj": { "path": self._path}}
+        self.set_param_normal()
 
-        self._logger = logger
+        self._logger = rsvis.utils.logger.Logger(logger=logger)
         self._opener = opener.Opener(param["opener"], logger=self._logger)
 
         self._stock = [0] * 3
@@ -38,7 +44,7 @@ class Height():
     def add_height(self, heightmap, factor=1.0):
         if not len(heightmap):
             return
-        print(factor)
+
         self._num_points = heightmap.shape[0]*heightmap.shape[1]
         self._shape = heightmap.shape[0:2]
         heightmap = imgtools.expand_image_dim(heightmap.astype(np.float32))
@@ -84,6 +90,24 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def set_param_normal(self, radius="AUTO", model="TRI"):
+        self._param_normal_radius = radius
+        self._param_normal_model = model
+
+        self.set_param_format()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_param_format(self):
+        self._param_format = {
+            "obj": { "path": self._path}, 
+            "normal": { 
+                "radius": self._param_normal_radius, 
+                "model": self._param_normal_model
+                }
+            }
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_level(self, level = 0):
         for idx in range(level, len(self._stock)):
             self._stock[idx] = 0
@@ -119,12 +143,12 @@ class Height():
     # -----------------------------------------------------------------------
     def set_mesh(self, maps, **kwargs):
         if not self._stock[1]: self.set_pointcloud(maps, **kwargs)
-        self._opener("editor", *self.get_normal_cmd(), wait=True)
+        self._opener("editor", *self.get_mesh_cmd(), wait=True)
         self._stock[2] = True
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def read(self, level="points"):
+    def read(self, level=None):
         imgio.show_read_str(self._path, logger=self._logger)
         data = ply.read_ply(self._path)
         return data[level] if level else data
@@ -145,12 +169,12 @@ class Height():
 
     #   method --------------------------------------------------------------
     # ----------------------------------------------------------------------- 
-    def get_mesh_cmd(self):
+    def get_normal_cmd(self):
         return (self.format_cmd(self._param["general"]), self.format_cmd(self._param["normal"]), self.format_cmd(self._param["save-pcl"])) 
 
     #   method --------------------------------------------------------------
     # ----------------------------------------------------------------------- 
-    def get_normal_cmd(self):
+    def get_mesh_cmd(self):
         return (self.format_cmd(self._param["general"]), self.format_cmd(self._param["mesh"]), self.format_cmd(self._param["save-mesh"])) 
 
     #   method --------------------------------------------------------------
@@ -160,16 +184,15 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_normal_img(self, heightmap, **kwargs):
+    def get_normal_img(self, heightmap, log=False, **kwargs):
         self.set_normal([heightmap, [], []], **kwargs)
-        normals = self.read()["nz"].to_numpy().reshape(self._shape)
+        normals = self.read(level="points")["nz"].to_numpy().reshape(self._shape)
+
+        self._logger(get_array_info(normals))
+
+        if log:
+            normals = normals*(-1.)+1.
+            normals = -np.log(np.where(normals>0., normals, np.min(normals[normals>0.])))
+
         normals = imgtools.project_data_to_img(normals, dtype=np.uint8, factor=255)
         return normals
-
-    # print("Normals computed by CC: {}".format(imgtools.get_array_info(normals, verbose=True)))
-    # normals = normals*(-1.)+1. 
-    # normals = np.where(normals>0., normals, np.min(normals[normals>0.]))
-    # normals = imgtools.project_data_to_img(normals, dtype=np.uint8, factor=255) # -np.log(normals)
-    # normals = np.ceil(normals*bins)
-    #  normals = (np.where(normals==0., 1., normals) - 1.)/(bins-1.)
-    

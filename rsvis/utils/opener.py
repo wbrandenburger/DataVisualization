@@ -5,6 +5,7 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 from rsvis.utils import imgio
+import rsvis.utils.logger
 
 import subprocess
 
@@ -16,12 +17,15 @@ class Opener():
     # -----------------------------------------------------------------------
     def __init__(self, opener, logger=None):
         self._opener = opener
-        self._logger = logger
+        self._logger = rsvis.utils.logger.Logger(logger=logger)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __call__(self, opener, *args, wait=False):
-        process = subprocess.Popen(self.get_args(self._opener[opener], *args))
+        cmd = self.get_args(self._opener[opener], *args)
+        
+        self._logger("[CMD] {}".format(cmd))
+        process = subprocess.Popen(cmd)
         if wait:
             process.wait()
 
