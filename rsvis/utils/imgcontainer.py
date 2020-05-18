@@ -23,7 +23,7 @@ class ImgListContainer(list):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def append(self, img=list(), path=None, label=None, load=None,  live=None,  bbox=list(), **kwargs):
+    def append(self, img=list(), path="", label=None, load=None,  live=None,  bbox=list(), **kwargs):
 
         self._live = self._live if live is None else live
         self._bbox = self._bbox if bbox  else bbox
@@ -65,6 +65,14 @@ class ImgListContainer(list):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def is_label(self, label):
+        for item in self:
+            if item.label==label:
+                return True
+        return False
+        
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def get_img_from_label(self, label):
         for item in self:
             if item.label==label:
@@ -86,14 +94,14 @@ class ImgContainer(object):
     def __init__(
             self, 
             img=list(), 
-            path=None, 
+            path="", 
             label="image", 
             load=None,
             live=False,
             bbox=list(),  
             **kwargs          
         ):
-        self._obj = list()
+        self._obj = img
         self._show = list()
 
         self._path = path

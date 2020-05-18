@@ -161,8 +161,10 @@ class ResizingCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img(self):
-        return np.asarray(self._img).copy()
+    def get_img(self, show=False):
+        if show:
+            return np.asarray(self._img).copy()
+        return self._data_img.copy()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

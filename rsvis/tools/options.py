@@ -18,11 +18,10 @@ def get_options(param_specs, param_cloud=dict()):
     
     options.extend(get_basic_options())
     
-    if "label" in param_specs:
-        options.extend(get_label_options())
-    if "height" in param_specs:
-        if param_cloud:
-            options.extend(get_height_options(param_cloud))
+    options.extend(get_label_options())
+
+    if param_cloud:
+        options.extend(get_height_options(param_cloud))
     
     return options
 
@@ -66,11 +65,11 @@ def get_object_options():
             "require" : "objects",
             "label" : "Objects",
             "name" : "Bounding Box",
-            "key" : "m",
+            "key" : None,
             "description": "Get the bounding boxes of connected image compenents which belongs to an object class.",
             "command": lambda obj: obj.set_object_boxes(
                 imgcv.get_bbox(
-                    obj.get_img_from_label("label"), 
+                    obj.get_img_from_label("{label}"), 
                     obj.get_class(index=True),
                     label=obj.get_class(),
                     margin=10
@@ -89,7 +88,7 @@ def get_general_options():
             "require" : "image",
             "label" : "Image",
             "name" : "Contrast",
-            "key" : "r",
+            "key" : None,
             "description": "Raise the contrast of the currently displayed image.",
             "command": lambda obj: obj.set_img(imgtools.raise_contrast(obj.get_img()))
         }
@@ -104,12 +103,12 @@ def get_label_options():
             "require" : "label",
             "label" : "Image",
             "name" : "Projection",
-            "key" : "t",
+            "key" : None,
             "description": "Show the mask of one label in current image.",
             "command": lambda obj: obj.set_img(
                 imgtools.get_label_image(
-                    obj.get_img_from_label("image"), 
-                    obj.get_img_from_label("label"), 
+                    obj.get_img("image"), 
+                    obj.get_img_from_label("{label}"), 
                     index=obj.get_class(index=True),
                     equal=False)
                 )
@@ -118,11 +117,11 @@ def get_label_options():
             "require" : "label",
             "label" : "Image",
             "name" : "Distance Transform",
-            "key" : "z",
+            "key" : None,
             "description": "Compute the distance transform map of a label given by current label index.",
             "command": lambda obj: obj.set_img(imgtools.project_and_stack(
                     imgtools.get_distance_transform(
-                        obj.get_img_from_label("label"),
+                        obj.get_img_from_label("{label}"),
                         index=obj.get_class(index=True),
                     ), dtype=np.uint8, factor=255)
                 )
@@ -154,7 +153,7 @@ def get_basic_options():
             "description": "Invert the current image.",
             "command": lambda obj: obj.set_img(
                 imgbasictools.get_inverted_image(
-                    obj.get_img()
+                    obj.get_img(show=True)
                 )
             )
         },
@@ -162,7 +161,7 @@ def get_basic_options():
             "require" : "basic",
             "label" : "Image",
             "name" : "Manipulation",
-            "key" : "p",
+            "key" : None,
             "description": "Manipulate the current image.",
             "command": lambda obj: obj.set_img(
                 imgbasictools.get_linear_transformation(
@@ -177,7 +176,7 @@ def get_basic_options():
             "require" : "label",
             "label" : "Image",
             "name" : "Shadow Detection",
-            "key" : ",",
+            "key" : None,
             "description": "Automatic shadow detection in aerial and terrestrial images.",
             "command": lambda obj: obj.set_img(
                 sd.shadowDetection_Santos_KH(
@@ -209,7 +208,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: Height(param).open("pointcloud",
-                [obj.get_img_from_label("height"), obj.get_img(), obj.get_img_from_label("label")],
+                [obj.get_img_from_label("height"), obj.get_img(), obj.get_img_from_label("{label}")],
                 opener="editor"
             )
         },           
@@ -230,7 +229,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: Height(param).open("mesh",
-                [obj.get_img_from_label("height"), obj.get_img(), obj.get_img_from_label("label")],
+                [obj.get_img_from_label("height"), obj.get_img(), obj.get_img_from_label("{label}")],
                 opener="editor"
             )
         },

@@ -45,11 +45,11 @@ class TopWindow(Toplevel):
         
         #   key bindings ----------------------------------------------------
         self.bind("<q>", self.key_q)
-        self.bind("<e>", self.key_e)
+        self.bind("<r>", self.key_r)
 
         self._keys = { 
             "q": "Exit RSVis.",
-            "e": "Set current image for processing."
+            "r": "Set currently displayed image for further analysis."
         }
 
         for o in options:
@@ -128,8 +128,8 @@ class TopWindow(Toplevel):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def key_e(self, event, **kwargs):
-        """Exit RSVis."""
+    def key_r(self, event, **kwargs):
+        """Set currently displayed image for further analysis."""
         self.set_img()
 
     #   method --------------------------------------------------------------

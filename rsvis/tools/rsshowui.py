@@ -81,7 +81,7 @@ class RSShowUI():
         self._textbox_scrollbar = Scrollbar(self._root)
         self._textbox = Text(self._root, height=3, font=("Courier", 8))
         self._textbox_scrollbar.grid(row=1, column=2, rowspan=4, sticky=N+S)
-        self._textbox.grid(row=1, column=1, rowspan=4, sticky=N+S+W+E)
+        self._textbox.grid(row=1, column=1, rowspan=5, sticky=N+S+W+E)
         self._textbox_scrollbar.config(command=self._textbox.yview)
         self._textbox.config(yscrollcommand=self._textbox_scrollbar.set)
         
@@ -98,12 +98,22 @@ class RSShowUI():
         self._cbox_test = rsvis.tools.combobox.ComboBox(self._root, "Test",  ["Histogram", "Normal"], lambda event: None )
         self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
 
+        #   settingsboxes (label image) -------------------------------------
+        self._sbox_label_img = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Label Image"], self.set_label_img, default=["label"])
+        self._sbox_label_img.grid(row=4, column=0, sticky=N+W+S+E)
+
         #   settingsboxes (grid) --------------------------------------------
         self._sbox_grid = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=show["grid"])
-        self._sbox_grid.grid(row=4, column=0, sticky=N+W+S+E)
-    
+        self._sbox_grid.grid(row=5, column=0, sticky=N+W+S+E)
+
+        #   canvas variables ------------------------------------------------
+        self._variables = {
+            "class": lambda index=False: self._cbox_class.get(index=index),
+            "labelimg": lambda: self._sbox_label_img.get()
+        }
+
         #   main image window -----------------------------------------------
-        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, variables={"class": lambda index=False: self._cbox_class.get(index=index)}, logger=self._logger, **show)
+        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, variables={"class": lambda index=False: self._cbox_class.get(index=index), "labelimg": lambda: self._sbox_label_img.get()}, logger=self._logger, **show)
         self._frame.grid(row=0, column=0, columnspan=3, sticky=N+S+W+E)
         
         #   menubar (File / Options / Information) --------------------------
@@ -155,9 +165,9 @@ class RSShowUI():
         if dtype=="img":
             kwargs.update( 
                 {
-                    "options": [o for o in self._options if o["require"] in ["image", "basic", "label", "height"]],
+                    "options": [o for o in self._options],# if o["require"] in ["image", "basic", "label", "height"]],
                     "canvas":{
-                        "variables": {"class": lambda index=False: self._cbox_class.get(index=index)}
+                        "variables": self._variables
                     }
                 }
             )
@@ -192,6 +202,11 @@ class RSShowUI():
     # -----------------------------------------------------------------------
     def set_area_event(self, event=None):
         self.get_obj().set_area_event(index=self._cbox_area.get(index=True))
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_label_img(self, event=None):
+        pass
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

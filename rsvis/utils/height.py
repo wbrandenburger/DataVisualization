@@ -41,7 +41,7 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def add_height(self, heightmap, factor=1.0):
+    def add_height(self, heightmap, factor=1.0, show=False, **kwargs):
         if not len(heightmap):
             return
 
@@ -49,7 +49,8 @@ class Height():
         self._shape = heightmap.shape[0:2]
         heightmap = imgtools.expand_image_dim(heightmap.astype(np.float32))
 
-        heightmap = (heightmap - np.min(heightmap))/np.float32(factor)
+        if show:
+            heightmap = imgtools.project_data_to_img(heightmap, dtype=np.float32, factor=1.0)*150/np.float32(factor)
 
         grid = np.indices((self._shape), dtype=np.float32)
 
@@ -164,7 +165,7 @@ class Height():
     # -----------------------------------------------------------------------
     def open(self, level, maps, opener="viewer", **kwargs):
         method = getattr(self, "set_{}".format(level), lambda: "Invalid method")
-        method(maps, **kwargs)
+        method(maps, show=True, **kwargs)
         self._opener(opener, self._path)
 
     #   method --------------------------------------------------------------

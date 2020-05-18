@@ -74,14 +74,14 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def update_sbox_normal_radius(self, event=None):
-        self._param_normal_radius = float(self._sbox_normal_radius.get_entry())
+        self._param_normal_radius = float(self._sbox_normal_radius.get())
         if self._param_normal_radius==0.0:
             self._param_normal_radius="AUTO"
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def update_sbox_height_factor(self, event=None):
-        self._param_height_factor = float(self._sbox_height_factor.get_entry())
+        self._param_height_factor = float(self._sbox_height_factor.get())
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

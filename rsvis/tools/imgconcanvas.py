@@ -35,16 +35,19 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         self._idx_label = rsvis.utils.index.Index(0)
 
         self._multi_modal_flag = multi_modal
+        self._labelimg = "label"
 
         self._variables = variables
 
         #   key bindings ----------------------------------------------------
         self.bind("<w>", self.key_w)
         self.bind("<s>", self.key_s)
+        self.bind("<Control-r>", self.key_ctrl_r)
 
         self._keys.update({
             "w": "Show the next image of the given image set.",
-            "s": "Show the previous image of the given image set."
+            "s": "Show the previous image of the given image set.",
+            "ctrl+r": "Set image to current image container for further analysis." 
         })
 
     #   method --------------------------------------------------------------
@@ -59,7 +62,32 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         self.clear()
         self._idx_label.index = self._idx_current
         self.set_img_from_index(index=self._idx_current)
-        
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_labelimg(self, labelimg=None):   
+        self._labelimg = "label"
+        if labelimg is not None:
+            self._labelimg = labelimg  
+        elif "labelimg" in self._variables:
+            self._labelimg = self._variables["labelimg"]()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_labelimg(self):  
+        return self._variables["labelimg"]() if "labelimg" in self._variables else self._labelimg
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_img_to_img_container(self, img, label, **kwargs):
+        if not self._img_container.is_label(label):
+            self._img_container.append(img, label=label, live=False)
+            self._idx_label.limit = self._idx_label.limit+1
+            self._idx_label.end()
+            self._idx_current = self._idx_label()
+        else:
+            self._logger("Specified label {} does exist in list of image containers.".format(label))
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img_container(self, img_container, **kwargs):
@@ -83,7 +111,8 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     def get_img_from_label(self, label, **kwargs):
         if not self._img_container:
             return
-        
+
+        label = label.format(**{"label": self.get_labelimg()})
         return self._img_container.get_img_from_label(label).data
 
     #   method --------------------------------------------------------------
@@ -145,3 +174,9 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     def key_ctrl_e(self, event, **kwargs):
         """Show the current original image."""
         self.reload()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_ctrl_r(self, event, **kwargs):
+        """Set image to current image container for further analysis."""
+        self.set_img_to_img_container(self.get_img(), self.get_labelimg())        

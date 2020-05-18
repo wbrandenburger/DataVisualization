@@ -59,8 +59,8 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_slider_hist(self, mean=0., std=0., row=0, column=2, rowspan=1):
-        img_mean = np.mean(self._canvas.get_img())
-        img_std = np.std(self._canvas.get_img())
+        img_mean = np.mean(self._canvas.get_img(show=True))
+        img_std = np.std(self._canvas.get_img(show=True))
 
         self._param_hist_mean = 0.
         self._slider_hist_mean = Scale(self, from_=-img_mean, to=255.-img_mean, orient=VERTICAL, command=self.update_slider_hist_mean, resolution=5.) 
@@ -68,7 +68,7 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
         self._slider_hist_mean.grid(row=row, column=column, rowspan=rowspan, sticky=N+S)
 
         self._param_hist_std = 0.
-        self._slider_hist_std = Scale(self, from_=-img_std+1, to=img_std-1, orient=VERTICAL, command=self.update_slider_hist_std, resolution=3.) 
+        self._slider_hist_std = Scale(self, from_=-img_std+3, to=img_std-3, orient=VERTICAL, command=self.update_slider_hist_std, resolution=3.) 
         self._slider_hist_std.set(self._param_hist_std) #label="Std"
         self._slider_hist_std.grid(row=row+1, column=column, rowspan=rowspan, sticky=N+S)
 
@@ -76,7 +76,7 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
     # -----------------------------------------------------------------------
     def update_hist(self, event=None, **kwargs):
         self._canvas_hist.set_img(
-            imgtools.get_histogram(self._canvas.get_img(), logger=self._logger)
+            imgtools.get_histogram(self._canvas.get_img(show=True), logger=self._logger)
         )
 
     #   method --------------------------------------------------------------

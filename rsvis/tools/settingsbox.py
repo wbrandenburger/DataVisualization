@@ -39,7 +39,7 @@ class SettingsBox(Frame):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_entry(self, index=None):
+    def get(self, index=None):
         return self._entries[0][1].get() if index is None else self._entries[index][1].get()
 
     #   method --------------------------------------------------------------

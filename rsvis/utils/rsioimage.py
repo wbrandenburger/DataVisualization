@@ -87,7 +87,7 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_log_in(self, path, default="", **kwargs):
-        if self._log_io:
+        if self._log_io and path:
             return imgio.get_log(
                 self._log_io(path, **kwargs), 
                 default="", 

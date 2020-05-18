@@ -108,7 +108,11 @@ def get_histogram(img, alpha=0.7, logger=None):
     canvas = FigureCanvas(fig)
     
     ax = fig.add_subplot(111)
-    color = ("b", "g", "r")
+    
+    if img.shape[-1] == 1:
+        color = ("k")
+    else:
+        color = ("b", "g", "r")
     
     log_mean = "[MEAN]"
     log_std = "[STD]"
