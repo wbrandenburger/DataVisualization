@@ -67,6 +67,8 @@ class RSShowUI():
         self._root.rowconfigure(0, weight=1)
         self._root.rowconfigure(1, weight=0)
 
+        self._row_settings = 5
+
         #   key bindings ----------------------------------------------------
         self._root.bind("q", self.key_q)
         self._keys = {
@@ -80,8 +82,8 @@ class RSShowUI():
         #   textfield (grid) ------------------------------------------------
         self._textbox_scrollbar = Scrollbar(self._root)
         self._textbox = Text(self._root, height=3, font=("Courier", 8))
-        self._textbox_scrollbar.grid(row=1, column=2, rowspan=4, sticky=N+S)
-        self._textbox.grid(row=1, column=1, rowspan=5, sticky=N+S+W+E)
+        self._textbox_scrollbar.grid(row=1, column=2, rowspan=self._row_settings, sticky=N+S)
+        self._textbox.grid(row=1, column=1, rowspan=self._row_settings, sticky=N+S+W+E)
         self._textbox_scrollbar.config(command=self._textbox.yview)
         self._textbox.config(yscrollcommand=self._textbox_scrollbar.set)
         
