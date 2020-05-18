@@ -37,33 +37,36 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
+        self._slider_hist_column = 4
         super(TopWindowHistNormal, self).set_canvas(img, **kwargs)
-
-        self._param_normal_model = "LS"
-        self._cbox_normal_model = rsvis.tools.combobox.ComboBox(self, "Local Model",  ["LS", "TRI", "QUADRIC"], self.update_cbox_normal_model, default=0)
-        self._cbox_normal_model.grid(row=2, column=0, sticky=W+E)
         
+        self._canvas_hist.grid(row=0, column=1, rowspan=2, columnspan=3, sticky=N+S+W+E)
+
         self._param_normal_radius = 3.0
         self._sbox_normal_radius = rsvis.tools.settingsbox.SettingsBox(self, ["Radius"], self.update_sbox_normal_radius, default=[3.0])
-        self._sbox_normal_radius.grid(row=3, column=0, sticky=W+E)
+        self._sbox_normal_radius.grid(row=2, column=0, sticky=W+E)
 
         self._param_height_factor = 1.0
         self._sbox_height_factor = rsvis.tools.settingsbox.SettingsBox(self, ["Height factor"], self.update_sbox_height_factor, default=[self._param_height_factor])
-        self._sbox_height_factor.grid(row=4, column=0, sticky=W+E)
+        self._sbox_height_factor.grid(row=3, column=0, sticky=W+E)
+
+        self._param_normal_model = "LS"
+        self._cbox_normal_model = rsvis.tools.combobox.ComboBox(self, "Local Model",  ["LS", "TRI", "QUADRIC"], self.update_cbox_normal_model, default=0)
+        self._cbox_normal_model.grid(row=2, column=1, columnspan=2, sticky=W+E)
 
         self._param_normal_log = IntVar()
         self._cbutton_normal_log = Checkbutton(self, text="Log", variable=self._param_normal_log)
-        self._cbutton_normal_log.grid(row=5, column=0, sticky=W+E)
+        self._cbutton_normal_log.grid(row=2, column=3, sticky=W+E)
 
-        self._button_normal = ttk.Button(self, text="Open Pointcloud", 
+        self._button_open = ttk.Button(self, text="Open Pointcloud", 
             command=self.open_normal_cloud)
-        self._button_normal.grid(row=2, column=1, columnspan=2)
+        self._button_open.grid(row=3, column=1, columnspan=1, sticky=E)
 
         self._button_normal = ttk.Button(self, text="Normal Image", 
             command=self.set_normal_img)
-        self._button_normal.grid(row=3, column=1, columnspan=2)
+        self._button_normal.grid(row=3, column=2, columnspan=1)
 
-        self._button_quit.grid(row=4, column=1, columnspan=2)
+        self._button_quit.grid(row=3, column=3, columnspan=1)
 
 
     #   method --------------------------------------------------------------

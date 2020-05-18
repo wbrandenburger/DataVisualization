@@ -24,6 +24,11 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
             **kwargs
         ):
 
+        #   general window settings -----------------------------------------
+        self._slider_hist_row = 0
+        self._slider_hist_column = 2
+        self._slider_hist_rowspan = 1
+
         #   settings --------------------------------------------------------
         super(TopWindowHist, self).__init__(parent, **kwargs)
         
@@ -58,19 +63,19 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_slider_hist(self, mean=0., std=0., row=0, column=2, rowspan=1):
+    def set_slider_hist(self, mean=0., std=0.):
         img_mean = np.mean(self._canvas.get_img(show=True))
         img_std = np.std(self._canvas.get_img(show=True))
 
         self._param_hist_mean = 0.
         self._slider_hist_mean = Scale(self, from_=-img_mean, to=255.-img_mean, orient=VERTICAL, command=self.update_slider_hist_mean, resolution=5.) 
         self._slider_hist_mean.set(self._param_hist_mean) #label="Mean"
-        self._slider_hist_mean.grid(row=row, column=column, rowspan=rowspan, sticky=N+S)
+        self._slider_hist_mean.grid(row=self._slider_hist_row, column=self._slider_hist_column, rowspan=self._slider_hist_rowspan, sticky=N+S)
 
         self._param_hist_std = 0.
         self._slider_hist_std = Scale(self, from_=-img_std+3, to=img_std-3, orient=VERTICAL, command=self.update_slider_hist_std, resolution=3.) 
         self._slider_hist_std.set(self._param_hist_std) #label="Std"
-        self._slider_hist_std.grid(row=row+1, column=column, rowspan=rowspan, sticky=N+S)
+        self._slider_hist_std.grid(row=self._slider_hist_row+1, column=self._slider_hist_column, rowspan=self._slider_hist_rowspan, sticky=N+S)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

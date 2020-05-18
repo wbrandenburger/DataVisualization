@@ -17,6 +17,7 @@ import rsvis.tools.settingsbox
 from rsvis.tools.topwindow import TopWindow
 from rsvis.tools.topwindowhist import TopWindowHist
 from rsvis.tools.topwindowhist_normal import TopWindowHistNormal
+from rsvis.tools.topwindowhist_filter import TopWindowHistFilter
 import rsvis.tools.widgets
 
 from tkinter import *
@@ -97,7 +98,7 @@ class RSShowUI():
         self._cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
         self._cbox_class = rsvis.tools.combobox.ComboBox(self._root, "Class", [c["name"] for c in classes], self.set_class )
         self._cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
-        self._cbox_test = rsvis.tools.combobox.ComboBox(self._root, "Test",  ["Histogram", "Normal"], lambda event: None )
+        self._cbox_test = rsvis.tools.combobox.ComboBox(self._root, "Test",  ["Histogram", "Normal", "Filter"], lambda event: None )
         self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (label image) -------------------------------------
@@ -179,6 +180,8 @@ class RSShowUI():
                     t = TopWindowHist(self._root, **kwargs)
                 elif self._cbox_test.get() == "Normal":
                     t = TopWindowHistNormal(self._root, self._param["cloud"], **kwargs)
+                elif self._cbox_test.get() == "Filter":
+                    t = TopWindowHistFilter(self._root, **kwargs)
             else:
                 t = TopWindow(self._root, **kwargs)
         else:
