@@ -114,7 +114,8 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def key_e(self, event, **kwargs):
+    def key_r(self, event, **kwargs):
         """Exit RSVis."""
-        super(TopWindowHist, self).key_e(event, **kwargs)
+        super(TopWindowHist, self).key_r(event, **kwargs)
+        self.set_slider_hist()
     
