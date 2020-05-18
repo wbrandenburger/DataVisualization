@@ -31,7 +31,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
         super(ExtendedCanvas, self).__init__(parent, **kwargs)
         
         self._channel_flag = 0
-        self._index_channel = self._index_channel = rsvis.utils.index.Index(3)
+        self._idx_channel = self._idx_channel = rsvis.utils.index.Index(3)
         
         #   grid ------------------------------------------------------------
         self._grid_flag = 1
@@ -79,7 +79,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     # -----------------------------------------------------------------------
     def remove_channel(self):
         self._channel_flag = 0
-        self._index_channel.index = 0
+        self._idx_channel.index = 0
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -114,7 +114,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
         if self._channel_flag:
             self._img_draw = Image.fromarray(
                 imgtools.stack_image_dim(
-                    np.asarray(self._img_draw)[..., self._index_channel()]
+                    np.asarray(self._img_draw)[..., self._idx_channel()]
                 )
             )
 
@@ -159,7 +159,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     # -----------------------------------------------------------------------
     def key_ctrl_x(self, event, **kwargs):
         """Show the next single channel of current image."""
-        self._index_channel.next()
+        self._idx_channel.next()
         self.show_channel()
         self.create_image()
 
@@ -167,7 +167,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     # -----------------------------------------------------------------------
     def key_ctrl_y(self, event, **kwargs):
         """Show the previous single channel of current image."""
-        self._index_channel.last()
+        self._idx_channel.last()
         self.show_channel()
         self.create_image()
 

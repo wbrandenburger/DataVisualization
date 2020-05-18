@@ -32,7 +32,7 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         self._idx_current = 0
 
         self._img_container = None
-        self._idx_spec = rsvis.utils.index.Index(0)
+        self._idx_label = rsvis.utils.index.Index(0)
 
         self._multi_modal_flag = multi_modal
 
@@ -57,19 +57,19 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     # -----------------------------------------------------------------------
     def reload(self):
         self.clear()
-        self._idx_spec.index = self._idx_current
+        self._idx_label.index = self._idx_current
         self.set_img_from_index(index=self._idx_current)
         
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img_container(self, img_container, **kwargs):
         self._img_container = img_container
-        self._idx_spec = rsvis.utils.index.Index(len(self._img_container))
+        self._idx_label = rsvis.utils.index.Index(len(self._img_container))
         
         if not self._multi_modal_flag:
-            self._idx_spec.index = self._idx_current = 0
+            self._idx_label.index = self._idx_current = 0
         else:
-            self._idx_spec.index = self._idx_current
+            self._idx_label.index = self._idx_current
 
         self.set_img_from_index(index=self._idx_current, **kwargs)
 
@@ -83,14 +83,14 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img_from_spec(self, spec, show=True, **kwargs):
+    def get_img_from_label(self, label, show=True, **kwargs):
         if not self._img_container:
             return
 
         if not show:
-            return self._img_container.get_img_from_spec(spec).data
+            return self._img_container.get_img_from_label(label).data
         else:
-            return self._img_container.get_img_from_spec(spec).show
+            return self._img_container.get_img_from_label(label).show
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -98,15 +98,15 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         if not self._img_container:
             return
             
-        return self._img_container[self._idx_spec()].path
+        return self._img_container[self._idx_label()].path
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img_spec(self, **kwargs):
+    def get_img_label(self, **kwargs):
         if not self._img_container:
             return
             
-        return self._img_container[self._idx_spec()].spec
+        return self._img_container[self._idx_label()].label
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -114,7 +114,7 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         if not self._img_container:
             return
 
-        index = self._idx_spec() if index is None else index
+        index = self._idx_label() if index is None else index
         return self._img_container[index]
 
     #   method --------------------------------------------------------------
@@ -123,7 +123,7 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         if not self._img_container:
             return
         
-        index = self._idx_spec() if index is None else index
+        index = self._idx_label() if index is None else index
         
         if not show:
             return self._img_container[index].data
@@ -140,14 +140,14 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
         """Show the next image of the given image set."""
-        self._idx_current = self._idx_spec.next() 
+        self._idx_current = self._idx_label.next() 
         self.set_img_from_index()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, event, **kwargs):
         """Show the previous image of the given image set."""
-        self._idx_current = self._idx_spec.last()
+        self._idx_current = self._idx_label.last()
         self.set_img_from_index()
     
     #   method --------------------------------------------------------------

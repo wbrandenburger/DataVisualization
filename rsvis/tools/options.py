@@ -6,6 +6,8 @@
 from rsvis.utils import imgtools, imgbasictools, imgcv
 from rsvis.utils.height import Height
 
+import rsvis.shadow.shdwDetection as sd
+
 import numpy as np
 
 #   function ----------------------------------------------------------------
@@ -68,7 +70,7 @@ def get_object_options():
             "description": "Get the bounding boxes of connected image compenents which belongs to an object class.",
             "command": lambda obj: obj.set_object_boxes(
                 imgcv.get_bbox(
-                    obj.get_img_from_spec("label")[...,0], 
+                    obj.get_img_from_label("label")[...,0], 
                     obj.get_class(index=True),
                     label=obj.get_class(),
                     margin=10
@@ -106,8 +108,8 @@ def get_label_options():
             "description": "Show the mask of one label in current image.",
             "command": lambda obj: obj.set_img(
                 imgtools.get_label_image(
-                    obj.get_img_from_spec("image"), 
-                    obj.get_img_from_spec("label"), 
+                    obj.get_img_from_label("image"), 
+                    obj.get_img_from_label("label"), 
                     index=obj.get_class(index=True),
                     equal=False)
                 )
@@ -120,11 +122,11 @@ def get_label_options():
             "description": "Compute the distance transform map of a label given by current label index.",
             "command": lambda obj: obj.set_img(imgtools.project_and_stack(
                     imgtools.get_distance_transform(
-                        obj.get_img_from_spec("label")[...,0],
+                        obj.get_img_from_label("label")[...,0],
                         index=obj.get_class(index=True),
                     ), dtype=np.uint8, factor=255)
                 )
-        }     
+        }
     ]
 
 #   function ----------------------------------------------------------------
@@ -172,7 +174,19 @@ def get_basic_options():
                     logger=obj.get_logger()
                 )
             )
-        }                
+        },
+        { 
+            "require" : "label",
+            "label" : "Image",
+            "name" : "Shadow Detection",
+            "key" : ",",
+            "description": "Automatic shadow detection in aerial and terrestrial images.",
+            "command": lambda obj: obj.set_img(
+                sd.shadowDetection_Santos_KH(
+                    obj.get_img()
+                    )
+                )
+        }               
     ]
 
 #   function ----------------------------------------------------------------
@@ -187,7 +201,7 @@ def get_height_options(param=dict()):
             "key" : "c",
             "description": "Open the currently displayed image in ccViewer as pointcloud.",
             "command": lambda obj: Height(param).open("pointcloud",
-                [obj.get_img_from_spec("height"), obj.get_img(), []]
+                [obj.get_img_from_label("height"), obj.get_img(), []]
             )
         },
         { 
@@ -197,7 +211,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: Height(param).open("pointcloud",
-                [obj.get_img_from_spec("height"), obj.get_img(), obj.get_img_from_spec("label")],
+                [obj.get_img_from_label("height"), obj.get_img(), obj.get_img_from_label("label")],
                 opener="editor"
             )
         },           
@@ -208,7 +222,7 @@ def get_height_options(param=dict()):
             "key" : "v",
             "description": "Open the currently displayed image in ccViewer as mesh.",
             "command": lambda obj: Height(param).open("mesh",
-                [obj.get_img_from_spec("height"), obj.get_img(), []]
+                [obj.get_img_from_label("height"), obj.get_img(), []]
             )
         },
         { 
@@ -218,7 +232,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: Height(param).open("mesh",
-                [obj.get_img_from_spec("height"), obj.get_img(), obj.get_img_from_spec("label")],
+                [obj.get_img_from_label("height"), obj.get_img(), obj.get_img_from_label("label")],
                 opener="editor"
             )
         },
@@ -229,7 +243,7 @@ def get_height_options(param=dict()):
             "key" : "n",
             "description": "Compute and show the normal image.",
             "command": lambda obj: obj.set_img(
-                Height(param).get_normal_img(obj.get_img_from_spec("height"))
+                Height(param).get_normal_img(obj.get_img_from_label("height"))
             )
         },
         { 
@@ -238,7 +252,7 @@ def get_height_options(param=dict()):
             "name" : "Open Pointcloud with normals in CC",
             "key" : None,
             "description": "Compute and show the normal image.",
-            "command": lambda obj: Height(param).open("normal", [obj.get_img_from_spec("height"),[],[]], opener="editor"
+            "command": lambda obj: Height(param).open("normal", [obj.get_img_from_label("height"),[],[]], opener="editor"
             )
         },                 
     ]
@@ -250,7 +264,7 @@ def get_height_options(param=dict()):
 #   msi_index = rsvis.utils.objindex.ObjIndex(param_msi.copy())
 # "key_r": lambda obj: obj.set_img(
 #         imgtools.get_sub_img(
-#             obj.get_img_from_spec("msi", show=False), 
+#             obj.get_img_from_label("msi", show=False), 
 #             msi_index()
 #     ),
 #     show=True

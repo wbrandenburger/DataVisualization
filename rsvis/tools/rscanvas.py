@@ -39,7 +39,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
 
         self._data = data
         self._images = images
-        self._index_list = rsvis.utils.index.Index(len(self._images))
+        self._idx_list = rsvis.utils.index.Index(len(self._images))
 
         self._area_event = 0
         self._object_flag = 0
@@ -109,7 +109,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_container(self, index=None):
-        index = self._index_list() if index is None else index   
+        index = self._idx_list() if index is None else index   
         self.get_object()
         self.set_img_container(self._images[index])
         self.set_log()        
@@ -122,8 +122,8 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_index_list(self):
-        return self._index_list()
+    def get_idx_list(self):
+        return self._idx_list()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -144,12 +144,12 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_object(self):
-        self._boxes = self._data.get_object_in(self._images[self._index_list()][0].path, default=list())
+        self._boxes = self._data.get_object_in(self._images[self._idx_list()][0].path, default=list())
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def write_object(self):
-        self._data.set_object_in(self._images[self._index_list()][0].path, self._boxes) 
+        self._data.set_object_in(self._images[self._idx_list()][0].path, self._boxes) 
         
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -235,14 +235,14 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     # -----------------------------------------------------------------------
     def key_d(self, event, **kwargs):
         """Show the next image in given image list (see listbox)."""
-        index = self._index_list.next()
+        index = self._idx_list.next()
         self.set_container(index=index)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_a(self, event, **kwargs):
         """Show the previous image in given image list (see listbox)."""
-        index = self._index_list.last()
+        index = self._idx_list.last()
         self.set_container(index=index)
 
     #   method --------------------------------------------------------------
