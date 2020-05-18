@@ -163,31 +163,24 @@ class ImgContainer(object):
     # -----------------------------------------------------------------------  
     @property
     def show(self):
-        if self._live:
-            show = imgtools.project_data_to_img(
-                imgtools.stack_image_dim(self.imread()), dtype=np.uint8, factor=255)
-        else:
-            if not len(self.obj):
-                self.obj = self.imread()
+        if not len(self.obj) or self._live:
+            self.obj = self.imread()
                 
-            if not len(self._show):
-                self._show = imgtools.project_data_to_img(
-                imgtools.stack_image_dim(self.obj), dtype=np.uint8, factor=255)
-            show = self._show    
-
-        return self.get_bbox(show) if self.bbox else show
+        if not len(self._show):
+            self._show = imgtools.project_data_to_img(
+            imgtools.stack_image_dim(self.obj), dtype=np.uint8, factor=255)
+        
+        data = self._show    
+        return self.get_bbox(data) if self.bbox else data
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------  
     @property
     def data(self):
-        if self._live:
-            data = self.imread()
-        else:
-            if not len(self.obj):
-                self.obj = self.imread()
-            data = self.obj
+        if not len(self.obj) or self._live:
+            self.obj = self.imread()
 
+        data = self.obj
         return self.get_bbox(data) if self.bbox else data
 
     #   method --------------------------------------------------------------

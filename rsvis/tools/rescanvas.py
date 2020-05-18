@@ -137,7 +137,7 @@ class ResizingCanvas(Canvas):
     def set_img(self, img):
         if not isinstance(img, np.ndarray):
             return
-        img = imgtools.stack_image_dim(img)
+        # img = imgtools.stack_image_dim(img)
         self._img_size = [img.shape[1], img.shape[0]]
         self._img = Image.fromarray(img)
         self.create_image()

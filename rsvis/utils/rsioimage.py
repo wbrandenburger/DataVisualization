@@ -19,7 +19,7 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     def __init__(
             self,
             images, 
-            specs,
+            labels,
             *args,
             label = list(),
             color = list(),
@@ -28,7 +28,7 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
         super(RSIOImage, self).__init__(*args, **kwargs)
 
         self._images = images
-        self._specs = specs
+        self._labels = labels
         self._label = label
         self._color = color
 
@@ -57,12 +57,12 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
                 load=self.get_load_img()
             )
 
-            specs = self._specs if len(self._specs) == len(images) else ["{}-{}".format(self._specs[0], idx) for idx in range(len(images))]
+            labels = self._labels if len(self._labels) == len(images) else ["{}-{}".format(self._labels[0], idx) for idx in range(len(images))]
             
             for idx, img in enumerate(images):
                 img_list_container.append(
                     path=img, 
-                    spec=specs[idx], 
+                    label=labels[idx], 
                     **self._param_show
                 )
 
