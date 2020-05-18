@@ -50,6 +50,11 @@ def bool_img_to_uint8(img):
 # ---------------------------------------------------------------------------
 def expand_image_dim(img):
     return np.expand_dims(img, axis=2) if len(img.shape) != 3 else img
+    
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def reduce_image_dim(img):
+    return np.squeeze(img, axis=2) if len(img.shape) == 3 and img.shape[2]== 1 else img
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -72,20 +77,21 @@ def resize_img(img, scale):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def project_and_stack(img, dtype=np.float32, factor=1.0):
-    img = stack_image_dim(project_data_to_img(img, dtype=dtype, factor=factor))
+def project_and_stack(img, dtype=np.float32, factor=1.0, force=True):
+    img = stack_image_dim(project_data_to_img(img, dtype=dtype, factor=factor, force=force))
     return img
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def project_data_to_img(img, dtype=np.float32, factor=1.0):
-    img = img.astype(np.float32)
-    min_max_img = (np.min(img), np.max(img))
-    if min_max_img[1] - min_max_img[0] != 0:
-        img = (img - min_max_img[0])/(min_max_img[1] - min_max_img[0]) 
-    
-    img *= factor
-    img = img.astype(dtype)
+def project_data_to_img(img, dtype=np.float32, factor=1.0, force=True):
+    if not img.dtype == np.uint8 or force:
+        img = img.astype(np.float32)
+        min_max_img = (np.min(img), np.max(img))
+        if min_max_img[1] - min_max_img[0] != 0:
+            img = (img - min_max_img[0])/(min_max_img[1] - min_max_img[0]) 
+        
+        img *= factor
+        img = img.astype(dtype)
     return img
 
 #   function ----------------------------------------------------------------
@@ -143,13 +149,13 @@ def raise_contrast(img):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def labels_to_image(img_label, colors):
-    label = np.zeros((img_label.shape[0], img_label.shape[1]), dtype=np.uint8)
+def labels_to_image(labelimg, colors):
+    label = np.zeros((labelimg.shape[0], labelimg.shape[1]), dtype=np.uint8)
     for idx, color in enumerate(colors):
-        if len(img_label.shape)==3:
-            label += np.uint8(idx+1)*np.all(img_label==color, axis=-1)
+        if len(labelimg.shape)==3:
+            label += np.uint8(idx+1)*np.all(labelimg==color, axis=-1)
         else:
-            label += np.where(img_label==color, np.uint8(idx+1), np.uint8(0))
+            label += np.where(labelimg==color, np.uint8(idx+1), np.uint8(0))
     return label
 
 # #   function ----------------------------------------------------------------
@@ -162,44 +168,45 @@ def labels_to_image(img_label, colors):
 #     plt.imshow(img, cmap=colormap, vmin=0, vmax=len(colors)-1)
 #     canvas.draw()
 #     s, (width, height) = canvas.print_to_buffer()
-#     img_label = np.fromstring(s, np.uint8).reshape((height, width, 4))*255
-#     return img_label
+#     labelimg = np.fromstring(s, np.uint8).reshape((height, width, 4))*255
+#     return labelimg
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_label_image(img, label, value=None, index=None, equal=True):
+def get_label_image(labelimg, label, value=None, index=None, equal=True):
+    labelimg = reduce_image_dim(labelimg)
     if index is not None:
         value = np.unique(label)[index]
 
     rsvis.__init__._logger.debug("Create label image '{}' with value '{}'".format(np.unique(label), value))
 
-    img_label = img.copy()
-    for c in range(img.shape[-1]):
+    labelimg_new = labelimg.copy()
+    for c in range(labelimg.shape[-1]):
         if equal:
-            mask = np.ma.masked_where(label[...,-1] == value, img[...,c])
+            mask = np.ma.masked_where(label[...,-1] == value, labelimg[...,c])
         else:
-            mask = np.ma.masked_where(label[...,-1] != value, img[...,c])
+            mask = np.ma.masked_where(label[...,-1] != value, labelimg[...,c])
                     
         np.ma.set_fill_value(mask, 0)
-        img_label[..., c] = mask.filled()
-    return img_label
+        labelimg_new[..., c] = mask.filled()
+    return labelimg_new
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_label_mask(label, label_list=None, equal=True):
+def get_label_mask(labelimg, label_list=None, equal=True):
     if not label_list:
-        label_list = np.unique(label)
+        label_list = np.unique(labelimg)
 
     label_mask = np.ndarray(
-        (label.shape[0], label.shape[1], len(label_list)), 
+        (labelimg.shape[0], labelimg.shape[1], len(label_list)), 
         dtype=np.uint8
     )
 
     for c, l in enumerate(label_list):
         if equal:
-            mask = np.ma.masked_where(label == l, label)
+            mask = np.ma.masked_where(labelimg == l, labelimg)
         else:
-            mask = np.ma.masked_where(label != l, label)
+            mask = np.ma.masked_where(labelimg != l, labelimg)
                     
         label_mask[..., c] = bool_img_to_uint8(mask.mask)
     return label_mask
@@ -213,15 +220,17 @@ def get_connected_components(img, connectivity=8):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_distance_transform(img, label=0, index=None, threshold=10):
+def get_distance_transform(labelimg, label=0, index=None, threshold=10):
+    labelimg = reduce_image_dim(labelimg)
+
     if index is not None:
-        label = np.unique(img)[index]
+        label = np.unique(labelimg)[index]
 
-    mask_class = ndimage.distance_transform_edt(get_label_mask(img, label_list=[label], equal=True).astype(float))
-    mask_non_class = ndimage.distance_transform_edt(get_label_mask(img, label_list=[label], equal=False).astype(float))
+    mask_class = ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=True).astype(float))
+    mask_non_class = ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=False).astype(float))
 
-    distm = np.where(mask_class < threshold, mask_class, threshold) - np.where(mask_non_class < threshold, mask_non_class, threshold)
-    return distm
+    distanceimg = np.where(mask_class < threshold, mask_class, threshold) - np.where(mask_non_class < threshold, mask_non_class, threshold)
+    return distanceimg
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

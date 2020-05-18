@@ -70,7 +70,7 @@ def get_object_options():
             "description": "Get the bounding boxes of connected image compenents which belongs to an object class.",
             "command": lambda obj: obj.set_object_boxes(
                 imgcv.get_bbox(
-                    obj.get_img_from_label("label")[...,0], 
+                    obj.get_img_from_label("label"), 
                     obj.get_class(index=True),
                     label=obj.get_class(),
                     margin=10
@@ -122,7 +122,7 @@ def get_label_options():
             "description": "Compute the distance transform map of a label given by current label index.",
             "command": lambda obj: obj.set_img(imgtools.project_and_stack(
                     imgtools.get_distance_transform(
-                        obj.get_img_from_label("label")[...,0],
+                        obj.get_img_from_label("label"),
                         index=obj.get_class(index=True),
                     ), dtype=np.uint8, factor=255)
                 )
@@ -154,9 +154,7 @@ def get_basic_options():
             "description": "Invert the current image.",
             "command": lambda obj: obj.set_img(
                 imgbasictools.get_inverted_image(
-                    # imgbasictools.get_gray_image(
-                        obj.get_img()
-                    #)
+                    obj.get_img()
                 )
             )
         },

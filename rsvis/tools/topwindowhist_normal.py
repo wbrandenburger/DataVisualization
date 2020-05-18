@@ -98,11 +98,11 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
     # -----------------------------------------------------------------------
     def set_normal_img(self):
         self.update_normal()
-        self.get_obj().set_img(self._height.get_normal_img(self.get_obj().get_img_from_spec("height"), log=int(self._param_normal_log.get()), factor=self._param_height_factor))
+        self.get_obj().set_img(self._height.get_normal_img(self.get_obj().get_img_from_label("height"), log=int(self._param_normal_log.get()), factor=self._param_height_factor))
         self.set_img()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def open_normal_cloud(self):
         self.update_normal()    
-        self._height.open("pointcloud", [self.get_obj().get_img_from_spec("height"), self.get_obj().get_img(), []], factor=self._param_height_factor)
+        self._height.open("pointcloud", [self.get_obj().get_img_from_label("height"), self.get_obj().get_img(), []], factor=self._param_height_factor)

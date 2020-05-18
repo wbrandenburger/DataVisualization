@@ -30,7 +30,7 @@ def erosion(img, iterations=1):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_bbox(labelimg, index, label=None, margin=0, connectivity=8, equal=True):
-    
+    labelimg = imgtools.reduce_image_dim(labelimg)
     shape = labelimg.shape
 
     img_label_value = np.unique(labelimg)[index]

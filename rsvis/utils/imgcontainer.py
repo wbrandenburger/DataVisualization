@@ -163,25 +163,20 @@ class ImgContainer(object):
     # -----------------------------------------------------------------------  
     @property
     def show(self):
-        if not len(self.obj) or self._live:
-            self.obj = self.imread()
+        self.imread()
                 
         if not len(self._show):
             self._show = imgtools.project_data_to_img(
             imgtools.stack_image_dim(self.obj), dtype=np.uint8, factor=255)
-        
-        data = self._show    
-        return self.get_bbox(data) if self.bbox else data
+            
+        return self.get_bbox(self._show) if self.bbox else self._show
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------  
     @property
     def data(self):
-        if not len(self.obj) or self._live:
-            self.obj = self.imread()
-
-        data = self.obj
-        return self.get_bbox(data) if self.bbox else data
+        self.imread()
+        return self.get_bbox(self._obj) if self.bbox else self._obj
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -194,13 +189,13 @@ class ImgContainer(object):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def imread(self):
-        if self.validate_path(self.path):
-            return self._load(self.path, self.label)
-
+        if not len(self._obj) and self.validate_path(self.path):
+            self._obj =  imgtools.expand_image_dim(self._load(self.path, self.label))
+            
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def load(self):
-        self.obj = self.imread()
+        self._obj = self.imread()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

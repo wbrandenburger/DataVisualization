@@ -75,22 +75,16 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    #########################################################################
     def set_img_from_index(self, index=None, **kwargs):
-        self.set_show(self.get_container_img(index=index, show=False))
         self.set_img(self.get_container_img(index=index), **kwargs)
-    #########################################################################
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_img_from_label(self, label, show=True, **kwargs):
+    def get_img_from_label(self, label, **kwargs):
         if not self._img_container:
             return
-
-        if not show:
-            return self._img_container.get_img_from_label(label).data
-        else:
-            return self._img_container.get_img_from_label(label).show
+        
+        return self._img_container.get_img_from_label(label).data
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -119,16 +113,12 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_container_img(self, index=None, path=False, show=True):
+    def get_container_img(self, index=None, path=False):
         if not self._img_container:
             return
         
         index = self._idx_label() if index is None else index
-        
-        if not show:
-            return self._img_container[index].data
-        else:
-            return self._img_container[index].show
+        return self._img_container[index].data
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

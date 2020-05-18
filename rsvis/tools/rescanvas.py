@@ -5,6 +5,7 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 import rsvis.utils.imgtools as imgtools
+import rsvis.utils.logger
 
 import logging
 import numpy as np
@@ -35,7 +36,7 @@ class ResizingCanvas(Canvas):
         
         self._parent = parent
 
-        self._logger = logger
+        self._logger = rsvis.utils.logger.Logger(logger=logger)
 
         #   key bindings ----------------------------------------------------
         self._mouse_sensitivity = 4
@@ -57,6 +58,11 @@ class ResizingCanvas(Canvas):
     # -----------------------------------------------------------------------
     def get_keys(self, **kwargs):
         return self._keys
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_logger(self):
+        return self._logger
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -137,16 +143,14 @@ class ResizingCanvas(Canvas):
     def set_img(self, img):
         if not isinstance(img, np.ndarray):
             return
-        # img = imgtools.stack_image_dim(img)
-        self._img_size = [img.shape[1], img.shape[0]]
-        self._img = Image.fromarray(img)
-        self.create_image()
 
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def set_show(self, img):
-        img = imgtools.stack_image_dim(img)
-        self._show = img
+        self._img_size = [img.shape[1], img.shape[0]]
+        self._data_img = imgtools.expand_image_dim(img)
+        self._img = Image.fromarray(
+            imgtools.project_and_stack(img, dtype=np.uint8, factor=255)
+        )
+            
+        self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -214,8 +218,7 @@ class ResizingCanvas(Canvas):
 
         mouse_img = self.resize_points(self._mouse_event, inversion=True)[0]
 
-        if hasattr(self, "_show"):
-            self._logger("[MOUSE] Pixel: {},  Value: {}".format(mouse_img,
-                self._show[mouse_img[0], mouse_img[1], :]
-                )
+        self._logger("[MOUSE] Pixel: {},  Value: {}".format(mouse_img,
+            self._data_img[mouse_img[0], mouse_img[1], :]
             )
+        )
