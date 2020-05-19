@@ -43,7 +43,7 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
         self._canvas_hist.grid(row=0, column=1, rowspan=2, columnspan=3, sticky=N+S+W+E)
 
         self._param_normal_radius = 3.0
-        self._sbox_normal_radius = rsvis.tools.settingsbox.SettingsBox(self, ["Radius"], self.update_sbox_normal_radius, default=[3.0])
+        self._sbox_normal_radius = rsvis.tools.settingsbox.SettingsBox(self, ["Radius"], self.update_sbox_normal_radius, default=[self._param_normal_radius])
         self._sbox_normal_radius.grid(row=2, column=0, sticky=W+E)
 
         self._param_height_factor = 1.0
@@ -78,8 +78,8 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
     # -----------------------------------------------------------------------
     def update_sbox_normal_radius(self, event=None):
         self._param_normal_radius = float(self._sbox_normal_radius.get())
-        if self._param_normal_radius==0.0:
-            self._param_normal_radius="AUTO"
+        if self._param_normal_radius == 0.0:
+            self._param_normal_radius = "AUTO"
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
