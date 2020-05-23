@@ -121,10 +121,10 @@ class ResizingCanvas(Canvas):
         ev = [event.y, event.x]
 
         ev[0] = ev[0] if ev[0] >= 0 else 0 
-        ev[0] = ev[0] if ev[0] <= self._img_draw.size[1] else self._img_draw.size[1]
+        ev[0] = ev[0] if ev[0] < self._img_draw.size[1] else self._img_draw.size[1]-1
         
         ev[1] = ev[1] if ev[1] >= 0 else 0 
-        ev[1] = ev[1] if ev[1] <= self._img_draw.size[0] else self._img_draw.size[0]
+        ev[1] = ev[1] if ev[1] < self._img_draw.size[0] else self._img_draw.size[0]-1
         
         return ev
 

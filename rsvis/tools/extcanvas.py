@@ -41,8 +41,8 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
         self.set_grid(grid=grid)
 
         #   selection -------------------------------------------------------
-        self._selection_color = [150, 100, 150]
-        self._selection = list()
+        self._selection_color = [100, 150, 100]
+        self._selection = { "temporary": list(), "selection": list() }
 
         #   key bindings ----------------------------------------------------
         self.bind("<B1-Motion>", self.mouse_motion)
@@ -67,8 +67,8 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def clear_selection(self):
-        self._selection = list()
+    def clear_selection(self, label):
+        self._selection[label] = list()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -83,13 +83,13 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_selection(self, box, resize=True):
-        self._selection = self.resize_boxes(box, inversion=True)[0] if resize else box
+    def set_selection(self, box, label, resize=True):
+        self._selection[label] = self.resize_boxes(box, inversion=True)[0] if resize else box
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_selection(self, resize=True):
-         return self.resize_boxes(self._selection)[0] if resize else self._selection
+    def get_selection(self, label, resize=True):
+         return self.resize_boxes(self._selection[label])[0] if resize else self._selection[label]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -107,8 +107,9 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
             img_assembly =  imgtools.draw_box(img_assembly, [], self.get_grid_bboxes(), color=self._grid_color, dtype=np.int16)
 
         #   draw selection --------------------------------------------------
-        if self._selection:
-            img_assembly =  imgtools.draw_box(img_assembly, [], self.get_selection(), self._selection_color, dtype=np.int16)
+        for selection in self._selection.keys():
+            if self._selection[selection]:
+                img_assembly =  imgtools.draw_box(img_assembly, [], self.get_selection(selection), self._selection_color, dtype=np.int16)
 
         #   consider alpha channel
         if self._channel_flag:
@@ -183,20 +184,21 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     def mouse_motion(self, event):
         self.focus_set()
         self._mouse_event = self.resize_event(event)
-        self.set_selection(self.get_event_box(event))
+        self.set_selection(self.get_event_box(event), "temporary")
         self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def mouse_button_1_pressed(self, event):
         super(ExtendedCanvas, self).mouse_button_1_pressed(event)
-        self.clear_selection
+        self.clear_selection("temporary")
+        self.clear_selection("selection")
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def mouse_button_1_released(self, event):
         super(ExtendedCanvas, self).mouse_button_1_released(event)
-        self._mouse_selection = self._selection
-
-        #self.clear_selection() when removing selection, there is no possibility to delete objects 
-        #self.create_image()
+        self._mouse_selection = self.get_selection("temporary", resize=False)
+        
+        self.clear_selection("temporary")
+        self.create_image()

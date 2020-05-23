@@ -36,6 +36,7 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
 
         self._multi_modal_flag = multi_modal
         self._labelimg = "label"
+        self._heightimg = "height"
 
         self._variables = variables
 
@@ -74,8 +75,22 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def set_heightimg(self, heightimg=None):   
+        self._heightimg = "height"
+        if heightimg is not None:
+            self._heightimg = heightimg  
+        elif "heightimg" in self._variables:
+            self._heightimg = self._variables["heightimg"]()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def get_labelimg(self):  
         return self._variables["labelimg"]() if "labelimg" in self._variables else self._labelimg
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_heightimg(self):  
+        return self._variables["heightimg"]() if "heightimg" in self._variables else self._heightimg
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -112,7 +127,7 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         if not self._img_container:
             return
 
-        label = label.format(**{"label": self.get_labelimg()})
+        label = label.format(**{"label": self.get_labelimg(), "height": self.get_heightimg()})
         return self._img_container.get_img_from_label(label).data
 
     #   method --------------------------------------------------------------

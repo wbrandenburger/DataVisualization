@@ -28,7 +28,7 @@ class Height():
         self._num_points = None
         self._shape = list()
 
-        io = gu.PathCreator(**gu.get_value(param["temp"], "temp", dict()))
+        io = gu.PathCreator(**gu.get_value(param, "temp", dict()))
         self._path = io(tempfile.mkstemp(prefix="shdw-", suffix=".ply")[1])
         
         self._param = param["process"]
@@ -55,11 +55,18 @@ class Height():
         grid = np.indices((self._shape), dtype=np.float32)
 
         self._height.update( {
-                'x': grid[0,...].reshape(self._num_points).T, 
-                'y': grid[1,...].reshape(self._num_points).T, 
-                'z': heightmap[...,0].reshape(self._num_points).T
+                "x": grid[0,...].reshape(self._num_points).T, 
+                "y": grid[1,...].reshape(self._num_points).T, 
+                "z": heightmap[...,0].reshape(self._num_points).T
             }
         )
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def remove_height(self):
+        self._height.pop("x", None)
+        self._height.pop("y", None)
+        self._height.pop("z", None)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -70,11 +77,18 @@ class Height():
         colormap = imgtools.stack_image_dim(colormap)
 
         self._height.update({
-                'red': colormap[:,:,0].reshape(self._num_points).T, 
-                'green': colormap[:,:,1].reshape(self._num_points).T, 
-                'blue': colormap[:,:,2].reshape(self._num_points).T
+                "red": colormap[:,:,0].reshape(self._num_points).T, 
+                "green": colormap[:,:,1].reshape(self._num_points).T, 
+                "blue": colormap[:,:,2].reshape(self._num_points).T
             }
         )
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def remove_color(self):
+        self._height.pop("red", None)
+        self._height.pop("green", None)
+        self._height.pop("blue", None)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -88,6 +102,11 @@ class Height():
                 'intensity': intensitymap[ :, :, 1].reshape(self._num_points).T
             }
         )
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def remove_intensity(self):
+        self._height.pop("intensity", None)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -142,6 +161,13 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def remove_normal(self):
+        self._height.pop("nx", None)
+        self._height.pop("ny", None)
+        self._height.pop("nz", None)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_mesh(self, maps, **kwargs):
         if not self._stock[1]: self.set_pointcloud(maps, **kwargs)
         self._opener("editor", *self.get_mesh_cmd(), wait=True)
@@ -185,15 +211,62 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_normal_img(self, heightmap, log=False, **kwargs):
+    def get_normal_img(self, heightmap, bins=None, log=False, **kwargs):
         self.set_normal([heightmap, [], []], **kwargs)
-        normals = self.read(level="points")["nz"].to_numpy().reshape(self._shape)
+        normalimg = self.read(level="points")["nz"].to_numpy().reshape(self._shape)
 
-        self._logger(get_array_info(normals))
+        self._logger(get_array_info(normalimg))
 
+        limits = [.0, 1.]
         if log:
-            normals = normals*(-1.)+1.
-            normals = -np.log(np.where(normals>0., normals, np.min(normals[normals>0.])))
+            normalimg = normalimg*(-1.)+1.
+            normalimg = -np.log(np.where(normalimg>0., normalimg, np.min(normalimg[normalimg>0.])))
+            limits = [.0, 10.]
 
-        normals = imgtools.project_data_to_img(normals, dtype=np.uint8, factor=255)
-        return normals
+        normalimg = imgtools.project_data_to_img(normalimg, limits=limits)
+        if bins is not None:
+            normalimg_binned = np.zeros(normalimg.shape, dtype=np.float32)
+            array = list(np.arange(1.0/bins, 1., 1.0/bins))
+            limit = 0.        
+            for i in array:
+                normalimg_binned += np.where(np.logical_and(normalimg>limit, normalimg<=i), limit, 0.)
+                limit = i
+            normalimg = normalimg_binned + np.where(normalimg>limit, limit, 0.)
+
+        return normalimg
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_normal(self, heightmap, log=False, opener="viewer", **kwargs):
+        self.set_normal([heightmap, [], []], **kwargs)
+        normals = self.read(level="points")
+        
+        normals_x = normals["nx"].to_numpy().reshape(self._shape)
+        normals_y = normals["ny"].to_numpy().reshape(self._shape)
+        normals_z = normals["nz"].to_numpy().reshape(self._shape)
+        
+        self._logger(get_array_info(normals_x))
+        self._logger(get_array_info(normals_y))
+        self._logger(get_array_info(normals_z))
+
+        # normals_x = normals_x*(-1.)+1.
+
+        normals_x = imgtools.project_data_to_img(normals_x, limits=[-1., 1.])
+        normals_y = imgtools.project_data_to_img(normals_y, limits=[-1., 1.])
+        
+        normals_z = normals_z*(-1.)+1.
+        normals_z = -np.log(np.where(normals_z>0., normals_z, np.min(normals_z[normals_z>0.])))
+        self._logger(get_array_info(normals_z))
+        normals_z = imgtools.project_data_to_img(normals_z, limits=[.0, 10.])
+
+        self._logger(get_array_info(normals_x))
+        self._logger(get_array_info(normals_y))
+        self._logger(get_array_info(normals_z))
+
+        self.add_height(heightmap, show=True)
+        self.add_color(np.stack([normals_x, normals_y, normals_z], axis=2))
+        self.remove_normal()
+
+        self.write()
+        self._opener(opener, self._path)
+   

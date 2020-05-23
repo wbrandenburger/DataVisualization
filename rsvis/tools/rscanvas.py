@@ -154,13 +154,19 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def remove_object(self):
-        if self._selection and self._patches_bbox:
-            idx = self._patches_bbox.equal(self.resize_boxes(self._selection)[0])
+        selection = self.get_selection("selection", resize=True)
+        if selection and self._patches_bbox:
+            idx = self._patches_bbox.equal(selection)
             if idx is not None: 
                 self._boxes.pop(idx)
-                self.clear_selection()
+                self.clear_selection("selection")
             self.create_image()
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_label(self, label):
+        self._label = label
+        
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_log(self):
@@ -184,7 +190,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
             indices=list()
             self._patches_bbox.get_bbox_from_point(self._mouse_event, indices=indices)
             if len(indices):
-                self.set_selection(self._boxes[indices[0]]["box"], resize=False)
+                self.set_selection(self._boxes[indices[0]]["box"], "selection", resize=False)
         self.create_image()
 
     #   method --------------------------------------------------------------
@@ -202,7 +208,8 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     # -----------------------------------------------------------------------
     def mouse_double_1_button(self, event):
         self.focus_set()
-        self.clear_selection()
+        self.clear_selection("temporary")
+        self.clear_selection("selection")
         self.mouse_button_2_released(event, histogram=False)
 
     #   method --------------------------------------------------------------

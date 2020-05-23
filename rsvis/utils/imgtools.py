@@ -77,18 +77,23 @@ def resize_img(img, scale):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def project_and_stack(img, dtype=np.float32, factor=1.0, force=True):
-    img = stack_image_dim(project_data_to_img(img, dtype=dtype, factor=factor, force=force))
+def project_and_stack(img, **kwargs):
+    img = stack_image_dim(project_data_to_img(img, **kwargs))
     return img
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def project_data_to_img(img, dtype=np.float32, factor=1.0, force=True):
+def project_data_to_img(img, dtype=np.float32, factor=1.0, force=True, limits=list()):
     if not img.dtype == np.uint8 or force:
         img = img.astype(np.float32)
-        min_max_img = (np.min(img), np.max(img))
-        if min_max_img[1] - min_max_img[0] != 0:
-            img = (img - min_max_img[0])/(min_max_img[1] - min_max_img[0]) 
+        if not limits:
+            limits = [np.min(img), np.max(img)]
+        else:
+            img = np.where(img<limits[0], limits[0], img)
+            img = np.where(img>limits[1], limits[1], img)
+            
+        if limits[1] - limits[0] != 0:
+            img = (img - limits[0])/(limits[1] - limits[0]) 
         
         img *= factor
         img = img.astype(dtype)

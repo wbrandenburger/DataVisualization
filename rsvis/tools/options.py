@@ -107,7 +107,7 @@ def get_label_options():
             "description": "Show the mask of one label in current image.",
             "command": lambda obj: obj.set_img(
                 imgtools.get_label_image(
-                    obj.get_img("image"), 
+                    obj.get_img_from_label("image"), 
                     obj.get_img_from_label("{label}"), 
                     index=obj.get_class(index=True),
                     equal=False)
@@ -198,7 +198,7 @@ def get_height_options(param=dict()):
             "key" : "Control-Shift-C",
             "description": "Open the currently displayed image in ccViewer as pointcloud.",
             "command": lambda obj: Height(param).open("pointcloud",
-                [obj.get_img_from_label("height"), obj.get_img(), []]
+                [obj.get_img_from_label("{height}"), obj.get_img(), []]
             )
         },
         { 
@@ -208,7 +208,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: Height(param).open("pointcloud",
-                [obj.get_img_from_label("height"), obj.get_img(), obj.get_img_from_label("{label}")],
+                [obj.get_img_from_label("{height}"), obj.get_img(), obj.get_img_from_label("{label}")],
                 opener="editor"
             )
         },           
@@ -219,7 +219,7 @@ def get_height_options(param=dict()):
             "key" : "Control-Shift-V",
             "description": "Open the currently displayed image in ccViewer as mesh.",
             "command": lambda obj: Height(param).open("mesh",
-                [obj.get_img_from_label("height"), obj.get_img(), []]
+                [obj.get_img_from_label("{height}"), obj.get_img(), []]
             )
         },
         { 
@@ -229,7 +229,7 @@ def get_height_options(param=dict()):
             "key" : None,
             "description": "Open the currently displayed image in CloudCompare as mesh.",
             "command": lambda obj: Height(param).open("mesh",
-                [obj.get_img_from_label("height"), obj.get_img(), obj.get_img_from_label("{label}")],
+                [obj.get_img_from_label("{height}"), obj.get_img(), obj.get_img_from_label("{label}")],
                 opener="editor"
             )
         },
@@ -240,7 +240,7 @@ def get_height_options(param=dict()):
             "key" : "Control-Shift-B",
             "description": "Compute and show the normal image.",
             "command": lambda obj: obj.set_img(
-                Height(param).get_normal_img(obj.get_img_from_label("height"))
+                Height(param).get_normal_img(obj.get_img_from_label("{height}"))
             )
         },
         { 
@@ -249,7 +249,7 @@ def get_height_options(param=dict()):
             "name" : "Open Pointcloud with normals in CC",
             "key" : None,
             "description": "Compute and show the normal image.",
-            "command": lambda obj: Height(param).open("normal", [obj.get_img_from_label("height"),[],[]], opener="editor"
+            "command": lambda obj: Height(param).open("normal", [obj.get_img_from_label("{height}"),[],[]], opener="editor"
             )
         },                 
     ]
