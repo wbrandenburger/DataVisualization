@@ -1,5 +1,5 @@
 # ===========================================================================
-#   extcanvas.py ------------------------------------------------------------
+#   extimgcv.py -------------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -8,7 +8,7 @@ from rsvis.utils import imgtools
 import rsvis.utils.patches_ordered
 import rsvis.utils.patches_unordered
 
-import rsvis.tools.rescanvas
+from rsvis.tools.canvas import imgcv
 
 from PIL import Image, ImageTk
 import numpy as np
@@ -17,7 +17,7 @@ from tkinter import Canvas, NW
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
+class ExtendedImgCv(imgcv.ImgCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -28,7 +28,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
         **kwargs
     ):
 
-        super(ExtendedCanvas, self).__init__(parent, **kwargs)
+        super(ExtendedImgCv, self).__init__(parent, **kwargs)
         
         self._channel_flag = 0
         self._idx_channel = self._idx_channel = rsvis.utils.index.Index(3)
@@ -62,7 +62,7 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def clear(self, **kwargs):
-        super(ExtendedCanvas, self).clear(**kwargs)
+        super(ExtendedImgCv, self).clear(**kwargs)
         self.remove_channel()
 
     #   method --------------------------------------------------------------
@@ -94,12 +94,12 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img(self, img):
-        super(ExtendedCanvas, self).set_img(img)
+        super(ExtendedImgCv, self).set_img(img)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def draw_image(self, **kwargs):
-        img_assembly = super(ExtendedCanvas, self).draw_image(**kwargs)
+        img_assembly = super(ExtendedImgCv, self).draw_image(**kwargs)
         
         #   draw grid -------------------------------------------------------
         self.set_grid_bboxes(np.asarray(self._img_draw))
@@ -190,14 +190,14 @@ class ExtendedCanvas(rsvis.tools.rescanvas.ResizingCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def mouse_button_1_pressed(self, event):
-        super(ExtendedCanvas, self).mouse_button_1_pressed(event)
+        super(ExtendedImgCv, self).mouse_button_1_pressed(event)
         self.clear_selection("temporary")
         self.clear_selection("selection")
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def mouse_button_1_released(self, event):
-        super(ExtendedCanvas, self).mouse_button_1_released(event)
+        super(ExtendedImgCv, self).mouse_button_1_released(event)
         self._mouse_selection = self.get_selection("temporary", resize=False)
         
         self.clear_selection("temporary")

@@ -32,20 +32,21 @@ setuptools.setup(
     url="https://github.com/wbrandenburger/DataVisualization",
     install_requires=[
         # - python project packages - 
-        "colorama==0.4.3",
-        "click==7.1.2",
-        "stevedore==1.32.0",
-        "configparser==5.0.0",
-        "pyyaml==5.3.1",
-        "pandas==1.0.3",
+        "colorama>=0.4.3",
+        "click>=7.1.2",
+        "stevedore>=1.32.0",
+        "configparser>=5.0.0",
+        "pyyaml>=5.3.1",
+        "pandas>=1.0.3",
         # - python image processing packages -
-        "opencv-python==4.2.0.34",
-        "pillow==7.1.2",
-        "tifffile==2020.2.16",
+        "opencv-python>=4.2.0.34",
+        "opencv-python-contrib>=4.2.0.34",        
+        "pillow>=7.1.2",
+        "tifffile>=2020.2.16",
         # - python numerical analysis packages -
-        "matplotlib==3.2.1",
-        "numpy==1.18.3",
-        "scipy==1.4.1",
+        "matplotlib>=3.2.1",
+        "numpy>=1.18.3",
+        "scipy>=1.4.1",
     ],
     python_requires=">=3",
     classifiers=[

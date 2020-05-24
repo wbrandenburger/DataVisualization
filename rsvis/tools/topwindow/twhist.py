@@ -6,7 +6,7 @@
 # ---------------------------------------------------------------------------
 from rsvis.utils import imgbasictools, imgtools
 
-import rsvis.tools.rescanvas
+from rsvis.tools.canvas import imgcv
 from rsvis.tools.topwindow import tw
 
 import numpy as np
@@ -55,7 +55,7 @@ class TWHist(tw.TopWindow):
         self._button_quit.grid(row=2, column=0, columnspan=3)
 
         self._canvas.grid(row=0, column=0, rowspan=2, sticky=N+S+W+E)
-        self._canvas_hist = rsvis.tools.rescanvas.ResizingCanvas(self)
+        self._canvas_hist = imgcv.ImgCanvas(self)
         self._canvas_hist.grid(row=0, column=1, rowspan=2, sticky=N+S+W+E)
 
         self.update_hist()

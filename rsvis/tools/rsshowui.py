@@ -95,7 +95,7 @@ class RSShowUI():
         self._cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
         self._cbox_class = rsvis.tools.combobox.ComboBox(self._root, "Class", [c["name"] for c in classes], self.set_class )
         self._cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
-        self._cbox_test = rsvis.tools.combobox.ComboBox(self._root, "Test",  ["Histogram", "Normal", "Filter"], lambda event: None, default=1 )
+        self._cbox_test = rsvis.tools.combobox.ComboBox(self._root, "Test",  ["Histogram", "Normal", "Filter", "Features"], lambda event: None, default=3)
         self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (label image) -------------------------------------
@@ -118,7 +118,7 @@ class RSShowUI():
         }
 
         #   main image window -----------------------------------------------
-        self._frame = rsvis.tools.rscanvasframe.RSCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, variables=self._variables, logger=self._logger, **show)
+        self._frame = rsvis.tools.rscanvasframe.RSVisCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, variables=self._variables, logger=self._logger, **show)
         self._frame.grid(row=0, column=0, columnspan=3, sticky=N+S+W+E)
         
         #   menubar (File / Options / Information) --------------------------
@@ -184,7 +184,7 @@ class RSShowUI():
                     t = twhnormal.TWHNormal(self._root, self._param["cloud"], **kwargs)
                 elif self._cbox_test.get() == "Filter":
                     t = twhfilter.TWHFilter(self._root, **kwargs)
-                elif self._cbox_test.get() == "Feature":
+                elif self._cbox_test.get() == "Features":
                     t = twhfeatures.TWHFeatures(self._root, **kwargs)
             else:
                 t = tw.TopWindow(self._root, **kwargs)

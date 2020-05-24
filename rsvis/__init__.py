@@ -10,7 +10,7 @@ import os
 #   settings ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 __license__ = "MIT"
-__version__ = '0.2.3'
+__version__ = '0.3.4'
 __author__ = __maintainer__ = "Wolfgang Brandenburger"
 __email__ = "wolfgang.brandenburger@outlook.com"
 

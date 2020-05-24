@@ -7,8 +7,7 @@
 from rsvis.utils import imgbasictools, imgtools
 import rsvis.utils.imgcontainer
 
-import rsvis.tools.extcanvas
-import rsvis.tools.imgconcanvas
+from rsvis.tools.canvas import extimgcv, extimgconcv
 
 import numpy as np
 from tkinter import ttk
@@ -117,11 +116,11 @@ class TopWindow(Toplevel):
     def set_canvas(self, value, **kwargs):
         self._img = value
         if isinstance(value, rsvis.utils.imgcontainer.ImgListContainer):
-            self._canvas = rsvis.tools.imgconcanvas.ImgConCanvas(self, logger=self._logger, **kwargs)
+            self._canvas = extimgconcv.ExtendedImgConCv(self, logger=self._logger, **kwargs)
             self._canvas.set_img_container(value)
             self._img = self._canvas.get_img()
         else:
-            self._canvas = rsvis.tools.extcanvas.ExtendedCanvas(self)
+            self._canvas = extimgcv.ExtendedImgCv(self)
             self._canvas.set_img(value)
 
         self._canvas.grid(row=0, column=0, sticky=N+S+W+E)

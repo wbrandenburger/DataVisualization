@@ -1,5 +1,5 @@
 # ===========================================================================
-#   rscanvas.py ---------------------------------------------------------
+#   rsviscv.py -------------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -9,7 +9,7 @@ import rsvis.utils.imgtools as imgtools
 import rsvis.utils.patches_ordered
 import rsvis.utils.patches_unordered
 
-import rsvis.tools.imgconcanvas
+from rsvis.tools.canvas import extimgconcv
 
 import numpy as np
 import pathlib
@@ -18,7 +18,7 @@ from tkinter import Canvas, Frame, Listbox, Scrollbar, INSERT, END, TOP, N, W, E
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
+class RSVisCanvas(extimgconcv.ExtendedImgConCv):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -33,7 +33,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     ):
 
         #   settings --------------------------------------------------------
-        super(RSCanvas, self).__init__(parent, shift=[4,4], **kwargs)
+        super(RSVisCanvas, self).__init__(parent, shift=[4,4], **kwargs)
         
         self._set_popup = popup if popup else (lambda x: x)
 
@@ -74,7 +74,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def draw_image(self, **kwargs):
-        img_assembly = super(RSCanvas, self).draw_image(**kwargs)
+        img_assembly = super(RSVisCanvas, self).draw_image(**kwargs)
         
         boxes = self.get_object_boxes()
         self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(self._img_draw), bbox=boxes)
@@ -185,7 +185,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def mouse_button_1_pressed(self, event):
-        super(RSCanvas, self).mouse_button_1_pressed(event)
+        super(RSVisCanvas, self).mouse_button_1_pressed(event)
         if self._area_event==1:
             indices=list()
             self._patches_bbox.get_bbox_from_point(self._mouse_event, indices=indices)
@@ -196,7 +196,7 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def mouse_button_1_released(self, event):
-        super(RSCanvas, self).mouse_button_1_released(event)
+        super(RSVisCanvas, self).mouse_button_1_released(event)
         if self.is_mouse_event(self._mouse_box):
             if self._area_event==0:
                 self.set_popup(self._mouse_selection)
@@ -228,14 +228,14 @@ class RSCanvas(rsvis.tools.imgconcanvas.ImgConCanvas):
     # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
         """Show the next image of the given image set."""
-        super(RSCanvas, self).key_w(event)
+        super(RSVisCanvas, self).key_w(event)
         self.set_log()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_s(self, event, **kwargs):
         """Show the previous image of the given image set."""
-        super(RSCanvas, self).key_s(event)
+        super(RSVisCanvas, self).key_s(event)
         self.set_log()
 
     #   method --------------------------------------------------------------

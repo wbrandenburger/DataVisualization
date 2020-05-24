@@ -1,5 +1,5 @@
 # ===========================================================================
-#   imgconcanvas.py ---------------------------------------------------------
+#   extimgconcv.py- ---------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -7,7 +7,7 @@
 import rsvis.utils.general as gu
 import rsvis.utils.index
 
-import rsvis.tools.extcanvas
+from rsvis.tools.canvas import extimgcv
 
 import numpy as np
 from PIL import Image, ImageTk
@@ -15,7 +15,7 @@ from tkinter import Canvas, NW
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
+class ExtendedImgConCv(extimgcv.ExtendedImgCv):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -27,7 +27,7 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
         **kwargs
     ):
 
-        super(ImgConCanvas, self).__init__(parent, **kwargs)
+        super(ExtendedImgConCv, self).__init__(parent, **kwargs)
 
         self._idx_current = 0
 
@@ -54,7 +54,7 @@ class ImgConCanvas(rsvis.tools.extcanvas.ExtendedCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def clear(self, **kwargs):
-        super(ImgConCanvas, self).clear(**kwargs)
+        super(ExtendedImgConCv, self).clear(**kwargs)
         self._idx_current = 0
     
     #   method --------------------------------------------------------------

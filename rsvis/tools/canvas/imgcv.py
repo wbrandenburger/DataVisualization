@@ -1,5 +1,5 @@
 # ===========================================================================
-#   rescanvas.py ---------------------------------------------------------
+#   imgcv.py ----------------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -14,7 +14,7 @@ from tkinter import Canvas, NW
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class ResizingCanvas(Canvas):
+class ImgCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -26,7 +26,7 @@ class ResizingCanvas(Canvas):
             logger=None, 
             **kwargs
         ):
-        super(ResizingCanvas, self).__init__(parent)
+        super(ImgCanvas, self).__init__(parent)
         self.bind("<Configure>", self.resize_image)
         
         self._shift = shift
@@ -197,7 +197,7 @@ class ResizingCanvas(Canvas):
         self._img_draw.paste(image, (0, 0), image)
 
         self._img_canvas = ImageTk.PhotoImage(image=self._img_draw)
-        super(ResizingCanvas, self).create_image(0, 0, image=self._img_canvas, anchor=NW)
+        super(ImgCanvas, self).create_image(0, 0, image=self._img_canvas, anchor=NW)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

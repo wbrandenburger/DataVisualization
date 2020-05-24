@@ -4,7 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.tools.rscanvas
+from rsvis.tools.canvas import rsviscv
 
 import numpy as np
 import pathlib
@@ -13,7 +13,7 @@ from tkinter import Canvas, Frame, Listbox, Scrollbar, END, N, W, E, S, UNDERLIN
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class RSCanvasFrame(Frame):
+class RSVisCanvasFrame(Frame):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -24,7 +24,7 @@ class RSCanvasFrame(Frame):
         data,
         **kwargs
     ):
-        super(RSCanvasFrame, self).__init__(parent)
+        super(RSVisCanvasFrame, self).__init__(parent)
 
         self.columnconfigure(2, weight=1)
         self.rowconfigure(0, weight=1)
@@ -37,7 +37,7 @@ class RSCanvasFrame(Frame):
             self.listbox.insert(END, pathlib.Path(item[0].path).stem)
         self.listbox.bind("<<ListboxSelect>>", self.listbox_event)
 
-        self._canvas = rsvis.tools.rscanvas.RSCanvas(self, images, data, **kwargs)
+        self._canvas = rsviscv.RSVisCanvas(self, images, data, **kwargs)
         self._canvas.set_container()
         self._canvas.grid(row=0, column=2, sticky=N+S+E+W)
 
