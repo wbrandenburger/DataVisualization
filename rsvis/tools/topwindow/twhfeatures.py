@@ -35,37 +35,34 @@ class TWHFeatures(twhist.TWHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
+        self._slider_hist_column = 4
         super(TWHFeatures, self).set_canvas(img, **kwargs)
+        self._canvas.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=N+S+W+E)
+        self._canvas_hist.grid(row=0, column=2, rowspan=2, columnspan=2, sticky=N+S+W+E)
 
-        self._button_fast = ttk.Button(self, text="FAST Algorithm for Corner Detection", 
-            command=self.create_fast)
-        self._button_fast.grid(row=2, column=0, columnspan=1, sticky=E+W)
+        self._sbox_harris = rsvis.tools.settingsbox.SettingsBox(self, ["blockSize", "ksize", "k"], self.create_harris, default=[2, 3, 0.04], dtype=["int", "int", "float"], button="Harris")
+        self._sbox_harris.grid(row=2, column=0, rowspan=4, sticky=W+E)
 
-        self._button_harris_corner = ttk.Button(self, text="Harris Corner Detection", 
-            command=self.create_harris_corner)
-        self._button_harris_corner.grid(row=3, column=0, columnspan=1, sticky=E+W)
+        self._sbox_shi = rsvis.tools.settingsbox.SettingsBox(self, ["maxCorners", "qualityLevel", "minDistance", "blockSize", "k"], self.create_shi, default=[50, 0.01, 3, 3, 0.04], dtype=["int", "float", "float", "int", "float"], button="Shi")
+        self._sbox_shi.grid(row=2, column=1, rowspan=6, sticky=W+E)
+    
+        self._sbox_star = rsvis.tools.settingsbox.SettingsBox(self, ["maxSize", "responseThreshold", "lineThresholdProjected", "lineThresholdBinarized", "suppressNonmaxSize"], self.create_star, default=[40, 30, 10, 8, 5], dtype=["int", "int", "int", "int", "int"], button="STAR")
+        self._sbox_star.grid(row=2, column=2, rowspan=6, sticky=W+E)
 
-        self._button_shi_tomasi_corner = ttk.Button(self, text="Shi-Tomasi Corner Detection", 
-            command=self.create_shi_tomasi_corner)
-        self._button_shi_tomasi_corner.grid(row=4, column=0, columnspan=1, sticky=E+W)
+        self._sbox_sift = rsvis.tools.settingsbox.SettingsBox(self, ["nfeatures", "nOctaveLayers", "contrastThreshold", "edgeThreshold", "sigma"], self.create_sift, default=[0, 3, 0.04, 10, 1.6], dtype=["int", "int", "float", "int", "float"], button="SIFT")
+        self._sbox_sift.grid(row=2, column=3, rowspan=6, sticky=W+E)
 
-        self._button_sift = ttk.Button(self, text="Scale-Invariant Feature Transform", 
-            command=self.create_sift)
-        self._button_sift.grid(row=5, column=0, columnspan=1, sticky=E+W)
+        self._button_quit.grid(row=8, column=0, columnspan=5, sticky=W+E)
 
-        self._button_quit.grid(row=2, column=1, columnspan=1, sticky=E+W)
+    # https://docs.opencv.org/3.4/d3/df6/namespacecv_1_1xfeatures2d.html
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def create_harris_corner(self, event=None, **kwargs):
+    def create_harris(self, event=None, **kwargs):
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_features_harris/py_features_harris.html
         grayimg = imgbasictools.get_gray_image(self._img).astype(np.float32)
-
-        # find Harris corners
-        dstimg = cv2.cornerHarris(grayimg, 2, 3, 0.04)
+        dstimg = cv2.cornerHarris(grayimg, **self._sbox_harris.get_dict())
         dstimg = cv2.dilate(dstimg, None)
-
-        # Threshold for an optimal value, it may vary depending on the image.
         img = self._img.copy()
         img[dstimg>0.01*dstimg.max()]=[0,0,255]
 
@@ -73,42 +70,35 @@ class TWHFeatures(twhist.TWHist):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def create_shi_tomasi_corner(self, event=None, **kwargs):
+    def create_shi(self, event=None, **kwargs):
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_shi_tomasi/py_shi_tomasi.html
         grayimg = imgbasictools.get_gray_image(self._img).astype(np.float32)
-
-        # find Harris corners
-        corners = cv2.goodFeaturesToTrack(grayimg,50,0.01,3)
+        corners = cv2.goodFeaturesToTrack(grayimg,**self._sbox_shi.get_dict())
         corners = np.int0(corners)
 
         img = self._img.copy()
         for i in corners:
             x,y = i.ravel()
-            cv2.circle(img, (x,y), 3, 255, -1)
+            cv2.circle(img, (x,y), 1, 255, -1)
 
         self._canvas.set_img(img)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def create_sift(self, event=None, **kwargs):
-        # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_brief/py_brief.html
-        gray= cv2.cvtColor(self._img,cv2.COLOR_BGR2GRAY)
-        sift = cv2.xfeatures2d.SIFT_create(contrastThreshold = 0.1,edgeThreshold=20, sigma=2.0)
-        kp = sift.detect(gray,None)
-        #kp = sift.detect(gray,None)
+        # https://docs.opencv.org/4.3.0/d5/d3c/classcv_1_1xfeatures2d_1_1SIFT.html
+        gray = imgbasictools.get_gray_image(self._img)
+        sift = cv2.xfeatures2d.SIFT_create(**self._sbox_sift.get_dict())
+        kp = sift.detect(gray, None)
         img = cv2.drawKeypoints(self._img, kp, outImage=None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         self._canvas.set_img(img)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def create_fast(self, event=None, **kwargs):
+    def create_star(self, event=None, **kwargs):
+        # https://docs.opencv.org/3.4/dd/d39/classcv_1_1xfeatures2d_1_1StarDetector.html#a9f1ed97bd2b42e30fc0fb1355ad262d3
         gray = imgbasictools.get_gray_image(self._img)
-
-        # Initiate FAST object with default values
-        fast = cv2.FastFeatureDetector_create()
-
-        # find and draw the keypoints
-        kp = fast.detect(gray, None)
+        star = cv2.xfeatures2d.StarDetector_create(**self._sbox_star.get_dict())
+        kp = star.detect(gray, None)
         img = cv2.drawKeypoints(self._img, kp, outImage=None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
         self._canvas.set_img(img)        

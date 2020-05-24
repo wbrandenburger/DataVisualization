@@ -4,7 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-from tkinter import Button, Frame, Entry, Label, END, TOP, X, YES, LEFT, RIGHT, END
+from tkinter import *
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -12,13 +12,18 @@ class SettingsBox(Frame):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, parent, fields, func, default=list(), **kwargs):
+    def __init__(self, parent, fields, func, default, dtype=list(), button="", **kwargs):
         Frame.__init__(self, parent, **kwargs)
+        
+        if button:
+            self._button = Button(self, text=button, command=lambda: self.func())
+            self._button.pack(side=TOP, fill=X)
 
-        self._entries = self.makeform(fields, default)
+        self._entries = dict()     
+        self._dtype = dtype
+        self._sbox_entries = self.makeform(fields, default)
 
         self.func = func
-        self.button_set = Button(parent, text="Set", command=lambda e=self._entries: self.func(e))
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -28,7 +33,7 @@ class SettingsBox(Frame):
             row = Frame(self)
             lab = Label(row, width=16, text=field, anchor='w')
             ent = Entry(row)
-            ent.bind("<Return>", (lambda event, e=entries: self.func(e))) 
+            ent.bind("<Return>", (lambda event: self.func())) 
             ent.insert(END, str(default[index]))
             row.pack(side=TOP, fill=X, padx=2, pady=2)
             lab.pack(side=LEFT)
@@ -39,14 +44,21 @@ class SettingsBox(Frame):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get(self, index=None):
-        return self._entries[0][1].get() if index is None else self._entries[index][1].get()
+    def get(self, index=0):
+        return self._sbox_entries[index][1].get() 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def fetch(self, entries):
+    def get_dict(self):
+        for entry, dtype in zip(self._sbox_entries, self._dtype):
+            self._entries[entry[0]] = eval(dtype)(entry[1].get())
+        return self._entries
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def fetch(self):
         entry_str = ""
-        for entry in entries:
+        for entry in self._sbox_entries:
             field = entry[0]
             text  = entry[1].get()
             entry_str = "{} {}: {}".format(entry_str, field, text)

@@ -40,4 +40,3 @@ def get_logformat(log, *args, **kwargs):
         log = "{}\n{:_<16}: {}".format(log, arg, kwargs[arg])
 
     return log
-
