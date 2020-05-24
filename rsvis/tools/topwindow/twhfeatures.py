@@ -107,20 +107,23 @@ class TWHFeatures(twhist.TWHist):
     # -----------------------------------------------------------------------
     def create_sift(self, event=None, **kwargs):
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_brief/py_brief.html
-
-        star = cv2.FeatureDetector_create("STAR")
+        gray= cv2.cvtColor(self._img,cv2.COLOR_BGR2GRAY)
+        sift = cv2.xfeatures2d.SURF_create()
+        kp = sift.detect(gray,None)
+        img=cv2.drawKeypoints(gray,kp,img)
+        # star = cv2.FeatureDetector_create("STAR")
 
         # # Initiate BRIEF extractor
         # brief = cv2.DescriptorExtractor_create("BRIEF")
 
         # find the keypoints with STAR
-        kp = star.detect(self._img, None)
+        # kp = star.detect(self._img, None)
 
         # # compute the descriptors with BRIEF
         # kp, des = brief.compute(self._img, kp)
 
         # self._logger("Blubb:\t{}\nBlubb:\t{}".format(brief.getInt('bytes'), des.shape))
 
-        img = self._img.copy()
-        img = cv2.drawKeypoints(img, kp, color=(255,0,0))
-        self._canvas.set_img(img)
+        # img = self._img.copy()
+        # img = cv2.drawKeypoints(img, kp, color=(255,0,0))
+        # self._canvas.set_img(img)
