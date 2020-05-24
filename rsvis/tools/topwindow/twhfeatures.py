@@ -110,7 +110,7 @@ class TWHFeatures(twhist.TWHist):
         gray= cv2.cvtColor(self._img,cv2.COLOR_BGR2GRAY)
         sift = cv2.xfeatures2d.SURF_create()
         kp = sift.detect(gray,None)
-        img=cv2.drawKeypoints(gray,kp,img)
+        img=cv2.drawKeypoints(gray,kp, self._img)
         # star = cv2.FeatureDetector_create("STAR")
 
         # # Initiate BRIEF extractor
@@ -126,4 +126,4 @@ class TWHFeatures(twhist.TWHist):
 
         # img = self._img.copy()
         # img = cv2.drawKeypoints(img, kp, color=(255,0,0))
-        # self._canvas.set_img(img)
+        self._canvas.set_img(img)
