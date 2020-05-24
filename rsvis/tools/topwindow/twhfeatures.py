@@ -57,21 +57,6 @@ class TWHFeatures(twhist.TWHist):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def create_fast(self, event=None, **kwargs):
-        # Initiate FAST object with default values
-        fast = cv2.FastFeatureDetector()
-
-        # find and draw the keypoints
-        kp = fast.detect(self._img, None)
-        img2 = cv2.drawKeypoints(self._img, kp, color=(255,0,0))
-
-        # Print all default params
-        print("Threshold: {}\nNonMaxSuppression: {}\nneighborhood: {}\nTotal Keypoints with nonmaxSuppression: {}", fast.getInt('threshold'), fast.getBool('nonmaxSuppression'), fast.getInt('type'), len(kp))
-
-        self._canvas.set_img(img2)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
     def create_harris_corner(self, event=None, **kwargs):
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_features_harris/py_features_harris.html
         grayimg = imgbasictools.get_gray_image(self._img).astype(np.float32)
@@ -108,22 +93,22 @@ class TWHFeatures(twhist.TWHist):
     def create_sift(self, event=None, **kwargs):
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_brief/py_brief.html
         gray= cv2.cvtColor(self._img,cv2.COLOR_BGR2GRAY)
-        sift = cv2.xfeatures2d.SURF_create()
+        sift = cv2.xfeatures2d.SIFT_create(contrastThreshold = 0.1,edgeThreshold=20, sigma=2.0)
         kp = sift.detect(gray,None)
-        img=cv2.drawKeypoints(gray,kp, self._img)
-        # star = cv2.FeatureDetector_create("STAR")
-
-        # # Initiate BRIEF extractor
-        # brief = cv2.DescriptorExtractor_create("BRIEF")
-
-        # find the keypoints with STAR
-        # kp = star.detect(self._img, None)
-
-        # # compute the descriptors with BRIEF
-        # kp, des = brief.compute(self._img, kp)
-
-        # self._logger("Blubb:\t{}\nBlubb:\t{}".format(brief.getInt('bytes'), des.shape))
-
-        # img = self._img.copy()
-        # img = cv2.drawKeypoints(img, kp, color=(255,0,0))
+        #kp = sift.detect(gray,None)
+        img = cv2.drawKeypoints(self._img, kp, outImage=None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         self._canvas.set_img(img)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def create_fast(self, event=None, **kwargs):
+        gray = imgbasictools.get_gray_image(self._img)
+
+        # Initiate FAST object with default values
+        fast = cv2.FastFeatureDetector_create()
+
+        # find and draw the keypoints
+        kp = fast.detect(gray, None)
+        img = cv2.drawKeypoints(self._img, kp, outImage=None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+        self._canvas.set_img(img)        

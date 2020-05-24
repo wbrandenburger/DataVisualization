@@ -4,7 +4,6 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-import rsvis.__init__
 import rsvis.utils.general as gu
 import rsvis.utils.index
 from rsvis.utils import opener, imgtools
@@ -28,14 +27,14 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, data, options=list(), show=dict(), classes=dict, param=dict(), logger=None, **kwargs):
+    def __init__(self, data, options=list(), show=dict(), classes=dict, param=dict(), **kwargs):
         
         self._data = data
         self._options = options
 
         self._param = param
 
-        self.initialize_window(show=show, classes=classes, logger=logger)
+        self.initialize_window(show=show, classes=classes)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -48,7 +47,7 @@ class RSShowUI():
         """Start the mainloop for displaying the graphical user interface"""
         self._root.mainloop()
 
-    def initialize_window(self, show=list(), classes=dict(), logger=None):
+    def initialize_window(self, show=list(), classes=dict()):
         """Set the geometry of the main window"""
 
         #   settings --------------------------------------------------------

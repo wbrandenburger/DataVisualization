@@ -24,3 +24,20 @@ class Logger():
             self._logger.info(log)
         else:
             self._logger(log)
+    
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_logformat(self, log, *args, **kwargs):
+        self.__call__(get_logformat(log, *args, **kwargs))
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_logformat(log, *args, **kwargs):
+    for idx in range(len(args)):
+        log = "{}\n{:_<16}: {}".format(log, idx, args[idx])
+
+    for arg in kwargs.keys():
+        log = "{}\n{:_<16}: {}".format(log, arg, kwargs[arg])
+
+    return log
+
