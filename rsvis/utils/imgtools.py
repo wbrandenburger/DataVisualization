@@ -107,7 +107,7 @@ def project_dict_to_img(obj, dtype=np.float32, factor=1.0):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_histogram(img, alpha=0.7, logger=None):    
+def get_histogram(img, mask=None, logger=None):    
     fig = Figure(figsize=(5, 4), dpi=100)
     # A canvas must be manually attached to the figure (pyplot would automatically do it).  This is done by instantiating the canvas with the figure as argument https://matplotlib.org/gallery/user_interfaces/canvasagg.html#sphx-glr-gallery-user-interfaces-canvasagg-py
     canvas = FigureCanvas(fig)
@@ -118,11 +118,11 @@ def get_histogram(img, alpha=0.7, logger=None):
         color = ("k")
     else:
         color = ("b", "g", "r")
-    
+
     log_mean = "[MEAN]"
     log_std = "[STD]"
     for channel, col in enumerate(color):
-        hist_channel = cv2.calcHist([img], [channel], None, [256], [0,256]) / get_area(img)
+        hist_channel = cv2.calcHist([img], [channel], mask, [256], [0,256]) / get_area(img)
         ax.plot(hist_channel, color=col)
         
         img_mean = np.mean(img[...,channel])
@@ -183,11 +183,11 @@ def labels_to_image(labelimg, colors):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_label_image(labelimg, label, value=None, index=None, equal=True):
-    labelimg = reduce_image_dim(labelimg)
+    # labelimg = reduce_image_dim(labelimg)
     if index is not None:
         value = np.unique(label)[index]
 
-    rsvis.__init__._logger.debug("Create label image '{}' with value '{}'".format(np.unique(label), value))
+    # rsvis.__init__._logger.debug("Create label image '{}' with value '{}'".format(np.unique(label), value))
 
     labelimg_new = labelimg.copy()
     for c in range(labelimg.shape[-1]):
@@ -199,6 +199,20 @@ def get_label_image(labelimg, label, value=None, index=None, equal=True):
         np.ma.set_fill_value(mask, 0)
         labelimg_new[..., c] = mask.filled()
     return labelimg_new
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_mask_image(labelimg, value=None, index=None, equal=True):
+    labelimg = reduce_image_dim(labelimg)
+    if index is not None:
+        value = np.unique(labelimg)[index]
+
+    if equal:
+        maskimg = np.ma.masked_where(labelimg == value, labelimg)
+    else:
+        maskimg = np.ma.masked_where(labelimg != value, labelimg)
+    
+    return bool_img_to_uint8(maskimg.mask)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

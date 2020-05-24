@@ -14,10 +14,7 @@ import rsvis.utils.yaml
 import rsvis.tools.combobox
 import rsvis.tools.rscanvasframe
 import rsvis.tools.settingsbox
-from rsvis.tools.topwindow import TopWindow
-from rsvis.tools.topwindowhist import TopWindowHist
-from rsvis.tools.topwindowhist_normal import TopWindowHistNormal
-from rsvis.tools.topwindowhist_filter import TopWindowHistFilter
+from rsvis.tools.topwindow import tw, twhist, twhnormal, twhfilter, twhfeatures
 import rsvis.tools.widgets
 
 from tkinter import *
@@ -182,15 +179,17 @@ class RSShowUI():
 
             if histogram:
                 if self._cbox_test.get() == "Histogram":
-                    t = TopWindowHist(self._root, **kwargs)
+                    t = twhist.TWHist(self._root, **kwargs)
                 elif self._cbox_test.get() == "Normal":
-                    t = TopWindowHistNormal(self._root, self._param["cloud"], **kwargs)
+                    t = twhnormal.TWHNormal(self._root, self._param["cloud"], **kwargs)
                 elif self._cbox_test.get() == "Filter":
-                    t = TopWindowHistFilter(self._root, **kwargs)
+                    t = twhfilter.TWHFilter(self._root, **kwargs)
+                elif self._cbox_test.get() == "Feature":
+                    t = twhfeatures.TWHFeatures(self._root, **kwargs)
             else:
-                t = TopWindow(self._root, **kwargs)
+                t = tw.TopWindow(self._root, **kwargs)
         else:
-            t = TopWindow(self._root, **kwargs)
+            t = tw.TopWindow(self._root, **kwargs)
         t.mainloop()
 
     #   method --------------------------------------------------------------

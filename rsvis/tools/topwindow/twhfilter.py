@@ -1,5 +1,5 @@
 # ===========================================================================
-#   topwindow.py -------------------------------------------------------------
+#   twhfilter.py ------------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -10,7 +10,7 @@ import rsvis.utils.imgcontainer
 
 import rsvis.tools.combobox
 import rsvis.tools.settingsbox
-import rsvis.tools.topwindowhist
+from rsvis.tools.topwindow import twhist
 
 import cv2
 import numpy as np
@@ -19,7 +19,7 @@ from tkinter import ttk
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class TopWindowHistFilter(rsvis.tools.topwindowhist.TopWindowHist):
+class TWHFilter(twhist.TWHist):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -30,13 +30,13 @@ class TopWindowHistFilter(rsvis.tools.topwindowhist.TopWindowHist):
         ):
 
         #   settings --------------------------------------------------------
-        super(TopWindowHistFilter, self).__init__(parent, **kwargs)
+        super(TWHFilter, self).__init__(parent, **kwargs)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
         self._slider_hist_column = 4
-        super(TopWindowHistFilter, self).set_canvas(img, **kwargs)
+        super(TWHFilter, self).set_canvas(img, **kwargs)
 
         self._canvas.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=N+S+W+E)        
         self._canvas_hist.grid(row=0, column=2, rowspan=2, columnspan=2, sticky=N+S+W+E)

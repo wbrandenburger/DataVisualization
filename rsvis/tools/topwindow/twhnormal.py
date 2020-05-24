@@ -1,5 +1,5 @@
 # ===========================================================================
-#   topwindow.py -------------------------------------------------------------
+#   twhnormal.py ------------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -10,7 +10,7 @@ import rsvis.utils.imgcontainer
 
 import rsvis.tools.combobox
 import rsvis.tools.settingsbox
-import rsvis.tools.topwindowhist
+from rsvis.tools.topwindow import twhist
 
 import numpy as np
 from tkinter import *
@@ -18,7 +18,7 @@ from tkinter import ttk
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
+class TWHNormal(twhist.TWHist):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -30,7 +30,7 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
         ):
 
         #   settings --------------------------------------------------------
-        super(TopWindowHistNormal, self).__init__(parent, **kwargs)
+        super(TWHNormal, self).__init__(parent, **kwargs)
         
         self._height = Height(param, logger=self._logger)
 
@@ -38,7 +38,7 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
         self._slider_hist_column = 4
-        super(TopWindowHistNormal, self).set_canvas(img, **kwargs)
+        super(TWHNormal, self).set_canvas(img, **kwargs)
         
         self._canvas_hist.grid(row=0, column=1, rowspan=3, columnspan=3, sticky=N+S+W+E)
 
@@ -70,6 +70,10 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
         self._button_open = ttk.Button(self, text="Open PC Normal", 
             command=self.open_normal_cloud_rgb)
         self._button_open.grid(row=3, column=2, columnspan=1, sticky=W+E)
+
+        self._button_hist_proj = ttk.Button(self, text="Mask Image", 
+            command=self.update_proj_hist)
+        self._button_hist_proj.grid(row=3, column=3, columnspan=1, sticky=E+W)
 
         self._button_normal = ttk.Button(self, text="Normal Image", 
             command=self.set_normal_img)
@@ -146,4 +150,4 @@ class TopWindowHistNormal(rsvis.tools.topwindowhist.TopWindowHist):
     # -----------------------------------------------------------------------
     def open_normal_cloud_rgb(self):
         self.update_normal()    
-        self._height.get_normal(self.get_obj().get_img_from_label("height"))        
+        self._height.get_normal(self.get_obj().get_img_from_label("height"))

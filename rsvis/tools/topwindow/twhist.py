@@ -1,5 +1,5 @@
 # ===========================================================================
-#   topwindow.py -------------------------------------------------------------
+#   twhist.py ------------------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -7,14 +7,14 @@
 from rsvis.utils import imgbasictools, imgtools
 
 import rsvis.tools.rescanvas
-import rsvis.tools.topwindow
+from rsvis.tools.topwindow import tw
 
 import numpy as np
 from tkinter import *
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class TopWindowHist(rsvis.tools.topwindow.TopWindow):
+class TWHist(tw.TopWindow):
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -30,7 +30,7 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
         self._slider_hist_rowspan = 1
 
         #   settings --------------------------------------------------------
-        super(TopWindowHist, self).__init__(parent, **kwargs)
+        super(TWHist, self).__init__(parent, **kwargs)
         
         #   key bindings ----------------------------------------------------
         self.bind("<w>", self.key_w)
@@ -41,14 +41,14 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_img(self):
-        super(TopWindowHist, self).set_img()
+        super(TWHist, self).set_img()
         self.set_slider_hist()
         self.update_hist()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
-        super(TopWindowHist, self).set_canvas(img, **kwargs)
+        super(TWHist, self).set_canvas(img, **kwargs)
 
         self.columnconfigure(1, weight=1)
 
@@ -107,6 +107,30 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def update_proj_hist(self, event=None, **kwargs): 
+        self._canvas.set_img(
+            imgtools.get_label_image(
+                self._img, 
+                self.get_obj().get_img_from_label("{label}"), 
+                index=self.get_obj().get_class(index=True),
+                equal=False
+            )
+        )
+                
+        self._canvas_hist.set_img(
+            imgtools.get_histogram(                 
+                imgtools.project_data_to_img(self._img, dtype=np.uint8, factor=255),
+                mask=imgtools.get_mask_image(
+                    self.get_obj().get_img_from_label("{label}"),
+                    index=[self.get_obj().get_class(index=True)],
+                    equal=True
+                ), 
+                logger=self._logger
+            )
+        )
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
         """Show the next image of the given image set."""
         self.set_img()
@@ -121,6 +145,6 @@ class TopWindowHist(rsvis.tools.topwindow.TopWindow):
     # -----------------------------------------------------------------------
     def key_r(self, event, **kwargs):
         """Exit RSVis."""
-        super(TopWindowHist, self).key_r(event, **kwargs)
+        super(TWHist, self).key_r(event, **kwargs)
         self.set_slider_hist()
     

@@ -112,7 +112,7 @@ def get_label_options():
                     index=obj.get_class(index=True),
                     equal=False)
                 )
-        },
+        },       
         { 
             "require" : "label",
             "label" : "Image",
