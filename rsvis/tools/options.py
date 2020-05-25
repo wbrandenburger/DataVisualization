@@ -70,7 +70,7 @@ def get_object_options():
             "command": lambda obj: obj.set_object_boxes(
                 imgcv.get_bbox(
                     obj.get_img_from_label("{label}"), 
-                    obj.get_class(index=True),
+                    obj.get_class(value=False),
                     label=obj.get_class(),
                     margin=10
                 ),
@@ -109,7 +109,7 @@ def get_label_options():
                 imgtools.get_label_image(
                     obj.get_img_from_label("image"), 
                     obj.get_img_from_label("{label}"), 
-                    index=obj.get_class(index=True),
+                    index=obj.get_class(value=False),
                     equal=False)
                 )
         },       
@@ -122,7 +122,7 @@ def get_label_options():
             "command": lambda obj: obj.set_img(imgtools.project_and_stack(
                     imgtools.get_distance_transform(
                         obj.get_img_from_label("{label}"),
-                        index=obj.get_class(index=True),
+                        index=obj.get_class(value=False),
                     ), dtype=np.uint8, factor=255)
                 )
         }

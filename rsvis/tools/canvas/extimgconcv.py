@@ -166,9 +166,9 @@ class ExtendedImgConCv(extimgcv.ExtendedImgCv):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_class(self, index=False, **kwargs):
+    def get_class(self, value=False, **kwargs):
         cl = gu.get_value(self._variables, "class", None)
-        return None if cl is None else cl(index=index)
+        return None if cl is None else cl(value=value)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

@@ -211,6 +211,11 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def get_rough_img(self, rough=3, **kwargs):
+        pass
+    
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def get_normal_img(self, heightmap, bins=None, log=False, **kwargs):
         self.set_normal([heightmap, [], []], **kwargs)
         normalimg = self.read(level="points")["nz"].to_numpy().reshape(self._shape)

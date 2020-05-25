@@ -90,11 +90,11 @@ class RSShowUI():
         self._opener = opener.GeneralOpener(logger=self._logger)
 
         #   comboboxes (mouse behavior/ classes) ----------------------------
-        self._cbox_area = rsvis.tools.combobox.ComboBox(self._root, "Histogram", ["Grid", "Objects"], self.set_area_event)
+        self._cbox_area = rsvis.tools.combobox.ComboBox(self._root, [["Histogram"], [["Grid", "Objects"]], ["Grid"], ["str"]], func=self.set_area_event)
         self._cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
-        self._cbox_class = rsvis.tools.combobox.ComboBox(self._root, "Class", [c["name"] for c in classes], self.set_class )
+        self._cbox_class = rsvis.tools.combobox.ComboBox(self._root, [["Class"], [[c["name"] for c in classes]], [classes[0]["name"]], ["str"]], func=self.set_class)
         self._cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
-        self._cbox_test = rsvis.tools.combobox.ComboBox(self._root, "Test",  ["Histogram", "Normal", "Filter", "Features"], lambda event: None, default=3)
+        self._cbox_test = rsvis.tools.combobox.ComboBox(self._root, [["Test"],  [["Histogram", "Normal", "Filter", "Features"]], ["Features"], ["str"]])
         self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (label image) -------------------------------------
@@ -111,7 +111,7 @@ class RSShowUI():
 
         #   canvas variables ------------------------------------------------
         self._variables = {
-            "class": lambda index=False: self._cbox_class.get(index=index),
+            "class": lambda value=False: self._cbox_class.get(value=value),
             "labelimg": lambda: self._sbox_label_img.get(),
             "heightimg": lambda: self._sbox_height_img.get()
         }
@@ -194,7 +194,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_class(self, event=None):
-        self._cbox_area.set_variable("Objects")
+        self._cbox_area.set_label("Objects")
         self.get_obj().set_label(self._cbox_class.get())
         self.set_area_event()
 
@@ -207,7 +207,7 @@ class RSShowUI():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_area_event(self, event=None):
-        self.get_obj().set_area_event(index=self._cbox_area.get(index=True))
+        self.get_obj().set_area_event(index=["Grid", "Objects"].index(self._cbox_area.get()))
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

@@ -112,7 +112,7 @@ class TWHist(tw.TopWindow):
             imgtools.get_label_image(
                 self._img, 
                 self.get_obj().get_img_from_label("{label}"), 
-                index=self.get_obj().get_class(index=True),
+                index=self.get_obj().get_class(value=False),
                 equal=False
             )
         )
@@ -122,7 +122,7 @@ class TWHist(tw.TopWindow):
                 imgtools.project_data_to_img(self._img, dtype=np.uint8, factor=255),
                 mask=imgtools.get_mask_image(
                     self.get_obj().get_img_from_label("{label}"),
-                    index=[self.get_obj().get_class(index=True)],
+                    index=[self.get_obj().get_class(value=False)],
                     equal=True
                 ), 
                 logger=self._logger
