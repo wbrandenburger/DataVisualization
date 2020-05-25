@@ -14,7 +14,7 @@ import rsvis.tools.rsshowui
 # ---------------------------------------------------------------------------
 def run(
         files, 
-        param_label, 
+        label, 
         param_in,
         param_out=dict(),
         param_classes=list(),
@@ -22,13 +22,13 @@ def run(
         param_show=dict()
     ):
 
-    rsvis.utils.logger.Logger().get_logformat("Start RSVis with the following parameters:", param_label=param_label, param_in=param_in, param_out=param_out, param_classes=param_classes, param_cloud=param_cloud, param_show=param_show)
+    rsvis.utils.logger.Logger().get_logformat("Start RSVis with the following parameters:", param_label=label, param_in=param_in, param_out=param_out, param_classes=param_classes, param_cloud=param_cloud, param_show=param_show)
 
     #   settings ------------------------------------------------------------
     # -----------------------------------------------------------------------
     param_label = [c["label"] for c in param_classes]
     param_color = [c["color"] for c in param_classes]
-    rsio = rsvis.utils.rsioobject.RSIOObject(files, param_label, param_in, param_out, param_show, label=param_label, color=param_color
+    rsio = rsvis.utils.rsioobject.RSIOObject(files, label, param_in, param_out, param_show, label=param_label, color=param_color
     )
 
     ui = rsvis.tools.rsshowui.RSShowUI(
