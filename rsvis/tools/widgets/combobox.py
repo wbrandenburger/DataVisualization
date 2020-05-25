@@ -1,59 +1,70 @@
 # ===========================================================================
-#   settingsbox.py ----------------------------------------------------------
+#   combobox.py -------------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 from tkinter import *
+from tkinter import ttk
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class SettingsBox(Frame):
+class ComboBox(Frame):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __init__(
             self, 
             parent, 
-            sbox=list(), 
-            func=lambda x: None, 
-            button="", 
+            cbox=list(),
+            func=lambda x: None,
             **kwargs
         ):
-        super(SettingsBox, self).__init__(parent, **kwargs)
-        
+        super(ComboBox, self).__init__(parent, **kwargs)
+
         self._func = func
 
-        if button:
-            self._button = Button(self, text=button, command=lambda: self._func())
-            self._button.pack(side=TOP, fill=X)
-
-        self._type = sbox[2] if sbox else list()
-        self._entries = self.makeform(sbox[0], sbox[1]) if sbox else list()
+        self._type = cbox[3] if cbox else list()
+        self._fields = cbox[1]
+        self._entries = self.makeform(cbox[0], cbox[1], cbox[2]) if cbox else list()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def makeform(self, fields, default=list()):
+    def makeform(self, labels, fields, default):
         entries = []
-        for idx, field in enumerate(fields):
+        for idx, label in enumerate(labels):
             row = Frame(self)
-            lab = Label(row, width=16, text=field, anchor='w')
+            lab = Label(row, width=13, text=label, anchor='w')
 
-            ent = Entry(row)
-            ent.bind("<Return>", (lambda event: self._func())) 
-            ent.insert(END, str(default[idx]))
-            row.pack(side=TOP, fill=X, padx=2, pady=2)
+            variable = StringVar(self)
+            variable.set(default[idx])
+            cbox = ttk.Combobox(row, textvariable=variable, values=fields[idx], state="readonly")
+            cbox.bind("<<ComboboxSelected>>", self._func)
+
+            row.pack(side=TOP, fill=X)
             lab.pack(side=LEFT)
-            ent.pack(side=RIGHT, expand=YES, fill=X)
-            entries.append((field, ent))
+            cbox.pack(side=RIGHT, expand=YES, fill=X)
+            entries.append((label, variable))
 
         return entries
-    
+
+        
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get(self, index=0):
-        return eval(self._type[index])(self._entries[index][1].get())
+    def get(self, index=0, value=True):
+        entry = eval(self._type[index])(self._entries[index][1].get())
+        return  entry if value else self._fields[index].index(entry)
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_label(self, choice, index=0):
+        self._entries[index][1].set(choice)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_label(self, index=0):
+        return self._entries[index][1]
+    
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_list(self):

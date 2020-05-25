@@ -8,8 +8,7 @@ from rsvis.utils.height import Height
 from rsvis.utils import imgbasictools, imgtools
 import rsvis.utils.imgcontainer
 
-import rsvis.tools.combobox
-import rsvis.tools.settingsbox
+from rsvis.tools.widgets import csbox, buttonbox
 from rsvis.tools.topwindow import twhist
 
 import cv2
@@ -35,67 +34,30 @@ class TWHFilter(twhist.TWHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
-        self._slider_hist_column = 4
         super(TWHFilter, self).set_canvas(img, **kwargs)
 
-        self._canvas.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=N+S+W+E)        
-        self._canvas_hist.grid(row=0, column=2, rowspan=2, columnspan=2, sticky=N+S+W+E)
+        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median"]], ["Median"], ["str"]], sbox=[["Kernel Size", "Kernel Std"], [5, 1.0, True, 1.0], ["int", "float"]])
+        self._csbox_blur.grid(row=2, column=0, rowspan=3, sticky=N+W+E)
 
-        self._param_image_blur = "Average"
-        self._cbox_image_blur = rsvis.tools.combobox.ComboBox(self, "Blurring",  ["Average", "Gaussian", "Median"], self.update_cbox_image_blur, default=0) # , "Bilateral Filtering"
-        self._cbox_image_blur.grid(row=2, column=0, columnspan=2, sticky=W+E)
+        self._button_normal = buttonbox.ButtonBox(self, bbox=[["Blur Image"], [self.set_image_blur]])
+        self._button_normal.grid(row=2, column=1, rowspan=1, sticky=N+W+E)
 
-        self._param_kernel_size = 5
-        self._sbox_kernel_size = rsvis.tools.settingsbox.SettingsBox(self, ["Kernel Size"], self.update_sbox_kernel_size, default=[self._param_kernel_size])
-        self._sbox_kernel_size.grid(row=3, column=0, sticky=W+E)
-
-        self._param_kernel_std = 1.0
-        self._sbox_kernel_std = rsvis.tools.settingsbox.SettingsBox(self, ["Kernel Std"], self.update_sbox_kernel_std, default=[self._param_kernel_std])
-        self._sbox_kernel_std.grid(row=3, column=1, sticky=W+E)
-
-        self._button_image_blur = ttk.Button(self, text="Blur Image", 
-            command=self.set_image_blur)
-        self._button_image_blur.grid(row=2, column=3, columnspan=1, sticky=W)
-
-        self._button_quit.grid(row=3, column=3, columnspan=1, sticky=W)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def update_cbox_image_blur(self, event=None):
-        self._param_image_blur = self._cbox_image_blur.get()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def update_sbox_kernel_size(self, event=None):
-        self._param_kernel_size = int(self._sbox_kernel_size.get())
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def update_sbox_kernel_std(self, event=None):
-        self._param_kernel_std = float(self._sbox_kernel_std.get())
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def update_image_blur(self):
-        self.update_cbox_image_blur()
-        self.update_sbox_kernel_size()
-        self.update_sbox_kernel_std()
-        self._logger("[CMP] Model: {}".format(self._param_image_blur))
+        self._button_quit.grid(row=6, column=0, columnspan=3, sticky=W+E)
   
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_image_blur(self):
-        self.update_image_blur()
-        
-        self._param_border_type = cv2.BORDER_REFLECT
+        param = self._csbox_blur.get_dict()
+        param["BorderType"] = cv2.BORDER_REFLECT
         
         img = self.get_obj().get_img(show=True)
-        if self._param_image_blur == "Average":
-            img = cv2.boxFilter(img, -1, (self._param_kernel_size, self._param_kernel_size), normalize=True, borderType=self._param_border_type)
-        elif self._param_image_blur == "Gaussian":
-            img = cv2.GaussianBlur(img, (self._param_kernel_size, self._param_kernel_size), self._param_kernel_std, borderType=self._param_border_type)
-        elif self._param_image_blur == "Median":
-            img = cv2.medianBlur(img, self._param_kernel_size)
+        kernel_size = (param["Kernel Size"], param["Kernel Size"])
+        if param["Model"] == "Average":
+            img = cv2.boxFilter(img, -1, kernel_size, normalize=True, borderType=param["BorderType"])
+        elif param["Model"] == "Gaussian":
+            img = cv2.GaussianBlur(img, kernel_size, param["Kernel Std"], borderType=param["BorderType"])
+        elif param["Model"] == "Median":
+            img = cv2.medianBlur(img, kernel_size[0])
         # elif self._param_image_blur == "Bilateral Filtering":
         #     imf = cv2.bilateralFilter(img, 9, 50, 50)
         self.get_obj().set_img(img)

@@ -8,7 +8,7 @@ from rsvis.utils.height import Height
 from rsvis.utils import imgbasictools, imgtools
 import rsvis.utils.imgcontainer
 
-from rsvis.tools.settingsbox import SettingsBox
+from rsvis.tools.widgets import settingsbox
 from rsvis.tools.topwindow import twhist
 
 import cv2
@@ -39,16 +39,16 @@ class TWHFeatures(twhist.TWHist):
         self._canvas.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=N+S+W+E)
         self._canvas_hist.grid(row=0, column=2, rowspan=2, columnspan=2, sticky=N+S+W+E)
 
-        self._sbox_harris = SettingsBox(self, sbox=[["blockSize", "ksize", "k"], [2, 3, 0.04], ["int", "int", "float"]], func=self.create_harris, button="Harris")
+        self._sbox_harris = settingsbox.SettingsBox(self, sbox=[["blockSize", "ksize", "k"], [2, 3, 0.04], ["int", "int", "float"]], func=self.create_harris, button="Harris")
         self._sbox_harris.grid(row=2, column=0, rowspan=4, sticky=W+E)
 
-        self._sbox_shi = SettingsBox(self, sbox=[["maxCorners", "qualityLevel", "minDistance", "blockSize", "k"], [50, 0.01, 3, 3, 0.04], ["int", "float", "float", "int", "float"]], func=self.create_shi, button="Shi")
+        self._sbox_shi = settingsbox.SettingsBox(self, sbox=[["maxCorners", "qualityLevel", "minDistance", "blockSize", "k"], [50, 0.01, 3, 3, 0.04], ["int", "float", "float", "int", "float"]], func=self.create_shi, button="Shi")
         self._sbox_shi.grid(row=2, column=1, rowspan=6, sticky=W+E)
     
-        self._sbox_star = SettingsBox(self, sbox=[["maxSize", "responseThreshold", "lineThresholdProjected", "lineThresholdBinarized", "suppressNonmaxSize"], [40, 30, 10, 8, 5], ["int", "int", "int", "int", "int"]], func=self.create_star, button="STAR")
+        self._sbox_star = settingsbox.SettingsBox(self, sbox=[["maxSize", "responseThreshold", "lineThresholdProjected", "lineThresholdBinarized", "suppressNonmaxSize"], [40, 30, 10, 8, 5], ["int", "int", "int", "int", "int"]], func=self.create_star, button="STAR")
         self._sbox_star.grid(row=2, column=2, rowspan=6, sticky=W+E)
 
-        self._sbox_sift = SettingsBox(self, sbox=[["nfeatures", "nOctaveLayers", "contrastThreshold", "edgeThreshold", "sigma"], [0, 3, 0.04, 10, 1.6], ["int", "int", "float", "int", "float"]], func=self.create_sift, button="SIFT")
+        self._sbox_sift = settingsbox.SettingsBox(self, sbox=[["nfeatures", "nOctaveLayers", "contrastThreshold", "edgeThreshold", "sigma"], [0, 3, 0.04, 10, 1.6], ["int", "int", "float", "int", "float"]], func=self.create_sift, button="SIFT")
         self._sbox_sift.grid(row=2, column=3, rowspan=6, sticky=W+E)
 
         self._button_quit.grid(row=8, column=0, columnspan=5, sticky=W+E)

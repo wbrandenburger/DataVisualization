@@ -4,8 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-from rsvis.tools.combobox import ComboBox
-from rsvis.tools.settingsbox import SettingsBox
+from rsvis.tools.widgets import combobox, settingsbox
 
 from tkinter import *
 
@@ -24,9 +23,9 @@ class CSBox(Frame):
     ):
         super(CSBox, self).__init__(parent, **kwargs)
 
-        self._cbox = ComboBox(self, cbox=cbox, **kwargs)
+        self._cbox = combobox.ComboBox(self, cbox=cbox, **kwargs)
         self._cbox.pack(side=TOP, fill=X)
-        self._sbox = SettingsBox(self, sbox=sbox, **kwargs)
+        self._sbox = settingsbox.SettingsBox(self, sbox=sbox, **kwargs)
         self._sbox.pack(side=TOP, fill=X)
 
     #   method --------------------------------------------------------------

@@ -10,11 +10,9 @@ from rsvis.utils import opener, imgtools
 import rsvis.utils.logger
 import rsvis.utils.yaml
 
-import rsvis.tools.combobox
 import rsvis.tools.rscanvasframe
-import rsvis.tools.settingsbox
+from rsvis.tools.widgets import settingsbox, combobox, widgets
 from rsvis.tools.topwindow import tw, twhist, twhnormal, twhfilter, twhfeatures
-import rsvis.tools.widgets
 
 from tkinter import *
 import numpy as np
@@ -90,23 +88,23 @@ class RSShowUI():
         self._opener = opener.GeneralOpener(logger=self._logger)
 
         #   comboboxes (mouse behavior/ classes) ----------------------------
-        self._cbox_area = rsvis.tools.combobox.ComboBox(self._root, [["Histogram"], [["Grid", "Objects"]], ["Grid"], ["str"]], func=self.set_area_event)
+        self._cbox_area = combobox.ComboBox(self._root, [["Histogram"], [["Grid", "Objects"]], ["Grid"], ["str"]], func=self.set_area_event)
         self._cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
-        self._cbox_class = rsvis.tools.combobox.ComboBox(self._root, [["Class"], [[c["name"] for c in classes]], [classes[0]["name"]], ["str"]], func=self.set_class)
+        self._cbox_class = combobox.ComboBox(self._root, [["Class"], [[c["name"] for c in classes]], [classes[0]["name"]], ["str"]], func=self.set_class)
         self._cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
-        self._cbox_test = rsvis.tools.combobox.ComboBox(self._root, [["Test"],  [["Histogram", "Normal", "Filter", "Features"]], ["Features"], ["str"]])
+        self._cbox_test =combobox.ComboBox(self._root, [["Test"],  [["Histogram", "Normal", "Filter", "Features"]], ["Features"], ["str"]])
         self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (label image) -------------------------------------
-        self._sbox_label_img = rsvis.tools.settingsbox.SettingsBox(self._root, sbox=[["Label Image"], ["label"], ["str"]])
+        self._sbox_label_img = settingsbox.SettingsBox(self._root, sbox=[["Label Image"], ["label"], ["str"]])
         self._sbox_label_img.grid(row=4, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (label image) -------------------------------------
-        self._sbox_height_img = rsvis.tools.settingsbox.SettingsBox(self._root, sbox=[["Height Image"], ["height"], ["str"]])
+        self._sbox_height_img = settingsbox.SettingsBox(self._root, sbox=[["Height Image"], ["height"], ["str"]])
         self._sbox_height_img.grid(row=5, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (grid) --------------------------------------------
-        self._sbox_grid = rsvis.tools.settingsbox.SettingsBox(self._root, sbox=[["Dimension x (Grid)", "Dimension y (Grid)"], show["grid"], ["int", "int"]], func=self.set_grid)
+        self._sbox_grid = settingsbox.SettingsBox(self._root, sbox=[["Dimension x (Grid)", "Dimension y (Grid)"], show["grid"], ["int", "int"]], func=self.set_grid)
         self._sbox_grid.grid(row=6, column=0, sticky=N+W+S+E)
 
         #   canvas variables ------------------------------------------------
@@ -128,14 +126,14 @@ class RSShowUI():
         filemenu.add_command(label="Open", command=lambda: self.open(self.get_img_path()))
         filemenu.add_command(label="Save", command=lambda obj=self.get_obj(), img_out=self._data.get_img_out(): img_out(obj.get_img_path(), obj.get_img(), prefix=obj.get_img_spec()))
         filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=rsvis.tools.widgets.quit)
+        filemenu.add_command(label="Exit", command=widgets.quit)
         self._menubar.add_cascade(label="File", menu=filemenu)
 
         #   menubar "Options"
-        rsvis.tools.widgets.add_option_menu(self._menubar, self._options, self._root, self.get_obj())
+        widgets.add_option_menu(self._menubar, self._options, self._root, self.get_obj())
 
         #   menubar "Information"
-        rsvis.tools.widgets.add_info_menu(self._menubar, self._root, self._root, lambda obj=self: self.show_help())
+        widgets.add_info_menu(self._menubar, self._root, self._root, lambda obj=self: self.show_help())
 
         self._root.config(menu=self._menubar)
 
