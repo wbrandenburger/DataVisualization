@@ -12,7 +12,15 @@ class ComboBox(Frame):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, parent, label, fields, func, default=0, **kwargs):
+    def __init__(
+            self, 
+            parent, 
+            label, 
+            fields, 
+            func, 
+            default=0, 
+            **kwargs
+        ):
         Frame.__init__(self, parent, **kwargs)
 
         self.makeform(label, fields, default=default)

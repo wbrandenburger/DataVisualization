@@ -98,15 +98,15 @@ class RSShowUI():
         self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (label image) -------------------------------------
-        self._sbox_label_img = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Label Image"], lambda event: None, default=["label"])
+        self._sbox_label_img = rsvis.tools.settingsbox.SettingsBox(self._root, sbox=[["Label Image"], ["label"], ["str"]])
         self._sbox_label_img.grid(row=4, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (label image) -------------------------------------
-        self._sbox_height_img = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Height Image"], lambda event: None, default=["height"])
+        self._sbox_height_img = rsvis.tools.settingsbox.SettingsBox(self._root, sbox=[["Height Image"], ["height"], ["str"]])
         self._sbox_height_img.grid(row=5, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (grid) --------------------------------------------
-        self._sbox_grid = rsvis.tools.settingsbox.SettingsBox(self._root,  ["Dimension x (Grid)", "Dimension y (Grid)"],  self.set_grid, default=show["grid"])
+        self._sbox_grid = rsvis.tools.settingsbox.SettingsBox(self._root, sbox=[["Dimension x (Grid)", "Dimension y (Grid)"], show["grid"], ["int", "int"]], func=self.set_grid)
         self._sbox_grid.grid(row=6, column=0, sticky=N+W+S+E)
 
         #   canvas variables ------------------------------------------------
@@ -200,11 +200,8 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_grid(self, entries):
-        grid = [0, 0]
-        for index, entry in enumerate(entries):
-            grid[index]  = int(entry[1].get())
-        self.get_obj().set_grid(grid)
+    def set_grid(self):
+        self.get_obj().set_grid(self._sbox_grid.get_list())
         self.create_image()
 
     #   method --------------------------------------------------------------
