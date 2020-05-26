@@ -21,7 +21,8 @@ class ButtonBox(Frame):
         ):
         super(ButtonBox, self).__init__(parent, **kwargs)
 
-        self.makeform(bbox[0], bbox[1])
+        if bbox:
+            self.makeform(bbox[0], bbox[1])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

@@ -71,7 +71,7 @@ def get_object_options():
                 imgcv.get_bbox(
                     obj.get_img_from_label("{label}"), 
                     obj.get_class(value=False),
-                    label=obj.get_class(),
+                    label=obj.get_class(value=True),
                     margin=10
                 ),
                 append=False

@@ -92,7 +92,7 @@ class RSShowUI():
         self._cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
         self._cbox_class = combobox.ComboBox(self._root, [["Class"], [[c["name"] for c in classes]], [classes[0]["name"]], ["str"]], func=self.set_class)
         self._cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
-        self._cbox_test =combobox.ComboBox(self._root, [["Test"],  [["Histogram", "Normal", "Filter", "Features"]], ["Features"], ["str"]])
+        self._cbox_test =combobox.ComboBox(self._root, [["Test"],  [["Histogram", "Normal", "Filter", "Features"]], ["Filter"], ["str"]])
         self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (label image) -------------------------------------
