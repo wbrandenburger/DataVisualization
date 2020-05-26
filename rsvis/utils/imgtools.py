@@ -43,8 +43,31 @@ def get_volume(array):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def bool_img_to_uint8(img):
-    return img.astype(np.uint8)*255
+def bool_img_to_uint8(img, factor=255):
+    return img.astype(np.uint8)*factor
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def img_to_bool(img, inverted=False):
+    img = np.where(img>0, 1, 0).astype(np.uint8)
+    return img if not inverted else invert_bool_img(img) 
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def invert_bool_img(img):
+    img = np.where(img==0, 1, 0).astype(np.uint8)
+    return img
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def bool_to_img(img, color=[1., 1., 1.], dtype=np.float32, factor=1., value=0):
+    img = img.astype(dtype)
+    color = [c/factor for c in color]
+
+    img_list = list()
+    for idx, c in enumerate(color):
+        img_list.append(np.where(img==0, value, c))
+    return np.stack(img_list, axis=2)*factor
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -107,6 +130,17 @@ def project_dict_to_img(obj, dtype=np.float32, factor=1.0):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def zeros_from_img(img, dtype=None, **kwargs):
+    dtype = img.dtype if dtype is None else dtype
+    return zeros_from_shape(img.shape, dtype=dtype, **kwargs)
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def zeros_from_shape(shape, value=0, dtype=np.float32):
+    return np.zeros(shape, dtype=dtype) + value
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def get_histogram(img, mask=None, logger=None):    
     fig = Figure(figsize=(5, 4), dpi=100)
     # A canvas must be manually attached to the figure (pyplot would automatically do it).  This is done by instantiating the canvas with the figure as argument https://matplotlib.org/gallery/user_interfaces/canvasagg.html#sphx-glr-gallery-user-interfaces-canvasagg-py
@@ -121,6 +155,7 @@ def get_histogram(img, mask=None, logger=None):
 
     log_mean = "[MEAN]"
     log_std = "[STD]"
+
     for channel, col in enumerate(color):
         hist_channel = cv2.calcHist([img], [channel], mask, [256], [0,256]) / get_area(img)
         ax.plot(hist_channel, color=col)
@@ -282,12 +317,12 @@ def draw_box(img, shape, boxes, color=[255, 255, 255], dtype=np.uint8):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_transparent_image(img, method="any", dtype=np.uint8):
+def get_transparent_image(img, method="any", value=255, dtype=np.uint8):
     # Creating RGBA images
     # https://pythoninformer.com/python-libraries/numpy/numpy-and-images/
     alpha_img = np.zeros((img.shape[0], img.shape[1], 4), dtype=np.int16)
     alpha_img[:, :, 0:3] = img
     if method=="any":
-        alpha_img[:,:,3] = np.where(np.sum(img, axis=2)>=0, 255, 0)
+        alpha_img[:,:,3] = np.where(np.sum(img, axis=2)>=0, value, 0)
     alpha_img = alpha_img.astype(dtype)
     return alpha_img

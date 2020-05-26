@@ -38,11 +38,11 @@ class TWHNormal(twhist.TWHist):
     def set_canvas(self, img, **kwargs):
         super(TWHNormal, self).set_canvas(img, **kwargs)
 
-        self._csbox_normal = csbox.CSBox(self, cbox=[["Local Model"], [["LS", "TRI", "QUADRIC"]], ["LS"], ["str"]], sbox=[["Radius", "Normal bins", "Log", "Height factor"], [6.0, 16, True, 1.0], ["float", "int", "bool", "float"]])
-        self._csbox_normal.grid(row=2, column=0, rowspan=5, sticky=N+W+E)
+        self._csbox_normal = csbox.CSBox(self, cbox=[["Local Model"], [["LS", "TRI", "QUADRIC"]], ["LS"], ["str"]], sbox=[["Radius", "Normal bins", "Log", "Height factor"], [6.0, 16, 1, 1.0], ["float", "int", "int", "float"]])
+        self._csbox_normal.grid(row=2, column=0, rowspan=5, sticky=N+W+E+S)
 
-        self._button_normal = buttonbox.ButtonBox(self, bbox=[["Open PC", "Open PC Normal", "Mask Image", "Normal Image", "Binned Image"], [self.open_normal_cloud, self.open_normal_cloud_rgb, self.update_proj_hist, self.set_normal_img, self.set_binned_normal_img]])
-        self._button_normal.grid(row=2, column=1, rowspan=5, sticky=N+W+E)
+        self._button_normal = buttonbox.ButtonBox(self, bbox=[["Open PC", "Open PC Normal", "Normal Image", "Binned Image"], [self.open_normal_cloud, self.open_normal_cloud_rgb, self.set_normal_img, self.set_binned_normal_img]])
+        self._button_normal.grid(row=2, column=1, rowspan=4, sticky=N+W+E+S)
 
         self._button_quit.grid(row=7, column=0, columnspan=3, sticky=W+E)
 
@@ -62,7 +62,7 @@ class TWHNormal(twhist.TWHist):
         param = self._csbox_normal.get_dict()
         normalimg = self._height.get_normal_img(self.get_obj().get_img_from_label("height"), log=param["Log"], factor=param["Height factor"])
 
-        self.get_obj().set_img(normalimg)
+        self.get_obj().set_img(normalimg, clear_mask=False)
         self.set_img()
 
     #   method --------------------------------------------------------------
@@ -73,7 +73,7 @@ class TWHNormal(twhist.TWHist):
         param = self._csbox_normal.get_dict()
         normalimg = self._height.get_normal_img(self.get_obj().get_img_from_label("height"), log=param["Log"], factor=param["Height factor"], bins=param["Normal bins"])
 
-        self.get_obj().set_img(normalimg)
+        self.get_obj().set_img(normalimg, clear_mask=False)
         self.set_img()
         
     #   method --------------------------------------------------------------

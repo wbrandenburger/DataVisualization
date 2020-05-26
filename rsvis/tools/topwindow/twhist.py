@@ -81,7 +81,7 @@ class TWHist(tw.TopWindow):
     # -----------------------------------------------------------------------
     def update_hist(self, event=None, **kwargs):
         self._canvas_hist.set_img(
-            imgtools.get_histogram(self._canvas.get_img(show=True), logger=self._logger)
+            imgtools.get_histogram(self._canvas.get_img(show=True), mask=self.get_obj().get_mask(), logger=self._logger)
         )
 
     #   method --------------------------------------------------------------
@@ -101,33 +101,10 @@ class TWHist(tw.TopWindow):
     def update_img_linear_transformation(self, event):
         self._canvas.set_img(
             imgbasictools.get_linear_transformation(self._img, self._param_hist_mean, self._param_hist_std, logger=self._logger
-            )
+            ),
+            clear_mask=False
         )
         self.update_hist()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def update_proj_hist(self, event=None, **kwargs): 
-        self._canvas.set_img(
-            imgtools.get_label_image(
-                self._img, 
-                self.get_obj().get_img_from_label("{label}"), 
-                index=self.get_obj().get_class(value=False),
-                equal=False
-            )
-        )
-                
-        self._canvas_hist.set_img(
-            imgtools.get_histogram(                 
-                imgtools.project_data_to_img(self._img, dtype=np.uint8, factor=255),
-                mask=imgtools.get_mask_image(
-                    self.get_obj().get_img_from_label("{label}"),
-                    index=[self.get_obj().get_class(value=False)],
-                    equal=True
-                ), 
-                logger=self._logger
-            )
-        )
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

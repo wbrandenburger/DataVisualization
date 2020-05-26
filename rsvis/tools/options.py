@@ -105,12 +105,12 @@ def get_label_options():
             "name" : "Projection",
             "key" : None,
             "description": "Show the mask of one label in current image.",
-            "command": lambda obj: obj.set_img(
-                imgtools.get_label_image(
-                    obj.get_img_from_label("image"), 
+            "command": lambda obj: obj.set_mask(
+                imgtools.get_mask_image(
                     obj.get_img_from_label("{label}"), 
-                    index=obj.get_class(value=False),
-                    equal=False)
+                    index=obj.get_class(value=False)
+                    ),
+                    invert=True
                 )
         },       
         { 
@@ -178,7 +178,7 @@ def get_basic_options():
             "name" : "Shadow Detection",
             "key" : None,
             "description": "Automatic shadow detection in aerial and terrestrial images.",
-            "command": lambda obj: obj.set_img(
+            "command": lambda obj: obj.set_mask(
                 sd.shadowDetection_Santos_KH(
                     obj.get_img()
                     )

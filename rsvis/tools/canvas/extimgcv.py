@@ -93,8 +93,8 @@ class ExtendedImgCv(imgcv.ImgCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_img(self, img):
-        super(ExtendedImgCv, self).set_img(img)
+    def set_img(self, img, **kwargs):
+        super(ExtendedImgCv, self).set_img(img, **kwargs)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -109,7 +109,7 @@ class ExtendedImgCv(imgcv.ImgCanvas):
         #   draw selection --------------------------------------------------
         for selection in self._selection.keys():
             if self._selection[selection]:
-                img_assembly =  imgtools.draw_box(img_assembly, [], self.get_selection(selection), self._selection_color, dtype=np.int16)
+                img_assembly = imgtools.draw_box(img_assembly, [], self.get_selection(selection), self._selection_color, dtype=np.int16)
 
         #   consider alpha channel
         if self._channel_flag:

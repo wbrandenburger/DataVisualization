@@ -60,5 +60,5 @@ class TWHFilter(twhist.TWHist):
             img = cv2.medianBlur(img, kernel_size[0])
         # elif self._param_image_blur == "Bilateral Filtering":
         #     imf = cv2.bilateralFilter(img, 9, 50, 50)
-        self.get_obj().set_img(img)
+        self.get_obj().set_img(img, clear_mask=False)
         self.set_img()
