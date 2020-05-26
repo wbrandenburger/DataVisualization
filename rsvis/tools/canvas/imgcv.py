@@ -29,10 +29,10 @@ class ImgCanvas(Canvas):
         super(ImgCanvas, self).__init__(parent)
         self.bind("<Configure>", self.resize_image)
 
-        self._mask = list()
+        self._mask = [None]
         self._mask_alpha = 200
-        self._mask_color = [0,0,0]
-        self._mask = False
+        self._mask_color = [[0,0,0]]
+        self._mask_invert = [False]
         
         self._shift = shift
         self._scale = [1.0, 1.0]
@@ -163,20 +163,20 @@ class ImgCanvas(Canvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_mask(self, mask=None, show=True, alpha=200, color=[0,0,0], invert=False):
-        self._mask = mask
+        self._mask = mask if isinstance(mask, list) else [mask]
         self._mask_alpha = alpha
-        self._mask_color = color
-        self._mask_invert= invert
+        self._mask_color = color if isinstance(color[0], list) else [color]
+        self._mask_invert= invert if isinstance(invert, list) else [invert]
         if show:
             self.create_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_mask(self, resize=False):
-        if isinstance(self._mask, np.ndarray):
-            return np.asarray(Image.fromarray(self._mask).resize(self.get_size())) if resize else self._mask
+        if isinstance(self._mask[0], np.ndarray):
+            return np.asarray(Image.fromarray(self._mask[0]).resize(self.get_size())) if resize else self._mask[0]
         else:
-            return self._mask
+            return self._mask[0]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -222,17 +222,17 @@ class ImgCanvas(Canvas):
             imgtools.get_transparent_image(self.draw_image(), value=200))
         self._img_draw.paste(image, (0, 0), image)
 
-        if isinstance(self._mask, np.ndarray):
-            mask = self.get_mask(resize=True).astype(np.int16)
-            if self._mask_invert:
-                mask = imgtools.invert_bool_img(mask)
-            mask = Image.fromarray(
-                imgtools.get_transparent_image(
-                    imgtools.bool_to_img(mask, value=-1, dtype=np.int16, color=self._mask_color, factor=255)
-                    ,value=self._mask_alpha
+        if isinstance(self._mask[0], np.ndarray):
+            for mask, color, invert in zip(self._mask, self._mask_color, self._mask_invert) :
+                mask = self.get_mask(resize=True)
+                mask = mask if not invert else imgtools.invert_bool_img(mask)
+                mask = Image.fromarray(
+                    imgtools.get_transparent_image(
+                        imgtools.bool_to_img(mask, value=-1, dtype=np.int16, color=color, factor=255)
+                        ,value=self._mask_alpha
+                    )
                 )
-            )
-            self._img_draw.paste(mask, (0, 0), mask)
+                self._img_draw.paste(mask, (0, 0), mask)
         
         self._img_canvas = ImageTk.PhotoImage(image=self._img_draw)
         super(ImgCanvas, self).create_image(0, 0, image=self._img_canvas, anchor=NW)
