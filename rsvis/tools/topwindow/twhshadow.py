@@ -11,7 +11,7 @@ import rsvis.utils.imgcontainer
 import rsvis.shadow.shdwDetection as sd
 
 from rsvis.tools.widgets import csbox, buttonbox, scalebox
-from rsvis.tools.topwindow import twhfilter
+from rsvis.tools.topwindow import tw,twhfilter
 
 from scipy.cluster.vq import vq, kmeans, kmeans2, whiten
 
@@ -128,29 +128,17 @@ class TWHShadow(twhfilter.TWHFilter):
         param_edges = self._csbox_edges.get_dict()
         param_hough = self._csbox_hough.get_dict()
 
-        img = self.get_obj().get_img()
+        img = self.get_obj().get_img(show=True)
         grayimg= cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         
+        images = list()
+
         edges = cv2.Canny(grayimg, param_edges["Threshold I"], param_edges["Threshold II"], apertureSize=param_edges["Aperture Size"])
     
-        # lines = cv2.HoughLines(edges,1,np.pi/180,50)
-        # for blubb in lines:
-        #     for rho,theta in blubb:
-        #         a = np.cos(theta)
-        #         b = np.sin(theta)
-        #         x0 = a*rho
-        #         y0 = b*rho
-        #         x1 = int(x0 + 1000*(-b))
-        #         y1 = int(y0 + 1000*(a))
-        #         x2 = int(x0 - 1000*(-b))
-        #         y2 = int(y0 - 1000*(a))
-
-        #         cv2.line(img,(x1,y1),(x2,y2),(0,0,255),2)   
-
         lines = cv2.HoughLinesP(edges, 1, np.pi/180, param_hough["Threshold"],minLineLength=param_hough["Minimum Line Length"], maxLineGap=param_hough["Maximum Line Gap"])
 
         for line in lines:
             x1, y1, x2, y2 = line[0]
             cv2.line(img, (x1, y1), (x2, y2), (0, 0, 128), 1)
 
-        self.get_obj().set_img(img, clear_mask=True)        
+        tw.TopWindow(self, title="Hough Transform", dtype="img", value=[edges, img], q_cmd=self._q_cmd)

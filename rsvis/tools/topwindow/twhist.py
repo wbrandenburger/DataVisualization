@@ -31,7 +31,8 @@ class TWHist(tw.TopWindow):
 
         #   settings --------------------------------------------------------
         super(TWHist, self).__init__(parent, **kwargs)
-        
+        self.rowconfigure(1, weight=1)
+
         #   key bindings ----------------------------------------------------
         self.bind("<w>", self.key_w)
         self.bind("<s>", self.key_s)

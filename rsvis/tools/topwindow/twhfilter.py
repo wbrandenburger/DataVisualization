@@ -9,7 +9,7 @@ from rsvis.utils import imgtools
 import rsvis.utils.imgcontainer
 
 from rsvis.tools.widgets import csbox, buttonbox, scalebox
-from rsvis.tools.topwindow import twhist
+from rsvis.tools.topwindow import tw, twhist
 
 import cv2
 import numpy as np
@@ -128,9 +128,9 @@ class TWHFilter(twhist.TWHist):
     def get_edges(self):
         param = self._csbox_edges.get_dict()
 
-        img = self.get_obj().get_img()
+        img = self.get_obj().get_img(show=True)
         grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         edges = cv2.Canny(grayimg, param["Threshold I"], param["Threshold II"], apertureSize=param["Aperture Size"])
 
-        self.get_obj().set_img(edges, clear_mask=True)   
+        tw.TopWindow(self, title="Edges", dtype="img", value=edges, q_cmd=self._q_cmd)

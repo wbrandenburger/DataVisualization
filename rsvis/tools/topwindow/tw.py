@@ -7,9 +7,10 @@
 from rsvis.utils import imgtools
 import rsvis.utils.imgcontainer
 
-from rsvis.tools.canvas import extimgcv, extimgconcv
+from rsvis.tools.canvas import imgcv, extimgcv, extimgconcv
 from rsvis.tools.widgets import widgets
 
+import math
 import numpy as np
 from tkinter import ttk
 from tkinter import *
@@ -66,7 +67,7 @@ class TopWindow(Toplevel):
         #   main image window -----------------------------------------------
         if dtype=="msg":
             self.set_msg(value)
-        elif dtype=="img":
+        elif dtype=="img":          
             self.set_canvas(value, **canvas)
         
         #   menubar (Options) -----------------------------------------------
@@ -115,17 +116,33 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, value, **kwargs):
-        self._img = value
+
         if isinstance(value, rsvis.utils.imgcontainer.ImgListContainer):
             self._canvas = extimgconcv.ExtendedImgConCv(self, logger=self._logger, **kwargs)
             self._canvas.set_img_container(value)
             self._img = self._canvas.get_img()
-        else:
+            self._canvas.grid(row=0, column=0, sticky=N+S+W+E)
+        elif isinstance(value, np.ndarray):
             self._canvas = extimgcv.ExtendedImgCv(self)
             self._canvas.set_img(value)
+            self._img = self._canvas.get_img()
+            self._canvas.grid(row=0, column=0, sticky=N+S+W+E)
+        elif isinstance(value, list):
+            dim = math.ceil(math.sqrt(len(value)))
+            grid = np.indices((dim, dim))
+            grid_y = grid[0].reshape(dim**2)
+            grid_x = grid[1].reshape(dim**2)
+            
+            self._canvas = list()
+            for idx, img in enumerate(value):
+                self._canvas.append(imgcv.ImgCanvas(self, logger=self._logger, **kwargs))
+                self._canvas[-1].set_img(img)
 
-        self._canvas.grid(row=0, column=0, sticky=N+S+W+E)
-
+                self._canvas[-1].grid(row=grid_y[idx], column=grid_x[idx], sticky=N+S+W+E)
+                
+                self.rowconfigure(grid_y[idx], weight=1)
+                self.columnconfigure(grid_x[idx], weight=1)
+                
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_r(self, event, **kwargs):
@@ -137,5 +154,3 @@ class TopWindow(Toplevel):
     def key_q(self, event, **kwargs):
         """Exit RSVis."""
         self._q_cmd()
-
-    
