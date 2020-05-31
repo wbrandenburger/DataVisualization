@@ -16,7 +16,7 @@ class SettingsBox(Frame):
             self, 
             parent, 
             sbox=list(), 
-            func=lambda x: None, 
+            func=lambda x=None: None, 
             button="", 
             **kwargs
         ):
@@ -34,13 +34,15 @@ class SettingsBox(Frame):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def makeform(self, labels, default=list()):
+        vcmd = (self.register(self.callback))
+
         entries = []
-        for idx, label in enumerate(labels):
+        for idx, (label, dtype) in enumerate(zip(labels, self._type)):
             row = Frame(self)
             lab = Label(row, width=16, text=label, anchor='w')
 
-            ent = Entry(row)
-            ent.bind("<Return>", (lambda event: self._func())) 
+            ent = Entry(row, validate="all", validatecommand=(vcmd, "%P", dtype))
+            ent.bind("<Return>", (lambda x=None: self._func())) 
             ent.insert(END, str(default[idx]))
             row.pack(side=TOP, fill=X)
             lab.pack(side=LEFT)
@@ -78,5 +80,15 @@ class SettingsBox(Frame):
             field = entry[0]
             text  = eval(dtype)(entry[1].get())
             entry_str = "{} {}: {}".format(entry_str, field, text)
-            
         return entry_str
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def callback(self, P, dtype):
+        if dtype=="int":
+            if str.isdigit(P) or P=="":
+                return True
+            else:
+                return False
+        else:
+            return True

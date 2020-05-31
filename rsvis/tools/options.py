@@ -3,7 +3,7 @@
 # ===========================================================================    
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-from rsvis.utils import imgtools, imgbasictools, imgcv
+from rsvis.utils import imgtools, imgcv
 from rsvis.utils.height import Height
 
 import rsvis.shadow.shdwDetection as sd
@@ -148,7 +148,7 @@ def get_basic_options():
             "key" : None,
             "description": "Convert the current image to a grayscale image.",
             "command": lambda obj: obj.set_img(
-                imgbasictools.get_gray_image(
+                imgtools.get_gray_image(
                     obj.get_img()
                 )
             )
@@ -160,7 +160,7 @@ def get_basic_options():
             "key" : None,
             "description": "Invert the current image.",
             "command": lambda obj: obj.set_img(
-                imgbasictools.get_inverted_image(
+                imgtools.get_inverted_image(
                     obj.get_img(show=True)
                 )
             )
@@ -172,7 +172,7 @@ def get_basic_options():
             "key" : None,
             "description": "Manipulate the current image.",
             "command": lambda obj: obj.set_img(
-                imgbasictools.get_linear_transformation(
+                imgtools.get_linear_transformation(
                     obj.get_img(),
                     dm=20,
                     ds=10,
@@ -180,16 +180,16 @@ def get_basic_options():
                 )
             )
         },
-        { 
-            "require" : "label",
-            "label" : "Image",
-            "name" : "Shadow Detection",
-            "key" : None,
-            "description": "Automatic shadow detection in aerial and terrestrial images.",
-            "command": lambda obj: obj.set_mask(
-                sd.shadowDetection(obj.get_img())[0]
-            )
-        }               
+        # { 
+        #     "require" : "label",
+        #     "label" : "Image",
+        #     "name" : "Shadow Detection",
+        #     "key" : None,
+        #     "description": "Automatic shadow detection in aerial and terrestrial images.",
+        #     "command": lambda obj: obj.set_mask(
+        #         sd.shadowDetection(obj.get_img())[0]
+        #     )
+        # }               
     ]
 
 #   function ----------------------------------------------------------------

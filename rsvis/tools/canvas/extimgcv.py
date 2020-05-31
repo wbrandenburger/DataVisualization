@@ -37,7 +37,7 @@ class ExtendedImgCv(imgcv.ImgCanvas):
         self._grid_flag = 1
         self._grid_bboxes = None
         self._grid_color = [150, 100, 150]
-        self._grid_default = [3, 3]
+        self._grid_default = [1, 1]
         self.set_grid(grid=grid)
 
         #   selection -------------------------------------------------------
@@ -124,7 +124,7 @@ class ExtendedImgCv(imgcv.ImgCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_grid(self, grid=list()):
-        self._grid = grid if grid else self._grid_default
+        self._grid = grid if grid and grid[0] != 0 and grid[1] != 0 else self._grid_default
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

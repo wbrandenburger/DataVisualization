@@ -5,7 +5,7 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 from rsvis.utils.height import Height
-from rsvis.utils import imgbasictools, imgtools
+from rsvis.utils import imgtools
 import rsvis.utils.imgcontainer
 
 from rsvis.tools.widgets import csbox, buttonbox

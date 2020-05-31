@@ -4,7 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-from rsvis.utils import imgbasictools, imgtools
+from rsvis.utils import imgtools
 
 from rsvis.tools.canvas import imgcv
 from rsvis.tools.topwindow import tw
@@ -100,7 +100,7 @@ class TWHist(tw.TopWindow):
     # -----------------------------------------------------------------------
     def update_img_linear_transformation(self, event):
         self._canvas.set_img(
-            imgbasictools.get_linear_transformation(self._img, self._param_hist_mean, self._param_hist_std, logger=self._logger
+            imgtools.get_linear_transformation(self._img, self._param_hist_mean, self._param_hist_std, logger=self._logger
             ),
             clear_mask=False
         )

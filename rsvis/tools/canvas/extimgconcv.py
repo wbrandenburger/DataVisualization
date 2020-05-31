@@ -128,7 +128,12 @@ class ExtendedImgConCv(extimgcv.ExtendedImgCv):
             return
 
         label = label.format(**{"label": self.get_labelimg(), "height": self.get_heightimg()})
-        return self._img_container.get_img_from_label(label).data
+
+        item = self._img_container.get_img_from_label(label)
+        if item is not None:
+            return self._img_container.get_img_from_label(label).data
+        else:
+            raise ValueError("Label '{}' does not exist in current image container.".format(label))
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

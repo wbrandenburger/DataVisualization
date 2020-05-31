@@ -17,7 +17,7 @@ class ComboBox(Frame):
             self, 
             parent, 
             cbox=list(),
-            func=lambda x: None,
+            func=lambda x=None: None,
             **kwargs
         ):
         super(ComboBox, self).__init__(parent, **kwargs)

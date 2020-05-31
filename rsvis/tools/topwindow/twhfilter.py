@@ -5,7 +5,7 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 from rsvis.utils.height import Height
-from rsvis.utils import imgbasictools, imgtools
+from rsvis.utils import imgtools
 import rsvis.utils.imgcontainer
 
 from rsvis.tools.widgets import csbox, buttonbox, scalebox
@@ -78,7 +78,7 @@ class TWHFilter(twhist.TWHist):
         param = self._scbox_threshold.get_dict()
         thresh = cv2.THRESH_BINARY if param["Thresh"] else cv2.THRESH_BINARY + cv2.THRESH_OTSU
         
-        ret, dst = cv2.threshold(imgbasictools.get_gray_image(self._img), param["Thresh"], 255, thresh)
+        ret, dst = cv2.threshold(imgtools.get_gray_image(self._img), param["Thresh"], 255, thresh)
 
         self._logger("Simple Thresholding with thresh: {}".format(ret))
         
@@ -92,7 +92,7 @@ class TWHFilter(twhist.TWHist):
             param_method = cv2.ADAPTIVE_THRESH_MEAN_C
         elif param["adaptiveMethod"] == "Gaussian":
             param_method = cv2.ADAPTIVE_THRESH_GAUSSIAN_C
-        dst	= cv2.adaptiveThreshold(imgbasictools.get_gray_image(self._img), 255,  param_method, cv2.THRESH_BINARY, param["blockSize"], param["C"])
+        dst	= cv2.adaptiveThreshold(imgtools.get_gray_image(self._img), 255,  param_method, cv2.THRESH_BINARY, param["blockSize"], param["C"])
 
         self.set_threshold_mask(dst)
 

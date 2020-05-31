@@ -4,7 +4,7 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-from rsvis.utils import imgbasictools, imgtools
+from rsvis.utils import imgtools
 import rsvis.utils.imgcontainer
 
 from rsvis.tools.canvas import extimgcv, extimgconcv
