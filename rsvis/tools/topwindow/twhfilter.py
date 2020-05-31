@@ -36,8 +36,11 @@ class TWHFilter(twhist.TWHist):
     def set_canvas(self, img, **kwargs):
         super(TWHFilter, self).set_canvas(img, **kwargs)
 
-        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median", "Bilateral Filtering"]], ["Median"], ["str"]], sbox=[["Kernel Size", "Sigma", "Diameter", "Sigma Color", "Sigma Space"], [5, 1.0, 7, 100, 500], ["int", "float", "int", "int", "int"]], bbox=[["Blur Image"], [self.set_image_blur]])
+        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median", "Bilateral Filtering"]], ["Median"], ["str"]], sbox=[["Kernel Size", "Sigma", "Diameter", "Sigma Color", "Sigma Space"], [5, 2.3, 7, 100, 500], ["int", "float", "int", "int", "int"]], bbox=[["Blur Image"], [self.get_image_blur]])
         self._csbox_blur.grid(row=2, column=0, rowspan=7, sticky=N+W+E)
+
+        self._csbox_edges = csbox.CSBox(self, bbox=[["Get Edges"], [self.get_edges]], sbox=[["Threshold I", "Threshold II", "Aperture Size"], [50, 150, 3], ["int", "int", "int"]])
+        self._csbox_edges.grid(row=9, column=0, rowspan=4, sticky=N+W+E)
 
         self._scbox_threshold = scalebox.ScaleBox(self, scbox=[["Thresh"], [[0, 255, 2, 0]], ["int"]],  orient=HORIZONTAL, func=self.set_simple_threshold, button="Simple Thresholding") 
         self._scbox_threshold.grid(row=2, column=1, rowspan=2, sticky=N+W+S+E)
@@ -45,11 +48,11 @@ class TWHFilter(twhist.TWHist):
         self._csbox_threshold = csbox.CSBox(self, cbox=[["adaptiveMethod"], [["Mean", "Gaussian"]], ["Gaussian"], ["str"]], sbox=[["blockSize", "C"], [5, 2], ["int", "int"]], bbox=[["Adaptive Thresholding"], [self.set_adaptive_thresholding]])
         self._csbox_threshold.grid(row=4, column=1, rowspan=3, sticky=N+W+S+E)
 
-        self._button_quit.grid(row=9, column=0, columnspan=3, sticky=W+E)
+        self._button_quit.grid(row=13, column=0, columnspan=3, sticky=W+E)
   
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_image_blur(self):
+    def get_image_blur(self):
         param = self._csbox_blur.get_dict()
         param["BorderType"] = cv2.BORDER_REFLECT
         
@@ -118,4 +121,16 @@ class TWHFilter(twhist.TWHist):
         
         self.get_obj().set_mask(mask=mask_list, color=mask_color
         , invert=mask_invert, alpha=mask_alpha, show=True)
-        self.update_hist()        
+        self.update_hist()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_edges(self):
+        param = self._csbox_edges.get_dict()
+
+        img = self.get_obj().get_img()
+        grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        edges = cv2.Canny(grayimg, param["Threshold I"], param["Threshold II"], apertureSize=param["Aperture Size"])
+
+        self.get_obj().set_img(edges, clear_mask=True)   

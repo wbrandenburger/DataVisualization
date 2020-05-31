@@ -36,9 +36,6 @@ class TWHShadow(twhfilter.TWHFilter):
         super(TWHShadow, self).__init__(parent, **kwargs)
 
         self._centroids = list()
-        
-
-        #self._img_whiten = whiten(img)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -47,19 +44,21 @@ class TWHShadow(twhfilter.TWHFilter):
 
         self._csbox_threshold.grid_forget()
 
-        self._csbox_centroids = csbox.CSBox(self, bbox=[["Reset Centroids", "Set Centroids", "Compute Centroids"], [self.reset_centroids, self.set_centroids, self.get_centroids]], sbox=[["Centroids"], [3], ["int"]])
-        self._csbox_centroids.grid(row=4, column=1, rowspan=4, sticky=W+E)
+        self._csbox_centroids = csbox.CSBox(self, bbox=[["Reset Centroids", "Set Centroids", "Compute Centroids (Color)", "Compute Centroids (Color+Space)"], [self.reset_centroids, self.set_centroids, self.get_centroids_color, self.get_centroids_color_space]], sbox=[["Centroids"], [3], ["int"]])
+        self._csbox_centroids.grid(row=4, column=1, rowspan=5, sticky=W+E)
 
-        self._csbox_shadow = csbox.CSBox(self, bbox=[["Detect Shadow"], [self.get_shadow]], cbox=[["Image"], [[0,1,2]], [0], ["int"]])
-        self._csbox_shadow.grid(row=8, column=1, rowspan=2, sticky=N+W+E)
+        # self._csbox_shadow = csbox.CSBox(self, bbox=[["Detect Shadow"], [self.get_shadow]], cbox=[["Image"], [[0, 1, 2]], [0], ["int"]])
+        # self._csbox_shadow.grid(row=9, column=1, rowspan=2, sticky=N+W+E)
 
-        self._button_quit.grid(row=10, column=0, columnspan=3, sticky=W+E)
+        self._csbox_hough = csbox.CSBox(self, bbox=[["Hough Transform"], [self.get_hough_transform]], sbox=[["Threshold", "Minimum Line Length","Maximum Line Gap"], [40, 40, 40], ["int", "int", "int"]])
+        self._csbox_hough.grid(row=10, column=1, rowspan=1, sticky=N+W+E)
+
+        self._button_quit.grid(row=14, column=0, columnspan=3, sticky=W+E)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_shadow(self, event=None):
         pass
-
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -73,10 +72,26 @@ class TWHShadow(twhfilter.TWHFilter):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_centroids(self, event=None):
-        self._centroids_img = self.get_obj().get_img()
-        self._centroids_img_shape = (self._centroids_img.shape[0], self._centroids_img.shape[1]) 
+    def get_centroids_color(self, event=None):
+        img = self.get_obj().get_img(show=True).astype(np.float)
+        self._centroids_img_shape = (img.shape[0], img.shape[1]) 
 
+        data = whiten(img.reshape((-1,3)))
+        self.get_centroids(data)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_centroids_color_space(self, event=None):
+        img = self.get_obj().get_img(show=True).astype(np.float)
+        self._centroids_img_shape = (img.shape[0], img.shape[1]) 
+
+        grid = np.indices((self._centroids_img_shape), dtype=np.float)
+        data = whiten(np.stack([img[...,0], img[...,1], img[...,2], grid[0], grid[1]], axis=2).reshape((-1,5)))
+        self.get_centroids(data)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_centroids(self, data, event=None):     
         if not self._centroids:
             number = self._csbox_centroids.get_dict()["Centroids"]
             codes = number
@@ -85,18 +100,17 @@ class TWHShadow(twhfilter.TWHFilter):
             number = len(self._centroids)
             codes = np.stack(self._centroids, axis=0).astype(np.float)
             minit = "matrix"
-        
-        centroids, label = kmeans2(self._centroids_img.reshape((-1,3)).astype(np.float), codes, minit=minit)
+
+        centroids, label = kmeans2(data, codes, minit=minit)
         label = label.reshape(self._centroids_img_shape)
 
         mask_list = [np.where(label==idx, 1, 0).astype(np.uint8) for idx in range(len(centroids))]
         mask_color = np.random.randint(0, 255, number*3, dtype=np.uint8).reshape((number,3)).tolist()
-        mask_alpha = [100]*number
+        mask_alpha = [150]*number
         mask_invert = [False]*number
 
         self.get_obj().set_mask(mask=mask_list, color=mask_color
         , invert=mask_invert, alpha=mask_alpha, show=True)
-        # self._centroids.append(self.get_obj()._mouse_img)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -107,14 +121,36 @@ class TWHShadow(twhfilter.TWHFilter):
     # -----------------------------------------------------------------------
     def set_centroids(self, event=None):
         self._centroids.append(self.get_obj()._data_img[self.get_obj()._mouse_img[0], self.get_obj()._mouse_img[1], :])
-        print(self._centroids)
-        # param_shdw = self._csbox_shadow.get_dict()
-        # param_blur = self._csbox_blur.get_dict()
 
-        # img = self.get_obj().get_img_from_label("image")
-        
-        
-        # shdwimg_list = sd.shadowDetection(img, d=param_blur["Diameter"], sigmaColor= param_blur["Sigma Color"], sigmaSpace=param_blur["Sigma Space"], logger=self._logger)
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_hough_transform(self, event=None):
+        param_edges = self._csbox_edges.get_dict()
+        param_hough = self._csbox_hough.get_dict()
 
-        # self.get_obj().set_img(shdwimg_list[param_shdw["Image"]])
-        # self.set_img()
+        img = self.get_obj().get_img()
+        grayimg= cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        edges = cv2.Canny(grayimg, param_edges["Threshold I"], param_edges["Threshold II"], apertureSize=param_edges["Aperture Size"])
+    
+        # lines = cv2.HoughLines(edges,1,np.pi/180,50)
+        # for blubb in lines:
+        #     for rho,theta in blubb:
+        #         a = np.cos(theta)
+        #         b = np.sin(theta)
+        #         x0 = a*rho
+        #         y0 = b*rho
+        #         x1 = int(x0 + 1000*(-b))
+        #         y1 = int(y0 + 1000*(a))
+        #         x2 = int(x0 - 1000*(-b))
+        #         y2 = int(y0 - 1000*(a))
+
+        #         cv2.line(img,(x1,y1),(x2,y2),(0,0,255),2)   
+
+        lines = cv2.HoughLinesP(edges, 1, np.pi/180, param_hough["Threshold"],minLineLength=param_hough["Minimum Line Length"], maxLineGap=param_hough["Maximum Line Gap"])
+
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            cv2.line(img, (x1, y1), (x2, y2), (0, 0, 128), 1)
+
+        self.get_obj().set_img(img, clear_mask=True)        
