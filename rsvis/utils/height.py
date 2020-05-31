@@ -8,6 +8,7 @@ import rsvis.utils.general as gu
 from rsvis.utils import imgio, imgtools, opener, ply
 import rsvis.utils.logger
 
+import cv2
 import numpy as np
 import pandas
 import tempfile
@@ -237,7 +238,7 @@ class Height():
                 normalimg_binned += np.where(np.logical_and(normalimg>limit, normalimg<=i), limit, 0.)
                 limit = i
             normalimg = normalimg_binned + np.where(normalimg>limit, limit, 0.)
-
+        
         return normalimg
 
     #   method --------------------------------------------------------------

@@ -1,54 +1,57 @@
 # ===========================================================================
-#   settingsbox.py ----------------------------------------------------------
+#   scalebox.py -----------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 from tkinter import *
+from tkinter import ttk
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-class SettingsBox(Frame):
+class ScaleBox(Frame):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def __init__(
             self, 
             parent, 
-            sbox=list(), 
-            func=lambda x: None, 
-            button="", 
+            scbox=list(),
+            func=lambda x: None,
+            button="",
+            orient=HORIZONTAL,
             **kwargs
         ):
-        super(SettingsBox, self).__init__(parent, **kwargs)
-        
+        super(ScaleBox, self).__init__(parent, **kwargs)
+
         self._func = func
+
+        self._orient = orient
 
         if button:
             self._button = Button(self, text=button, command=lambda: self._func())
             self._button.pack(side=TOP, fill=X)
 
-        self._type = sbox[2] if sbox else list()
-        self._entries = self.makeform(sbox[0], sbox[1]) if sbox else list()
+        self._type = scbox[2] if scbox else list()
+        self._entries = self.makeform(scbox[0], scbox[1]) if scbox else list()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def makeform(self, labels, default=list()):
+    def makeform(self, labels, params):
         entries = []
-        for idx, label in enumerate(labels):
+        for label, param in zip(labels, params):
             row = Frame(self)
             lab = Label(row, width=16, text=label, anchor='w')
 
-            ent = Entry(row)
-            ent.bind("<Return>", (lambda event: self._func())) 
-            ent.insert(END, str(default[idx]))
+            sli = Scale(row, from_=param[0], to=param[1], orient=self._orient, command=lambda event: self._func(), resolution=param[2], showvalue=0)
+            sli.set(param[3]) 
             row.pack(side=TOP, fill=X)
             lab.pack(side=LEFT)
-            ent.pack(side=RIGHT, expand=YES, fill=X)
-            entries.append((label, ent))
-            
+            sli.pack(side=RIGHT, expand=YES, fill=X)
+            entries.append((label, sli))
+
         return entries
-    
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get(self, index=0):

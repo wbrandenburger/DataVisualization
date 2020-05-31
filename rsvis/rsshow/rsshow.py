@@ -19,10 +19,11 @@ def run(
         param_out=dict(),
         param_classes=list(),
         param_cloud=dict(),
+        param_vis=dict(),
         param_show=dict()
     ):
 
-    rsvis.utils.logger.Logger().get_logformat("Start RSVis with the following parameters:", param_label=label, param_in=param_in, param_out=param_out, param_classes=param_classes, param_cloud=param_cloud, param_show=param_show)
+    rsvis.utils.logger.Logger().get_logformat("Start RSVis with the following parameters:", param_label=label, param_in=param_in, param_out=param_out, param_classes=param_classes, param_cloud=param_cloud, param_vis=param_vis, param_show=param_show)
 
     #   settings ------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -38,7 +39,7 @@ def run(
         ), 
         classes = param_classes,
         objects = rsio,
-        param={"cloud": param_cloud},
+        param={"cloud": param_cloud, "vis": param_vis},
         show=param_show
     )
 

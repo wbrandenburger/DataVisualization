@@ -8,7 +8,7 @@ from rsvis.utils.height import Height
 from rsvis.utils import imgbasictools, imgtools
 import rsvis.utils.imgcontainer
 
-from rsvis.tools.widgets import csbox, buttonbox
+from rsvis.tools.widgets import csbox, buttonbox, scalebox
 from rsvis.tools.topwindow import twhist
 
 import cv2
@@ -36,17 +36,16 @@ class TWHFilter(twhist.TWHist):
     def set_canvas(self, img, **kwargs):
         super(TWHFilter, self).set_canvas(img, **kwargs)
 
-        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median"]], ["Median"], ["str"]], sbox=[["Kernel Size", "Kernel Std"], [5, 1.0, True, 1.0], ["int", "float"]], bbox=[["Blur Image"], [self.set_image_blur]])
-        self._csbox_blur.grid(row=2, column=0, rowspan=4, sticky=N+W+E)
+        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median", "Bilateral Filtering"]], ["Median"], ["str"]], sbox=[["Kernel Size", "Sigma", "Diameter", "Sigma Color", "Sigma Space"], [5, 1.0, 7, 100, 500], ["int", "float", "int", "int", "int"]], bbox=[["Blur Image"], [self.set_image_blur]])
+        self._csbox_blur.grid(row=2, column=0, rowspan=7, sticky=N+W+E)
+
+        self._scbox_threshold = scalebox.ScaleBox(self, scbox=[["Thresh"], [[0, 255, 2, 0]], ["int"]],  orient=HORIZONTAL, func=self.set_simple_threshold, button="Simple Thresholding") 
+        self._scbox_threshold.grid(row=2, column=1, rowspan=2, sticky=N+W+S+E)
 
         self._csbox_threshold = csbox.CSBox(self, cbox=[["adaptiveMethod"], [["Mean", "Gaussian"]], ["Gaussian"], ["str"]], sbox=[["blockSize", "C"], [5, 2], ["int", "int"]], bbox=[["Adaptive Thresholding"], [self.set_adaptive_thresholding]])
-        self._csbox_threshold.grid(row=2, column=1, rowspan=3, sticky=N+W+E)
+        self._csbox_threshold.grid(row=4, column=1, rowspan=3, sticky=N+W+S+E)
 
-        self._slider_threshold = Scale(self, label="Threshold", from_=0, to=255, orient=HORIZONTAL, command=self.set_threshold, resolution=2) 
-        self._slider_threshold.set(0)
-        self._slider_threshold.grid(row=6, column=0, columnspan=3, sticky=W+E)
-
-        self._button_quit.grid(row=7, column=0, columnspan=3, sticky=W+E)
+        self._button_quit.grid(row=9, column=0, columnspan=3, sticky=W+E)
   
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -59,20 +58,27 @@ class TWHFilter(twhist.TWHist):
         if param["Model"] == "Average":
             img = cv2.boxFilter(img, -1, kernel_size, normalize=True, borderType=param["BorderType"])
         elif param["Model"] == "Gaussian":
-            img = cv2.GaussianBlur(img, kernel_size, param["Kernel Std"], borderType=param["BorderType"])
+            # https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#gaabe8c836e97159a9193fb0b11ac52cf1
+            img = cv2.GaussianBlur(img, kernel_size, param["Kernel Size"], borderType=param["BorderType"])
         elif param["Model"] == "Median":
+            # https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#ga564869aa33e58769b4469101aac458f9
             img = cv2.medianBlur(img, kernel_size[0])
-        # elif self._param_image_blur == "Bilateral Filtering":
-        #     imf = cv2.bilateralFilter(img, 9, 50, 50)
+        elif param["Model"] == "Bilateral Filtering":
+            # https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#ga9d7064d478c95d60003cf839430737ed
+            img = cv2.bilateralFilter(img, param["Diameter"], param["Sigma Color"], param["Sigma Space"])
         self.get_obj().set_img(img, clear_mask=False)
         self.set_img()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_threshold(self, event=None):
-        param = self._slider_threshold.get()
-        _, dst = cv2.threshold(imgbasictools.get_gray_image(self._img), param, 255, cv2.THRESH_BINARY)
+    def set_simple_threshold(self, event=None, otsu=False):
+        param = self._scbox_threshold.get_dict()
+        thresh = cv2.THRESH_BINARY if param["Thresh"] else cv2.THRESH_BINARY + cv2.THRESH_OTSU
+        
+        ret, dst = cv2.threshold(imgbasictools.get_gray_image(self._img), param["Thresh"], 255, thresh)
 
+        self._logger("Simple Thresholding with thresh: {}".format(ret))
+        
         self.set_threshold_mask(dst)
 
     #   method --------------------------------------------------------------
@@ -94,20 +100,22 @@ class TWHFilter(twhist.TWHist):
         dst_inv = imgtools.invert_bool_img(dst)
 
         mask = self.get_obj().get_mask(index=0)
+
+        if not isinstance(mask, np.ndarray):
+            mask = imgtools.zeros_from_shape(dst.shape, value=1, dtype=np.uint8)
+
         mask_list = [mask] if isinstance(mask, np.ndarray) else list()
-        if isinstance(mask, np.ndarray):
-            mask_list.extend([np.where(np.logical_and(dst_inv==1, mask!=0), 1, 0)]) #, np.where(np.logical_and(dst==1, mask!=0), 1, 0)]) 
-        # else: 
-        #     mask_list.extend([dst_inv])
+        mask_list.extend([np.where(np.logical_and(dst_inv==1, mask!=0), 1, 0).astype(np.uint8)]) 
 
-            mask_color = [[0, 0, 0]] if isinstance(mask, np.ndarray) else list()
-            mask_color.extend([[0, 0, 255]])#, [0,255,0]])
-            
-            mask_alpha = [200] if isinstance(mask, np.ndarray) else list()
-            mask_alpha.extend([75])#, 75])
+        mask_color = [[0, 0, 0]] if isinstance(mask, np.ndarray) else list()
+        mask_color.extend([[255, 255, 0]])
+        
+        mask_alpha = [150] if isinstance(mask, np.ndarray) else list()
+        mask_alpha.extend([75])
 
-            mask_invert = [True] if isinstance(mask, np.ndarray) else list()
-            mask_invert.extend([False])#, False])
-            
-            self.get_obj().set_mask(mask=mask_list, color=mask_color, invert=mask_invert, alpha=mask_alpha, show=True)
-
+        mask_invert = [True] if isinstance(mask, np.ndarray) else list()
+        mask_invert.extend([False])
+        
+        self.get_obj().set_mask(mask=mask_list, color=mask_color
+        , invert=mask_invert, alpha=mask_alpha, show=True)
+        self.update_hist()        

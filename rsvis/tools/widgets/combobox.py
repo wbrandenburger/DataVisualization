@@ -25,7 +25,7 @@ class ComboBox(Frame):
         self._func = func
 
         self._type = cbox[3] if cbox else list()
-        self._fields = cbox[1]
+        self._fields = cbox[1] if cbox else list()
         self._entries = self.makeform(cbox[0], cbox[1], cbox[2]) if cbox else list()
 
     #   method --------------------------------------------------------------
@@ -34,7 +34,7 @@ class ComboBox(Frame):
         entries = []
         for idx, label in enumerate(labels):
             row = Frame(self)
-            lab = Label(row, width=13, text=label, anchor='w')
+            lab = Label(row, width=16, text=label, anchor='w')
 
             variable = StringVar(self)
             variable.set(default[idx])

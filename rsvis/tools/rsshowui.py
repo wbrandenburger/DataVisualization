@@ -11,8 +11,9 @@ import rsvis.utils.logger
 import rsvis.utils.yaml
 
 import rsvis.tools.rscanvasframe
+import rsvis.tools.keys
 from rsvis.tools.widgets import settingsbox, combobox, widgets
-from rsvis.tools.topwindow import tw, twhist, twhnormal, twhfilter, twhfeatures
+from rsvis.tools.topwindow import tw, twhist, twhnormal, twhfilter, twhfeatures, twhshadow
 
 from tkinter import *
 import numpy as np
@@ -92,7 +93,7 @@ class RSShowUI():
         self._cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
         self._cbox_class = combobox.ComboBox(self._root, [["Class"], [[c["name"] for c in classes]], [classes[0]["name"]], ["str"]], func=self.set_class)
         self._cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
-        self._cbox_test =combobox.ComboBox(self._root, [["Test"],  [["Histogram", "Normal", "Filter", "Features"]], ["Filter"], ["str"]])
+        self._cbox_test =combobox.ComboBox(self._root, [["Test"],  [self._param["vis"]["test_menu"]], [self._param["vis"]["test"]], ["str"]])
         self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
 
         #   settingsboxes (label image) -------------------------------------
@@ -183,6 +184,8 @@ class RSShowUI():
                     t = twhfilter.TWHFilter(self._root, **kwargs)
                 elif self._cbox_test.get() == "Features":
                     t = twhfeatures.TWHFeatures(self._root, **kwargs)
+                elif self._cbox_test.get() == "Shadow":
+                    t = twhshadow.TWHShadow(self._root, **kwargs)                    
             else:
                 t = tw.TopWindow(self._root, **kwargs)
         else:

@@ -14,7 +14,10 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 
 from rsvis.shadow.smoothing import *
 
-def isShadow(K_R, K_G, K_B):
+def isShadow(K):
+	K_R = K[2]
+	K_G = K[1]
+	K_B = K[0]
 
 	# Property 1: tal*K_H^80 < K_H < eta*K_H^20
 	if K_R < 1.59 or K_R > 48.44:
@@ -45,134 +48,46 @@ def isShadow(K_R, K_G, K_B):
 	return True
 
 
-def shadowDetection_Santos_KH(imgIn):
+def shadowDetection(img, d=7, sigmaColor=700, sigmaSpace=25, logger=None):
 
-	rows = imgIn.shape[0]
-	cols = imgIn.shape[1]
-
-	mask = np.zeros((3,3), dtype=float)
-
-	mask[0,0] = -1.0
-	mask[0,1] = -1.0
-	mask[0,2] = -1.0
-	mask[1,0] = -1.0
-	mask[1,1] = 32.0
-	mask[1,2] = -1.0
-	mask[2,0] = -1.0
-	mask[2,1] = -1.0
-	mask[2,2] = -1.0
-
-
-	imgOut = np.zeros((rows, cols), dtype=np.uint8)
-	shadowMatrix = np.full((rows, cols), 0, dtype=float)
-	I_band = np.zeros((rows, cols), dtype=np.uint8)
-
-	np.zeros((rows, cols), dtype=np.uint8)
+	dtype = cv2.CV_32F
 	
-	# to gray, implement easy function for transfer
-	for l in range(rows):
-		for c in range(cols):
-			R = imgIn.item(l,c,2)
-			G = imgIn.item(l,c,1)
-			B = imgIn.item(l,c,0)
+	grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	grayimg = cv2.bilateralFilter(grayimg, d, sigmaColor, sigmaSpace)
 
-
-			# Compute components S and I from HSI system - values between 0 and 255
-			I  = (0.33333333) * (R + G + B)
-			
-			I_band[l,c] = I
-
-	# https://docs.opencv.org/master/d4/d13/tutorial_py_filtering.html
-	# https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#ga9d7064d478c95d60003cf839430737ed
-	w = 7
-	gray = cv2.bilateralFilter(I_band, w, 700, 25) 
-	shadowMatrix = sg.convolve(gray,mask)/8.0
-
-	normalizedImg = cv2.normalize(shadowMatrix  , 0, 255, cv2.NORM_MINMAX)
-	# cv2.namedWindow( "Display window", cv2.WINDOW_NORMAL )
-	# cv2.imshow("Display window", normalizedImg)
-	# while True:
-	# 	key = chr(cv2.waitKeyEx(1) & 0xFF)
-	# 	if key=="q":
-	# 		break
-	# cv2.destroyAllWindows() 
-	threshold = np.mean(gray)
+	shdwimg = cv2.filter2D(
+		grayimg, 
+		dtype, 
+		np.array(
+			[[-1., -1., -1.], [-1., 32., -1.], [-1., -1., -1.]], 
+			dtype=float
+		)/8., 
+		borderType= cv2.BORDER_CONSTANT)
+	normshdwimg = cv2.normalize(shdwimg, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
 	
-	R_medio_nonShdw = 0.0
-	G_medio_nonShdw = 0.0
-	B_medio_nonShdw = 0.0
-	count = 0.0
-	for l in range(2,rows-2):
-		for c in range(2,cols-2):
-			# Shadow candidates (value 255) are values below the threshold
-			if shadowMatrix[l,c] > threshold*1.3:
+	if logger is not None:
+		logger("Shadw value: {}".format(np.mean(grayimg)*1.3))
+	no_shadow_mask = np.logical_and(shdwimg>np.mean(grayimg)*1.3, grayimg>255/2)
+	medio_nonShdw = np.sum(np.where(np.stack([no_shadow_mask]*3, axis=2), img, [0,0,0]), axis=(0, 1))
 
-				# Compute the average R,G,B values from the original image only on shadow-free areas.
-				if gray[l,c] > 255/2:
-					R_medio_nonShdw += imgIn.item(l,c,2)
-					G_medio_nonShdw += imgIn.item(l,c,1)
-					B_medio_nonShdw += imgIn.item(l,c,0)
-					count += 1.0
-			else:
-				imgOut[l,c] = 255
+	imgOut = np.where(no_shadow_mask, 0, 255).astype(np.uint8)
+	count = np.count_nonzero(no_shadow_mask)
 
-	# imgOut2 is a copy of imgOut
-	imgOut2 = np.copy(imgOut)
-	
-	# Just in case there are shadow-free pixels
-	if count > 0:
-		R_medio_nonShdw = R_medio_nonShdw / count
-		G_medio_nonShdw = G_medio_nonShdw / count
-		B_medio_nonShdw = B_medio_nonShdw / count
+	# # Just in case there are shadow-free pixels
+	# if count:
+	# 	# Checking on shadow-free areas, verifying the K_H property with windows of size 3
+	# 	kernel =  np.array([[1., 1., 1.], [1., 1., 1.], [1., 1., 1.]], dtype=float)
+	# 	kernel = kernel/np.sum(kernel)
 
-		K_R = 0.0
-		K_G = 0.0
-		K_B = 0.0
+	# 	imgtarget = cv2.filter2D(imgOut, dtype, kernel, borderType= cv2.BORDER_CONSTANT)
+	# 	imgsum = cv2.filter2D(img, dtype, kernel, borderType= cv2.BORDER_CONSTANT)
 
-		# Checking on shadow-free areas, verifying the K_H property with windows of size 3
-		for l in range(2,rows-2):
-			for c in range(2,cols-2):
-					
-				R_med = 0.0
-				G_med = 0.0
-				B_med = 0.0
+	# 	imgtarget_verified = np.where(np.logical_or(imgtarget==1, imgtarget==0), True, False)
+	# 	imgsum_med = np.divide(np.power(medio_nonShdw/count+14, 2.4), np.power(imgsum+14, 2.4))
+	# 	imgOut = np.where(np.logical_and(imgtarget_verified, np.apply_along_axis(isShadow, 2, imgsum_med)), 255, imgOut)
 
-				# All pixels from the window below must belong to the same target
-				# in order to apply the shadow verification process.
-				allSameTarget = True
-				target = imgOut[l,c]
-				for ll in range(-1,2):
-					for cc in range(-1,2):
-						if imgOut[l+ll, c+cc] != target:
-							allSameTarget = False
-						else:
-							B_med += imgIn[l+ll, c+cc, 0]
-							G_med += imgIn[l+ll, c+cc, 1]
-							R_med += imgIn[l+ll, c+cc, 2]
+	# imgOut = cv2.morphologyEx(imgOut, cv2.MORPH_CLOSE,  cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3)))
 
-				
-				# Verify the K_H
-				# if case they are from the same target
-				if allSameTarget == True:
-					# Calcula os componentes K_H
-					R_med = R_med / 9.0
-					G_med = G_med / 9.0
-					B_med = B_med / 9.0
-
-					K_R=((R_medio_nonShdw+14)**2.4) / ((R_med+14)**2.4)
-					K_G=((G_medio_nonShdw+14)**2.4) / ((G_med+14)**2.4)
-					K_B=((B_medio_nonShdw+14)**2.4) / ((B_med+14)**2.4)
-
-					# Case the value belong to a shadow, then label it
-					if isShadow(K_R, K_G, K_B) == True:
-						imgOut2[l,c] = 255
-					
-
-
-	strElem = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3)) # Structuring element is a circle
-	imgOut2 = cv2.morphologyEx(imgOut2, cv2.MORPH_CLOSE, strElem)
-
-	return imgOut2
-
+	return (imgOut, shdwimg, normshdwimg)
 		
 

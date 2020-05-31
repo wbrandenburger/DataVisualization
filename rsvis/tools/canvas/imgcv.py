@@ -30,7 +30,7 @@ class ImgCanvas(Canvas):
         self.bind("<Configure>", self.resize_image)
 
         self._mask = [None]
-        self._mask_alpha = [200]
+        self._mask_alpha = [150]
         self._mask_color = [[0,0,0]]
         self._mask_invert = [False]
         
@@ -48,7 +48,8 @@ class ImgCanvas(Canvas):
         self._mouse_box = [0, 0, 0, 0]
         self._mouse_point = [0, 0]
         self._mouse_event = [0, 0]
-
+        self._mouse_img = [0, 0]
+        
         self._keys = dict()
         
         self.bind("<Button-1>", self.mouse_button_1_pressed)
@@ -162,7 +163,7 @@ class ImgCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_mask(self, mask=None, show=True, alpha=200, color=[0,0,0], invert=False):
+    def set_mask(self, mask=None, show=True, alpha=150, color=[0,0,0], invert=False):
         self._mask = mask if isinstance(mask, list) else [mask]
         self._mask_alpha = alpha  if isinstance(alpha, list) else [alpha]
         self._mask_color = color if isinstance(color[0], list) else [color]
@@ -172,11 +173,18 @@ class ImgCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_mask(self, index=0, resize=False):
-        if isinstance(self._mask[index], np.ndarray):
-            return np.asarray(Image.fromarray(self._mask[index]).resize(self.get_size())) if resize else self._mask[index]
+    def get_mask(self, index=None, resize=False):
+        if index is None:
+            mask = self._mask[0]
+            for idx in range(1, len(self._mask)):
+                if isinstance(self._mask[idx], np.ndarray):
+                    mask = np.where(np.logical_and(mask, self._mask[idx]), 1, 0).astype(np.uint8)
+            return mask
         else:
-            return self._mask[index]
+            if isinstance(self._mask[index], np.ndarray):
+                return np.asarray(Image.fromarray(self._mask[index]).resize(self.get_size())) if resize else self._mask[index]
+            else:
+                return self._mask[index]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -218,10 +226,6 @@ class ImgCanvas(Canvas):
     def create_image(self, **kwargs):
         self._img_draw = self._img.resize(self.get_size())
 
-        image = Image.fromarray(
-            imgtools.get_transparent_image(self.draw_image(), value=200))
-        self._img_draw.paste(image, (0, 0), image)
-
         if isinstance(self._mask[0], np.ndarray):
             for idx, (mask, color, alpha, invert) in enumerate(zip(self._mask, self._mask_color, self._mask_alpha, self._mask_invert)):
                 mask = self.get_mask(index=idx, resize=True)
@@ -233,6 +237,10 @@ class ImgCanvas(Canvas):
                     )
                 )
                 self._img_draw.paste(mask, (0, 0), mask)
+
+        image = Image.fromarray(
+            imgtools.get_transparent_image(self.draw_image(), value=200))
+        self._img_draw.paste(image, (0, 0), image)
         
         self._img_canvas = ImageTk.PhotoImage(image=self._img_draw)
         super(ImgCanvas, self).create_image(0, 0, image=self._img_canvas, anchor=NW)
@@ -257,9 +265,9 @@ class ImgCanvas(Canvas):
         self._mouse_event = self.resize_event(event)
         self._mouse_box = self.get_event_box(event)
 
-        mouse_img = self.resize_points(self._mouse_event, inversion=True)[0]
+        self._mouse_img = self.resize_points(self._mouse_event, inversion=True)[0]
 
-        self._logger("[MOUSE] Pixel: {},  Value: {}".format(mouse_img,
-            self._data_img[mouse_img[0], mouse_img[1], :]
+        self._logger("[MOUSE] Pixel: {},  Value: {}".format(self._mouse_img,
+            self._data_img[self._mouse_img[0], self._mouse_img[1], :]
             )
         )

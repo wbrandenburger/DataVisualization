@@ -91,7 +91,15 @@ def get_general_options():
             "key" : None,
             "description": "Raise the contrast of the currently displayed image.",
             "command": lambda obj: obj.set_img(imgtools.raise_contrast(obj.get_img()))
-        }
+        },
+        { 
+            "require" : "image",
+            "label" : "Image",
+            "name" : "Colormap",
+            "key" : "Control-c",
+            "description": "Pseudocolor a grayscale image.",
+            "command": lambda obj: obj.set_img(imgtools.apply_colormap(obj.get_img()))
+        }        
     ]
 
 #   function ----------------------------------------------------------------
@@ -179,10 +187,8 @@ def get_basic_options():
             "key" : None,
             "description": "Automatic shadow detection in aerial and terrestrial images.",
             "command": lambda obj: obj.set_mask(
-                sd.shadowDetection_Santos_KH(
-                    obj.get_img()
-                    )
-                )
+                sd.shadowDetection(obj.get_img())[0]
+            )
         }               
     ]
 

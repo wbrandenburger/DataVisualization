@@ -276,6 +276,20 @@ def get_connected_components(img, connectivity=8):
     # num_labels, labels, stats, centroids =  cv2.connectedComponentsWithStats(img, connectivity, cv2.CV_32S)
     return cv2.connectedComponentsWithStats(img, connectivity, cv2.CV_32S)
 
+# #   function ----------------------------------------------------------------
+# # ---------------------------------------------------------------------------
+# def get_distance_transform(labelimg, label=0, index=None, threshold=10):
+#     labelimg = reduce_image_dim(labelimg)
+
+#     if index is not None:
+#         label = np.unique(labelimg)[index]
+
+#     mask_class = ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=True).astype(float))
+#     mask_non_class = ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=False).astype(float))
+
+#     distanceimg = np.where(mask_class < threshold, mask_class, threshold) - np.where(mask_non_class < threshold, mask_non_class, threshold)
+#     return distanceimg
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_distance_transform(labelimg, label=0, index=None, threshold=10):
@@ -286,9 +300,7 @@ def get_distance_transform(labelimg, label=0, index=None, threshold=10):
 
     mask_class = ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=True).astype(float))
     mask_non_class = ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=False).astype(float))
-
-    distanceimg = np.where(mask_class < threshold, mask_class, threshold) - np.where(mask_non_class < threshold, mask_non_class, threshold)
-    return distanceimg
+    return mask_non_class
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -326,3 +338,14 @@ def get_transparent_image(img, method="any", value=255, dtype=np.uint8):
         alpha_img[:,:,3] = np.where(np.sum(img, axis=2)>=0, value, 0)
     alpha_img = alpha_img.astype(dtype)
     return alpha_img
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def apply_colormap(img, colormap=cv2.COLORMAP_JET):
+    if not len(img.shape)==2 and img.shape[2]>1:
+        return img
+
+    if not isinstance(img.dtype, np.uint8):
+        img = project_data_to_img(img, dtype=np.uint8, factor=255)
+    img = cv2.applyColorMap(img, colormap)
+    return img
