@@ -36,6 +36,8 @@ class TWHNormal(twhist.TWHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
+        """Set the main image canvas with the image to be displayed and the corresponding histogram
+        """        
         super(TWHNormal, self).set_canvas(img, **kwargs)
 
         self._csbox_normal = csbox.CSBox(self, cbox=[["Local Model"], [["LS", "TRI", "QUADRIC"]], ["LS"], ["str"]], sbox=[["Radius", "Normal bins", "Log", "Height factor"], [6.0, 16, 1, 1.0], ["float", "int", "int", "float"]])

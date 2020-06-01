@@ -34,6 +34,8 @@ class TWHFeatures(twhist.TWHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
+        """Set the main image canvas with the image to be displayed and the corresponding histogram
+        """        
         self._slider_hist_column = 3
         super(TWHFeatures, self).set_canvas(img, **kwargs)
         self._canvas.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=N+S+W+E)

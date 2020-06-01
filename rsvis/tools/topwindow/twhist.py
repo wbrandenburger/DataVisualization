@@ -49,6 +49,8 @@ class TWHist(tw.TopWindow):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
+        """Set the main image canvas with the image to be displayed and the corresponding histogram
+        """        
         super(TWHist, self).set_canvas(img, **kwargs)
 
         self.columnconfigure(1, weight=1)

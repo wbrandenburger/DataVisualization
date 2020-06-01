@@ -152,9 +152,10 @@ class ImgCanvas(Canvas):
 
         self._img_size = [img.shape[1], img.shape[0]]
         self._data_img = imgtools.expand_image_dim(img)
-        self._img = Image.fromarray(
-            imgtools.project_and_stack(img, dtype=np.uint8, factor=255)
-        )
+        if not isinstance(img.dtype, np.uint8):
+            img = imgtools.project_and_stack(img, dtype=np.uint8, factor=255)
+        
+        self._img = Image.fromarray(img)
             
         if clear_mask:
             self.set_mask(show=False)

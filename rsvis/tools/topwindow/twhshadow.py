@@ -1,5 +1,5 @@
 # ===========================================================================
-#   twhfilter.py ------------------------------------------------------------
+#   twhshadow.py ------------------------------------------------------------
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
@@ -7,8 +7,6 @@
 from rsvis.utils.height import Height
 from rsvis.utils import imgtools
 import rsvis.utils.imgcontainer
-
-import rsvis.shadow.shdwDetection as sd
 
 from rsvis.tools.widgets import csbox, buttonbox, scalebox
 from rsvis.tools.topwindow import tw,twhfilter
@@ -35,25 +33,25 @@ class TWHShadow(twhfilter.TWHFilter):
         #   settings --------------------------------------------------------
         super(TWHShadow, self).__init__(parent, **kwargs)
 
-        self._centroids = list()
+        self.reset_centroids()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
+        """Set the main image canvas with the image to be displayed and the corresponding histogram
+        """        
         super(TWHShadow, self).set_canvas(img, **kwargs)
 
         self._csbox_threshold.grid_forget()
+        self._csbox_difference.grid(row=14, column=0, rowspan=4, sticky=N+W+S+E)
 
         self._csbox_centroids = csbox.CSBox(self, bbox=[["Reset Centroids", "Set Centroids", "Compute Centroids (Color)", "Compute Centroids (Color+Space)"], [self.reset_centroids, self.set_centroids, self.get_centroids_color, self.get_centroids_color_space]], sbox=[["Centroids"], [3], ["int"]])
         self._csbox_centroids.grid(row=4, column=1, rowspan=5, sticky=W+E)
 
-        # self._csbox_shadow = csbox.CSBox(self, bbox=[["Detect Shadow"], [self.get_shadow]], cbox=[["Image"], [[0, 1, 2]], [0], ["int"]])
-        # self._csbox_shadow.grid(row=9, column=1, rowspan=2, sticky=N+W+E)
-
         self._csbox_hough = csbox.CSBox(self, bbox=[["Hough Transform"], [self.get_hough_transform]], sbox=[["Threshold", "Minimum Line Length","Maximum Line Gap"], [40, 40, 40], ["int", "int", "int"]])
         self._csbox_hough.grid(row=10, column=1, rowspan=1, sticky=N+W+E)
 
-        self._button_quit.grid(row=14, column=0, columnspan=3, sticky=W+E)
+        self._button_quit.grid(row=18, column=0, columnspan=3, sticky=W+E)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -133,12 +131,21 @@ class TWHShadow(twhfilter.TWHFilter):
         
         images = list()
 
+        aperture_size = param_edges["Aperture Size"]
+        if (aperture_size%2)==0 or aperture_size<3 or aperture_size>7:
+            raise ValueError("Aperture size should be odd between 3 and 7.")
+
         edges = cv2.Canny(grayimg, param_edges["Threshold I"], param_edges["Threshold II"], apertureSize=param_edges["Aperture Size"])
     
         lines = cv2.HoughLinesP(edges, 1, np.pi/180, param_hough["Threshold"],minLineLength=param_hough["Minimum Line Length"], maxLineGap=param_hough["Maximum Line Gap"])
 
-        for line in lines:
-            x1, y1, x2, y2 = line[0]
-            cv2.line(img, (x1, y1), (x2, y2), (0, 0, 128), 1)
+        if lines is not None:
+            for line in lines:
+                x1, y1, x2, y2 = line[0]
+                cv2.line(img, (x1, y1), (x2, y2), (0, 0, 128), 1)
 
-        tw.TopWindow(self, title="Hough Transform", dtype="img", value=[edges, img], q_cmd=self._q_cmd)
+            images = [edges, img]
+        else:
+            images = edges
+
+        tw.TopWindow(self, title="Hough Transform", dtype="img", value=images, q_cmd=self._q_cmd)

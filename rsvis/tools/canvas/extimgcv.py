@@ -9,6 +9,7 @@ import rsvis.utils.patches_ordered
 import rsvis.utils.patches_unordered
 
 from rsvis.tools.canvas import imgcv
+from rsvis.tools.topwindow import tw
 
 from PIL import Image, ImageTk
 import numpy as np
@@ -46,6 +47,7 @@ class ExtendedImgCv(imgcv.ImgCanvas):
 
         #   key bindings ----------------------------------------------------
         self.bind("<B1-Motion>", self.mouse_motion)
+        self.bind("<Double-Button-1>", self.mouse_double_1_button)
 
         self.bind("<Control-x>", self.key_ctrl_x)
         self.bind("<Control-y>", self.key_ctrl_y)
@@ -181,6 +183,19 @@ class ExtendedImgCv(imgcv.ImgCanvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def set_popup(self, **kwargs):
+        t = tw.TopWindow(self._parent, title="Image Canvas", dtype="img", value=self.get_img(show=True), q_cmd= self.quit, logger= self._logger)
+        t.mainloop()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def quit(self, window, **kwargs):
+        """Exit Window."""   
+        window.quit()
+        window.destroy()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def mouse_motion(self, event):
         self.focus_set()
         self._mouse_event = self.resize_event(event)
@@ -202,3 +217,12 @@ class ExtendedImgCv(imgcv.ImgCanvas):
         
         self.clear_selection("temporary")
         self.create_image()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def mouse_double_1_button(self, event):
+        self.focus_set()
+        self.clear_selection("temporary")
+        self.clear_selection("selection")
+
+        self.set_popup()

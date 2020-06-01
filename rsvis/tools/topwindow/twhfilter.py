@@ -30,51 +30,160 @@ class TWHFilter(twhist.TWHist):
 
         #   settings --------------------------------------------------------
         super(TWHFilter, self).__init__(parent, **kwargs)
+        
+        self.reset_dimage()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, img, **kwargs):
+        """Set the main image canvas with the image to be displayed and the corresponding histogram
+        """        
         super(TWHFilter, self).set_canvas(img, **kwargs)
 
-        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median", "Bilateral Filtering"]], ["Median"], ["str"]], sbox=[["Kernel Size", "Sigma", "Diameter", "Sigma Color", "Sigma Space"], [5, 2.3, 7, 100, 500], ["int", "float", "int", "int", "int"]], bbox=[["Blur Image"], [self.get_image_blur]])
-        self._csbox_blur.grid(row=2, column=0, rowspan=7, sticky=N+W+E)
+        # set combobox and settingsbox for blurring parameters
+        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median", "Bilateral Filtering"]], ["Bilateral Filtering"], ["str"]], sbox=[["Kernel Size", "Sigma", "Diameter", "Sigma Color", "Sigma Space"], [5, 2.3, 7, 100, 500], ["int", "float", "int", "int", "int"]], bbox=[["Blur Image", "Gradient Image"], [self.blur_image, self.gradient_image]])
+        self._csbox_blur.grid(row=2, column=0, rowspan=7, sticky=N+W+E+S)
 
+        # set combobox and settingsbox for edge detection parameters
         self._csbox_edges = csbox.CSBox(self, bbox=[["Get Edges"], [self.get_edges]], sbox=[["Threshold I", "Threshold II", "Aperture Size"], [50, 150, 3], ["int", "int", "int"]])
-        self._csbox_edges.grid(row=9, column=0, rowspan=4, sticky=N+W+E)
+        self._csbox_edges.grid(row=10, column=0, rowspan=4, sticky=N+W+E+S)
 
+        # set combobox and settingsbox for thresholding parameters    
         self._scbox_threshold = scalebox.ScaleBox(self, scbox=[["Thresh"], [[0, 255, 2, 0]], ["int"]],  orient=HORIZONTAL, func=self.set_simple_threshold, button="Simple Thresholding") 
         self._scbox_threshold.grid(row=2, column=1, rowspan=2, sticky=N+W+S+E)
 
         self._csbox_threshold = csbox.CSBox(self, cbox=[["adaptiveMethod"], [["Mean", "Gaussian"]], ["Gaussian"], ["str"]], sbox=[["blockSize", "C"], [5, 2], ["int", "int"]], bbox=[["Adaptive Thresholding"], [self.set_adaptive_thresholding]])
         self._csbox_threshold.grid(row=4, column=1, rowspan=3, sticky=N+W+S+E)
 
-        self._button_quit.grid(row=13, column=0, columnspan=3, sticky=W+E)
+        # set combobox and settingsbox for building difference images
+        self._csbox_difference = csbox.CSBox(self, bbox=[["Reset Images", "Set Image", "Compute Difference (Image)", "Show Image List"], [self.reset_dimage, self.set_dimage, self.compute_dimage, self.show_dimage]])
+        self._csbox_difference.grid(row=7, column=1, rowspan=4, sticky=N+W+S+E)        
+
+        self._button_quit.grid(row=14, column=0, columnspan=3, sticky=W+E)
   
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_image_blur(self):
+    def reset_dimage(self, event=None):
+        """Reset list of difference images
+        """  
+        self._dimage = list()   
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_dimage(self, event=None):        
+        """Append list of difference images with the currently displayed image
+        """
+        self._dimage.append(self.get_obj().get_img(show=True))
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def show_dimage(self, event=None):        
+        """Show list of difference images in a own topwindow
+        
+        """
+
+        if not len(self._dimage):
+            raise IndexError("There are no images available.")
+
+        # open a topwindow with images used for building the difference
+        tw.TopWindow(self, title="Difference of images", dtype="img", value=self._dimage, q_cmd=self._q_cmd)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def compute_dimage(self, event=None):
+        """Compute the difference image of the currently images in 'd_image'
+        """
+        
+        # continue if two images are provided
+        if len(self._dimage)<2:
+            raise IndexError("There are not enough images available to compute the difference.")
+
+        # compute the difference image of the currently images in 'd_image'
+        img = np.absolute(imgtools.get_gray_image(self._dimage[-2].astype(np.float32))-imgtools.get_gray_image(self._dimage[-1].astype(np.float32)))
+
+        #check wheter the image is not empty
+        if np.sum(img) == 0:
+            raise ValueError("Sum of differences is zero.")
+
+        img = imgtools.project_data_to_img(img)
+
+        # set image in canvas and update histogram
+        self.get_obj().set_img(img, clear_mask=False)
+        self.set_img()
+
+        # open a topwindow with images used for building the difference
+        tw.TopWindow(self, title="Difference of images", dtype="img", value=[self._dimage[-1], self._dimage[-2]], q_cmd=self._q_cmd)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def blur_image(self):
+        """Blur the currently displayed image with an average or median filter
+        """
+
+        # get settings of combobox and fields 
         param = self._csbox_blur.get_dict()
+        kernel_size = (param["Kernel Size"], param["Kernel Size"])
+
+        if (kernel_size[0]%2)==0 or kernel_size[0]>32:
+            raise ValueError("Kernel size  must be odd and not larger than 31.")
+
+        # set the border mode used to extrapolate pixels outside of the image, see https://docs.opencv.org/master/d2/de8/group__core__array.html#ga209f2f4869e304c82d07739337eae7c5
         param["BorderType"] = cv2.BORDER_REFLECT
         
+        # get the currently displayed image
         img = self.get_obj().get_img(show=True)
-        kernel_size = (param["Kernel Size"], param["Kernel Size"])
+        
+        # blur the image with selected model
         if param["Model"] == "Average":
+            # https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#gad533230ebf2d42509547d514f7d3fbc3
             img = cv2.boxFilter(img, -1, kernel_size, normalize=True, borderType=param["BorderType"])
         elif param["Model"] == "Gaussian":
             # https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#gaabe8c836e97159a9193fb0b11ac52cf1
-            img = cv2.GaussianBlur(img, kernel_size, param["Kernel Size"], borderType=param["BorderType"])
+            img = cv2.GaussianBlur(img, kernel_size, param["Sigma"], borderType=param["BorderType"])
         elif param["Model"] == "Median":
             # https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#ga564869aa33e58769b4469101aac458f9
             img = cv2.medianBlur(img, kernel_size[0])
         elif param["Model"] == "Bilateral Filtering":
             # https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#ga9d7064d478c95d60003cf839430737ed
             img = cv2.bilateralFilter(img, param["Diameter"], param["Sigma Color"], param["Sigma Space"])
+
+        # set image in canvas and update histogram
         self.get_obj().set_img(img, clear_mask=False)
         self.set_img()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def gradient_image(self):
+        """Calculate the horizontal and vertical gradients of the currently displayed image
+        """
+
+        # https://www.learnopencv.com/histogram-of-oriented-gradients/
+        
+        # get settings of combobox and fields 
+        param = self._csbox_blur.get_dict()
+        kernel_size = param["Kernel Size"]
+
+        if (kernel_size%2)==0 or kernel_size>32:
+            raise ValueError("Kernel size  must be odd and not larger than 31.")
+        
+        # get the currently displayed image
+        img = self.get_obj().get_img(show=True).astype(np.float32)/255.0
+
+        # calculate gradient
+        gx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=kernel_size)
+        gy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=kernel_size)
+        
+        # calculate gradient magnitude and direction (in degrees)
+        mag, angle = cv2.cartToPolar(gx, gy, angleInDegrees=True)
+
+        # open a topwindow with gradient images
+        tw.TopWindow(self, title="Gradient Image", dtype="img", value=[img, mag, gx, gy], q_cmd=self._q_cmd)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_simple_threshold(self, event=None, otsu=False):
+        
+        # get settings of combobox and fields 
         param = self._scbox_threshold.get_dict()
         thresh = cv2.THRESH_BINARY if param["Thresh"] else cv2.THRESH_BINARY + cv2.THRESH_OTSU
         
@@ -87,7 +196,9 @@ class TWHFilter(twhist.TWHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_adaptive_thresholding(self, event=None):
+        # get settings of combobox and fields 
         param = self._csbox_threshold.get_dict()
+        
         if  param["adaptiveMethod"] == "Mean":
             param_method = cv2.ADAPTIVE_THRESH_MEAN_C
         elif param["adaptiveMethod"] == "Gaussian":
@@ -126,11 +237,21 @@ class TWHFilter(twhist.TWHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_edges(self):
+        
+        # get settings of combobox and fields 
         param = self._csbox_edges.get_dict()
 
+        # get the currently displayed image
         img = self.get_obj().get_img(show=True)
+
+        # convert (color) image to grayscale
         grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        aperture_size = param["Aperture Size"]
+        if (aperture_size%2)==0 or aperture_size<3 or aperture_size>7:
+            raise ValueError("Aperture size should be odd between 3 and 7.")
 
         edges = cv2.Canny(grayimg, param["Threshold I"], param["Threshold II"], apertureSize=param["Aperture Size"])
 
+        # open a topwindow with the edges of the currently displayed image computed via canny
         tw.TopWindow(self, title="Edges", dtype="img", value=edges, q_cmd=self._q_cmd)

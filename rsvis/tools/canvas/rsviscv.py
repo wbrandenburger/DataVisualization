@@ -55,7 +55,7 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
 
         #   key bindings ----------------------------------------------------
         self.bind("<ButtonRelease-2>", self.mouse_button_2_released)
-        self.bind("<Double-Button-1>", self.mouse_double_1_button)
+        # self.bind("<Double-Button-1>", self.mouse_double_1_button)
 
         self.bind("<w>", self.key_w)
         self.bind("<s>", self.key_s)

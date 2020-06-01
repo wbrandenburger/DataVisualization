@@ -116,7 +116,8 @@ class TopWindow(Toplevel):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, value, **kwargs):
-
+        """Set the main image canvas with the image to be displayed
+        """
         if isinstance(value, rsvis.utils.imgcontainer.ImgListContainer):
             self._canvas = extimgconcv.ExtendedImgConCv(self, logger=self._logger, **kwargs)
             self._canvas.set_img_container(value)
@@ -128,7 +129,7 @@ class TopWindow(Toplevel):
             self._img = self._canvas.get_img()
             self._canvas.grid(row=0, column=0, sticky=N+S+W+E)
         elif isinstance(value, list):
-            dim = math.ceil(math.sqrt(len(value)))
+            dim = math.ceil(math.sqrt(len(value))) if len(value) > 4 else 4
             grid = np.indices((dim, dim))
             grid_y = grid[0].reshape(dim**2)
             grid_x = grid[1].reshape(dim**2)
@@ -136,8 +137,8 @@ class TopWindow(Toplevel):
             self._canvas = list()
             for idx, img in enumerate(value):
                 self._canvas.append(imgcv.ImgCanvas(self, logger=self._logger, **kwargs))
-                self._canvas[-1].set_img(img)
 
+                self._canvas[-1].set_img(img)
                 self._canvas[-1].grid(row=grid_y[idx], column=grid_x[idx], sticky=N+S+W+E)
                 
                 self.rowconfigure(grid_y[idx], weight=1)
