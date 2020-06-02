@@ -112,7 +112,7 @@ class TWHFilter(twhist.TWHist):
         self.set_img()
 
         # open a topwindow with images used for building the difference
-        tw.TopWindow(self, title="Difference of images", dtype="img", value=[self._dimage[-1], self._dimage[-2]], q_cmd=self._q_cmd)
+        tw.TopWindow(self, title="Difference of images", dtype="img", value=[img, self._dimage[-1], self._dimage[-2]], q_cmd=self._q_cmd)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
