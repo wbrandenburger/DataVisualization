@@ -8,7 +8,7 @@ The source code can be found under the following [link](https://github.com/wbran
 
 ## Requirements
 
-- Python 3.x
+- Python 3.7.x
 
 - Git (optional)
 - CloudCompare (optional)
@@ -41,11 +41,11 @@ Start the virtual environment in python where the data visualization package is 
 rsvis run "lecture.yaml" --task_set tasks --task lecture
 ```
 
-The field `path_dir` of key `param_io` in `lecture.yaml` has to point to an existing path, where displayed images can be saved. The other parameter of the key are not relevant for the user. If images have to be saved under Windows in folder `C:\User\Username\RSVis` the key `param_io` might be defined as follows:
+The field `path_dir` of keys `param_in>object` and `param_out>image` in `lecture.yaml` has to point to an existing path, where displayed images and the meta data of annotated objects can be saved. The other parameter of the key are not relevant for the user. If images have to be saved under Windows in folder `C:\User\Username\RSVis` the key `param_io` might be defined as follows:
 
 ```yaml
 param_io:
-  path_dir: C:\User\Username\RSVis
+  path_dir: C:/User/Username/RSVis
   path_name: '{}'
   regex:
   - .*
@@ -55,30 +55,20 @@ param_io:
 
 ## CloudCompare
 
-The field `path_dir` of key `param_io` in `lecture.yaml` has to point to an existing path, where displayed images can be saved. The other parameter of the key are not relevant for the user. If images have to be saved under Windows in folder `C:\\User\\Username\\RSVis` the key `param_io` might be defined as follows:
-
-```yaml
-param_io:
-  path_dir: C:\\User\\Username\\RSVis
-  path_name: '{}'
-  regex:
-  - .*
-  - 0
-  ext: .tif
-```
-
-If the use of CloudCompare is desired, the field `cloud_viewer` and `cloud_editor` of key `param_cloud` have to point to the executables of `ccViewer` and `CloudCompare`, for example:
+If the use of CloudCompare is desired, the fields `opener>viewer` and `opener>editor` of key `param_cloud` in `lecture-cloud.yaml` have to point to the executables of `ccViewer` and `CloudCompare`, for example:
 
 ```yaml
 param_cloud:
-  cloud_viewer: "C:\\Program Files\\ccViewer\\ccViewer.exe",
-  cloud_editor: "C:\\Program Files\\CloudCompare\\CloudCompare.exe",
+  cloud_viewer: "C:/Program Files/ccViewer/ccViewer.exe",
+  cloud_editor: "C:/Program Files/CloudCompare/CloudCompare.exe",
 ```
+
+Additionally, the field `path_dir` of key `param_cloud>temp` has to point to an existing path, where pointclouds an meshes can be saved.
 
 Since, the use of CloudCompare is not activated by default, the command to execute `RSVis` changes to:
 
 ```PowerShell
-rsvis run "lecture.yaml" --task_set tasks --task rsshow
+rsvis run "lecture-cloud.yaml" --task_set tasks --task rsshow
 ```
 
 ![RSVis](temp/rsvis_cloud.png)
