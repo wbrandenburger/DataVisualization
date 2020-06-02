@@ -129,7 +129,7 @@ class TWHLecture(twhist.TWHist):
         self.set_img()
 
         # open a topwindow with images used for building the difference
-        tw.TopWindow(self, title="Difference of images", dtype="img", value=[img, img_a, img_b], q_cmd=self._q_cmd)
+        tw.TopWindow(self, title="Difference of images", dtype="img", value=[img, img_a, img_b])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -153,4 +153,4 @@ class TWHLecture(twhist.TWHist):
         gradient_x = gradient_y = magnitude = np.zeros((0,0)) # implementation of the gradient images and gradient magnitudes
 
         # open a topwindow with gradient images
-        tw.TopWindow(self, title="Gradient Image", dtype="img", value=[img, magnitude, gradient_x, gradient_y], q_cmd=self._q_cmd)
+        tw.TopWindow(self, title="Gradient Image", dtype="img", value=[img, magnitude, gradient_x, gradient_y])

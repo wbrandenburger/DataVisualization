@@ -184,15 +184,8 @@ class ExtendedImgCv(imgcv.ImgCanvas):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_popup(self, **kwargs):
-        t = tw.TopWindow(self._parent, title="Image Canvas", dtype="img", value=self.get_img(show=True), q_cmd= self.quit, logger= self._logger)
+        t = tw.TopWindow(self._parent, title="Image Canvas", dtype="img", value=self.get_img(show=True), logger= self._logger)
         t.mainloop()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def quit(self, window, **kwargs):
-        """Exit Window."""   
-        window.quit()
-        window.destroy()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

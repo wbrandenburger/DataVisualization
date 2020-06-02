@@ -58,11 +58,12 @@ class TopWindow(Toplevel):
                 self._keys.update({o["key"]: o["description"]}) 
 
         #   button (Quit) ---------------------------------------------------
-        self._q_cmd = lambda toplevel=self, title=title: q_cmd(toplevel, title)
-        self._button_quit = ttk.Button(self, text="OK", 
-            command=self._q_cmd
-        )
-        self._button_quit.grid(row=1, column=0, columnspan=1)
+        if q_cmd is not None:
+            self._q_cmd = lambda toplevel=self, title=title: q_cmd(toplevel, title)
+            self._button_quit = ttk.Button(self, text="OK", 
+                command=self._q_cmd
+            )
+            self._button_quit.grid(row=1, column=0, columnspan=1)
 
         #   main image window -----------------------------------------------
         if dtype=="msg":
@@ -129,7 +130,7 @@ class TopWindow(Toplevel):
             self._img = self._canvas.get_img()
             self._canvas.grid(row=0, column=0, sticky=N+S+W+E)
         elif isinstance(value, list):
-            dim = math.ceil(math.sqrt(len(value))) if len(value) > 4 else 4
+            dim = math.ceil(math.sqrt(len(value))) if len(value) > 4 else len(value)
             grid = np.indices((dim, dim))
             grid_y = grid[0].reshape(dim**2)
             grid_x = grid[1].reshape(dim**2)
@@ -143,6 +144,8 @@ class TopWindow(Toplevel):
                 
                 self.rowconfigure(grid_y[idx], weight=1)
                 self.columnconfigure(grid_x[idx], weight=1)
+            
+            self._button_quit.grid(row=1, column=0, columnspan=len(value))
                 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

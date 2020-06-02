@@ -86,7 +86,7 @@ class TWHFilter(twhist.TWHist):
             raise IndexError("There are no images available.")
 
         # open a topwindow with images used for building the difference
-        tw.TopWindow(self, title="Difference of images", dtype="img", value=self._dimage, q_cmd=self._q_cmd)
+        tw.TopWindow(self, title="Difference of images", dtype="img", value=self._dimage)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -112,7 +112,7 @@ class TWHFilter(twhist.TWHist):
         self.set_img()
 
         # open a topwindow with images used for building the difference
-        tw.TopWindow(self, title="Difference of images", dtype="img", value=[img, self._dimage[-1], self._dimage[-2]], q_cmd=self._q_cmd)
+        tw.TopWindow(self, title="Difference of images", dtype="img", value=[img, self._dimage[-1], self._dimage[-2]])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -176,8 +176,12 @@ class TWHFilter(twhist.TWHist):
         # calculate gradient magnitude and direction (in degrees)
         magnitude, angle = cv2.cartToPolar(gradient_x, gradient_y, angleInDegrees=True)
 
+        # set image in canvas and update histogram
+        self.get_obj().set_img(magnitude, clear_mask=False)
+        self.set_img()
+
         # open a topwindow with gradient images
-        tw.TopWindow(self, title="Gradient Image", dtype="img", value=[img, magnitude, gradient_x, gradient_y], q_cmd=self._q_cmd)
+        tw.TopWindow(self, title="Gradient Image", dtype="img", value=[img, magnitude, gradient_x, gradient_y])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -242,16 +246,17 @@ class TWHFilter(twhist.TWHist):
         param = self._csbox_edges.get_dict()
 
         # get the currently displayed image
-        img = self.get_obj().get_img(show=True)
-
-        # convert (color) image to grayscale
-        grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = imgtools.project_data_to_img(imgtools.get_gray_image(self.get_obj().get_img(show=True)), dtype=np.uint8, factor=255)
 
         aperture_size = param["Aperture Size"]
         if (aperture_size%2)==0 or aperture_size<3 or aperture_size>7:
             raise ValueError("Aperture size should be odd between 3 and 7.")
 
-        edges = cv2.Canny(grayimg, param["Threshold I"], param["Threshold II"], apertureSize=param["Aperture Size"])
+        edges = cv2.Canny(img, param["Threshold I"], param["Threshold II"], apertureSize=param["Aperture Size"])
+
+        # set image in canvas and update histogram
+        self.get_obj().set_img(edges, clear_mask=False)
+        self.set_img()
 
         # open a topwindow with the edges of the currently displayed image computed via canny
-        tw.TopWindow(self, title="Edges", dtype="img", value=edges, q_cmd=self._q_cmd)
+        tw.TopWindow(self, title="Edges", dtype="img", value=[img, edges])
