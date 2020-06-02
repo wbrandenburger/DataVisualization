@@ -56,7 +56,7 @@ class TWHFilter(twhist.TWHist):
         self._csbox_threshold.grid(row=4, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for building difference images
-        self._csbox_difference = csbox.CSBox(self, bbox=[["Reset Images", "Set Image", "Compute Difference (Image)", "Show Image List"], [self.reset_dimage, self.set_dimage, self.compute_dimage, self.show_dimage]])
+        self._csbox_difference = csbox.CSBox(self, bbox=[["Clear Image List", "Add Image to Image List", "Compute Difference (Image)", "Show Image List"], [self.reset_dimage, self.set_dimage, self.compute_dimage, self.show_dimage]])
         self._csbox_difference.grid(row=7, column=1, rowspan=4, sticky=N+W+S+E)        
 
         self._button_quit.grid(row=14, column=0, columnspan=3, sticky=W+E)
@@ -167,17 +167,17 @@ class TWHFilter(twhist.TWHist):
             raise ValueError("Kernel size  must be odd and not larger than 31.")
         
         # get the currently displayed image
-        img = self.get_obj().get_img(show=True).astype(np.float32)/255.0
+        img = imgtools.project_data_to_img(imgtools.get_gray_image(self.get_obj().get_img(show=True)))
 
         # calculate gradient
-        gx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=kernel_size)
-        gy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=kernel_size)
+        gradient_x = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=kernel_size)
+        gradient_y = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=kernel_size)
         
         # calculate gradient magnitude and direction (in degrees)
-        mag, angle = cv2.cartToPolar(gx, gy, angleInDegrees=True)
+        magnitude, angle = cv2.cartToPolar(gradient_x, gradient_y, angleInDegrees=True)
 
         # open a topwindow with gradient images
-        tw.TopWindow(self, title="Gradient Image", dtype="img", value=[img, mag, gx, gy], q_cmd=self._q_cmd)
+        tw.TopWindow(self, title="Gradient Image", dtype="img", value=[img, magnitude, gradient_x, gradient_y], q_cmd=self._q_cmd)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

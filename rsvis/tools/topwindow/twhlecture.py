@@ -41,14 +41,14 @@ class TWHLecture(twhist.TWHist):
         super(TWHLecture, self).set_canvas(img, **kwargs)
 
         # set combobox and settingsbox for blurring parameters
-        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Median", "Binomial"]], ["Average"], ["str"]], sbox=[["Kernel Size", "Sigma"], [5, 2.3], ["int", "float"]], bbox=[["Blur Image"], [self.blur_image]])
-        self._csbox_blur.grid(row=2, column=0, rowspan=4, sticky=N+W+E)
+        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Median", "Binomial"]], ["Average"], ["str"]], sbox=[["Kernel Size", "Sigma"], [5, 2.3], ["int", "float"]], bbox=[["Blur Image", "Gradient Image"], [self.blur_image, self.gradient_image]])
+        self._csbox_blur.grid(row=2, column=0, rowspan=5, sticky=N+W+E)
 
         # set combobox and settingsbox for building difference images
-        self._csbox_difference = csbox.CSBox(self, bbox=[["Reset Images", "Set Image", "Compute Difference (Image)", "Show Image List"], [self.reset_dimage, self.set_dimage, self.compute_dimage, self.show_dimage]])
+        self._csbox_difference = csbox.CSBox(self, bbox=[["Clear Image List", "Add Image to Image List", "Compute Difference (Image)", "Show Image List"], [self.reset_dimage, self.set_dimage, self.compute_dimage, self.show_dimage]])
         self._csbox_difference.grid(row=2, column=1, rowspan=4, sticky=N+W+S+E)        
         
-        self._button_quit.grid(row=6, column=0, columnspan=3, sticky=W+E)
+        self._button_quit.grid(row=7, column=0, columnspan=3, sticky=W+E)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -120,11 +120,37 @@ class TWHLecture(twhist.TWHist):
             raise IndexError("There are not enough images available to compute the difference.")
 
         # compute the difference image of the currently images in 'd_image'
-        img = np.zeros((0,0)) # implementation of the binomial filter
+        img_a = self._dimage[-1]
+        img_b = self._dimage[-2]
+        img = np.zeros((0,0)) # implementation of the differences of images img_a and img_b
 
         # set image in canvas and update histogram
         self.get_obj().set_img(img, clear_mask=False)
         self.set_img()
 
         # open a topwindow with images used for building the difference
-        tw.TopWindow(self, title="Difference of images", dtype="img", value=[self._dimage[-1], self._dimage[-2]], q_cmd=self._q_cmd)
+        tw.TopWindow(self, title="Difference of images", dtype="img", value=[img_a, img_b], q_cmd=self._q_cmd)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def gradient_image(self):
+        """Calculate the horizontal and vertical gradients of the currently displayed image
+        """
+
+        # https://www.learnopencv.com/histogram-of-oriented-gradients/
+        
+        # get settings of combobox and fields 
+        param = self._csbox_blur.get_dict()
+        kernel_size = param["Kernel Size"]
+
+        if (kernel_size%2)==0 or kernel_size>32:
+            raise ValueError("Kernel size  must be odd and not larger than 31.")
+        
+        # get the currently displayed image
+        img = imgtools.project_data_to_img(imgtools.get_gray_image(self.get_obj().get_img(show=True)))
+
+        # calculate gradient
+        gradient_x = gradient_y = magnitude = np.zeros((0,0)) # implementation of the gradient images and gradient magnitudes
+
+        # open a topwindow with gradient images
+        tw.TopWindow(self, title="Gradient Image", dtype="img", value=[img, magnitude, gradient_x, gradient_y], q_cmd=self._q_cmd)
