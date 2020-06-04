@@ -144,8 +144,6 @@ class TopWindow(Toplevel):
                 
                 self.rowconfigure(grid_y[idx], weight=1)
                 self.columnconfigure(grid_x[idx], weight=1)
-            
-            self._button_quit.grid(row=1, column=0, columnspan=len(value))
                 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

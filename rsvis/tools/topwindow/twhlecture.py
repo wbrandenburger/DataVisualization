@@ -122,8 +122,8 @@ class TWHLecture(twhist.TWHist):
         # compute the difference image of the currently images in 'd_image'
         img_a = self._dimage[-1]
         img_b = self._dimage[-2]
-        img = np.zeros((0,0)) # implementation of the differences of images img_a and img_b
 
+        img = np.zeros((0,0)) # implementation of the differences of images img_a and img_b
         # set image in canvas and update histogram
         self.get_obj().set_img(img, clear_mask=False)
         self.set_img()
