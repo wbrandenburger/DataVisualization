@@ -45,9 +45,11 @@ class TWHShadow(twhfilter.TWHFilter):
         self._csbox_threshold.grid_forget()
         self._csbox_difference.grid(row=14, column=0, rowspan=4, sticky=N+W+S+E)
 
+        # set combobox and settingsbox for kmeans
         self._csbox_centroids = csbox.CSBox(self, bbox=[["Reset Centroids", "Set Centroids", "Compute Centroids (Color)", "Compute Centroids (Color+Space)"], [self.reset_centroids, self.set_centroids, self.get_centroids_color, self.get_centroids_color_space]], sbox=[["Centroids"], [3], ["int"]])
         self._csbox_centroids.grid(row=4, column=1, rowspan=5, sticky=W+E)
 
+        # set combobox and settingsbox for hough transformation
         self._csbox_hough = csbox.CSBox(self, bbox=[["Hough Transform"], [self.get_hough_transform]], sbox=[["Threshold", "Minimum Line Length","Maximum Line Gap"], [40, 40, 40], ["int", "int", "int"]])
         self._csbox_hough.grid(row=10, column=1, rowspan=1, sticky=N+W+E)
 

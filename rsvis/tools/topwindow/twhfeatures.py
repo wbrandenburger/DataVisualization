@@ -58,7 +58,7 @@ class TWHFeatures(twhist.TWHist):
     # -----------------------------------------------------------------------
     def create_shi(self, event=None, **kwargs):
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_shi_tomasi/py_shi_tomasi.html
-        grayimg = imgtools.get_gray_image(self._img).astype(np.float32)
+        grayimg = imgtools.gray_image(self._img).astype(np.float32)
         corners = np.int0(cv2.goodFeaturesToTrack(grayimg,**self._sbox_shi.get_dict()))
         img = imgtools.zeros_from_shape(self._img.shape[0:2], dtype=np.uint8)
         for c in corners:
@@ -82,8 +82,8 @@ class TWHFeatures(twhist.TWHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def create_keypoints(self, model, color=[100,200,50]):
-        kp = model.detect(imgtools.get_gray_image(self._img), None)
+        kp = model.detect(imgtools.gray_image(self._img), None)
         img = imgtools.zeros_from_shape(self._img.shape, dtype=np.uint8)
-        img = imgtools.get_gray_image(cv2.drawKeypoints(img, kp, outImage=None))
+        img = imgtools.gray_image(cv2.drawKeypoints(img, kp, outImage=None))
         self.get_obj().set_mask(imgtools.img_to_bool(img), color=color)
         self.set_img()

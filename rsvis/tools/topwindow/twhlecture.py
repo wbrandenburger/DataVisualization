@@ -147,7 +147,7 @@ class TWHLecture(twhist.TWHist):
             raise ValueError("Kernel size  must be odd and not larger than 31.")
         
         # get the currently displayed image
-        img = imgtools.project_data_to_img(imgtools.get_gray_image(self.get_obj().get_img(show=True)))
+        img = imgtools.project_data_to_img(imgtools.gray_image(self.get_obj().get_img(show=True)))
 
         # calculate gradient
         gradient_x = gradient_y = magnitude = np.zeros((0,0)) # implementation of the gradient images and gradient magnitudes

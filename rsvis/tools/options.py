@@ -148,7 +148,7 @@ def get_basic_options():
             "key" : None,
             "description": "Convert the current image to a grayscale image.",
             "command": lambda obj: obj.set_img(
-                imgtools.get_gray_image(
+                imgtools.gray_image(
                     obj.get_img()
                 )
             )
@@ -160,11 +160,23 @@ def get_basic_options():
             "key" : None,
             "description": "Invert the current image.",
             "command": lambda obj: obj.set_img(
-                imgtools.get_inverted_image(
+                imgtools.invert_image(
                     obj.get_img(show=True)
                 )
             )
         },
+        { 
+            "require" : "basic",
+            "label" : "Image",
+            "name" : "Quantize",
+            "key" : None,
+            "description": "Quantization the current image.",
+            "command": lambda obj: obj.set_img(
+                imgtools.quantize_image(
+                    obj.get_img(show=True)
+                )
+            )
+        },        
         { 
             "require" : "basic",
             "label" : "Image",

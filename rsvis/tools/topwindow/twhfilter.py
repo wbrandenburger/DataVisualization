@@ -99,7 +99,7 @@ class TWHFilter(twhist.TWHist):
             raise IndexError("There are not enough images available to compute the difference.")
 
         # compute the difference image of the currently images in 'd_image'
-        img = np.absolute(imgtools.get_gray_image(self._dimage[-2].astype(np.float32))-imgtools.get_gray_image(self._dimage[-1].astype(np.float32)))
+        img = np.absolute(imgtools.gray_image(self._dimage[-2].astype(np.float32))-imgtools.gray_image(self._dimage[-1].astype(np.float32)))
 
         #check wheter the image is not empty
         if np.sum(img) == 0:
@@ -167,7 +167,7 @@ class TWHFilter(twhist.TWHist):
             raise ValueError("Kernel size  must be odd and not larger than 31.")
         
         # get the currently displayed image
-        img = imgtools.project_data_to_img(imgtools.get_gray_image(self.get_obj().get_img(show=True)))
+        img = imgtools.project_data_to_img(imgtools.gray_image(self.get_obj().get_img(show=True)))
 
         # calculate gradient
         gradient_x = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=kernel_size)
@@ -191,7 +191,7 @@ class TWHFilter(twhist.TWHist):
         param = self._scbox_threshold.get_dict()
         thresh = cv2.THRESH_BINARY if param["Thresh"] else cv2.THRESH_BINARY + cv2.THRESH_OTSU
         
-        ret, dst = cv2.threshold(imgtools.get_gray_image(self._img), param["Thresh"], 255, thresh)
+        ret, dst = cv2.threshold(imgtools.gray_image(self._img), param["Thresh"], 255, thresh)
 
         self._logger("Simple Thresholding with thresh: {}".format(ret))
         
@@ -207,7 +207,7 @@ class TWHFilter(twhist.TWHist):
             param_method = cv2.ADAPTIVE_THRESH_MEAN_C
         elif param["adaptiveMethod"] == "Gaussian":
             param_method = cv2.ADAPTIVE_THRESH_GAUSSIAN_C
-        dst	= cv2.adaptiveThreshold(imgtools.get_gray_image(self._img), 255,  param_method, cv2.THRESH_BINARY, param["blockSize"], param["C"])
+        dst	= cv2.adaptiveThreshold(imgtools.gray_image(self._img), 255,  param_method, cv2.THRESH_BINARY, param["blockSize"], param["C"])
 
         self.set_threshold_mask(dst)
 
@@ -246,7 +246,7 @@ class TWHFilter(twhist.TWHist):
         param = self._csbox_edges.get_dict()
 
         # get the currently displayed image
-        img = imgtools.project_data_to_img(imgtools.get_gray_image(self.get_obj().get_img(show=True)), dtype=np.uint8, factor=255)
+        img = imgtools.project_data_to_img(imgtools.gray_image(self.get_obj().get_img(show=True)), dtype=np.uint8, factor=255)
 
         aperture_size = param["Aperture Size"]
         if (aperture_size%2)==0 or aperture_size<3 or aperture_size>7:
