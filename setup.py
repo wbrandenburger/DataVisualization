@@ -48,6 +48,8 @@ setuptools.setup(
         "matplotlib>=3.2.1",
         "numpy>=1.18.3",
         "scipy>=1.4.1",
+        "scikit-image>=0.17"
+        "scikit-learn>=0.23"
     ],
     python_requires=">=3",
     classifiers=[
