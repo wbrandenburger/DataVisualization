@@ -388,3 +388,26 @@ def apply_colormap(img, colormap=cv2.COLORMAP_JET):
         img = project_data_to_img(img, dtype=np.uint8, factor=255)
     img = cv2.applyColorMap(img, colormap)
     return img
+
+#   function ------------------------------------------------------------
+# -----------------------------------------------------------------------
+def set_threshold_mask(dst, mask):      
+    dst = img_to_bool(dst)
+    dst_inv = invert_bool_img(dst)
+
+    if not isinstance(mask, np.ndarray):
+        mask = zeros_from_shape(dst.shape, value=1, dtype=np.uint8)
+
+    mask_list = [mask] if isinstance(mask, np.ndarray) else list()
+    mask_list.extend([np.where(np.logical_and(dst_inv==1, mask!=0), 1, 0).astype(np.uint8)]) 
+
+    mask_color = [[0, 0, 0]] if isinstance(mask, np.ndarray) else list()
+    mask_color.extend([[255, 255, 0]])
+    
+    mask_alpha = [150] if isinstance(mask, np.ndarray) else list()
+    mask_alpha.extend([75])
+
+    mask_invert = [True] if isinstance(mask, np.ndarray) else list()
+    mask_invert.extend([False])
+
+    return mask_list, mask_color, mask_invert, mask_alpha

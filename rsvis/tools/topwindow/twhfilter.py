@@ -59,7 +59,11 @@ class TWHFilter(twhist.TWHist):
         self._csbox_difference = csbox.CSBox(self, bbox=[["Clear Image List", "Add Image to Image List", "Compute Difference (Image)", "Show Image List"], [self.reset_dimage, self.set_dimage, self.compute_dimage, self.show_dimage]])
         self._csbox_difference.grid(row=7, column=1, rowspan=4, sticky=N+W+S+E)        
 
-        self._button_quit.grid(row=14, column=0, columnspan=3, sticky=W+E)
+        # set combobox and settingsbox for hough transformation
+        self._csbox_hough = csbox.CSBox(self, bbox=[["Hough Transform"], [self.get_hough_transform]], sbox=[["Threshold", "Minimum Line Length","Maximum Line Gap"], [40, 40, 40], ["int", "int", "int"]])
+        self._csbox_hough.grid(row=14, column=0, rowspan=4, sticky=N+W+S+E)
+
+        self._button_quit.grid(row=18, column=0, columnspan=3, sticky=W+E)
   
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -177,8 +181,8 @@ class TWHFilter(twhist.TWHist):
         magnitude, angle = cv2.cartToPolar(gradient_x, gradient_y, angleInDegrees=True)
 
         # set image in canvas and update histogram
-        self.get_obj().set_img(magnitude, clear_mask=False)
-        self.set_img()
+        # self.get_obj().set_img(magnitude, clear_mask=False)
+        # self.set_img()
 
         # open a topwindow with gradient images
         tw.TopWindow(self, title="Gradient Image", dtype="img", value=[img, magnitude, gradient_x, gradient_y])
@@ -191,10 +195,12 @@ class TWHFilter(twhist.TWHist):
         param = self._scbox_threshold.get_dict()
         thresh = cv2.THRESH_BINARY if param["Thresh"] else cv2.THRESH_BINARY + cv2.THRESH_OTSU
         
+        # set threshold
         ret, dst = cv2.threshold(imgtools.gray_image(self._img), param["Thresh"], 255, thresh)
 
         self._logger("Simple Thresholding with thresh: {}".format(ret))
         
+        # visualize the binary mask in the currently displayed image   
         self.set_threshold_mask(dst)
 
     #   method --------------------------------------------------------------
@@ -213,33 +219,6 @@ class TWHFilter(twhist.TWHist):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_threshold_mask(self, dst):      
-        dst = imgtools.img_to_bool(dst)
-        dst_inv = imgtools.invert_bool_img(dst)
-
-        mask = self.get_obj().get_mask(index=0)
-
-        if not isinstance(mask, np.ndarray):
-            mask = imgtools.zeros_from_shape(dst.shape, value=1, dtype=np.uint8)
-
-        mask_list = [mask] if isinstance(mask, np.ndarray) else list()
-        mask_list.extend([np.where(np.logical_and(dst_inv==1, mask!=0), 1, 0).astype(np.uint8)]) 
-
-        mask_color = [[0, 0, 0]] if isinstance(mask, np.ndarray) else list()
-        mask_color.extend([[255, 255, 0]])
-        
-        mask_alpha = [150] if isinstance(mask, np.ndarray) else list()
-        mask_alpha.extend([75])
-
-        mask_invert = [True] if isinstance(mask, np.ndarray) else list()
-        mask_invert.extend([False])
-        
-        self.get_obj().set_mask(mask=mask_list, color=mask_color
-        , invert=mask_invert, alpha=mask_alpha, show=True)
-        self.update_hist()
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
     def get_edges(self):
         
         # get settings of combobox and fields 
@@ -255,8 +234,41 @@ class TWHFilter(twhist.TWHist):
         edges = cv2.Canny(img, param["Threshold I"], param["Threshold II"], apertureSize=param["Aperture Size"])
 
         # set image in canvas and update histogram
-        self.get_obj().set_img(edges, clear_mask=False)
-        self.set_img()
+        # self.get_obj().set_img(edges, clear_mask=False)
+        # self.set_img()
 
         # open a topwindow with the edges of the currently displayed image computed via canny
         tw.TopWindow(self, title="Edges", dtype="img", value=[img, edges])
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_hough_transform(self, event=None):
+
+        # get settings of combobox and fields 
+        param_edges = self._csbox_edges.get_dict()
+        param_hough = self._csbox_hough.get_dict()
+
+        # get the currently displayed image
+        img = self.get_obj().get_img(show=True)
+        grayimg = imgtools.gray_image(img)
+
+        aperture_size = param_edges["Aperture Size"]
+        if (aperture_size%2)==0 or aperture_size<3 or aperture_size>7:
+            raise ValueError("Aperture size should be odd between 3 and 7.")
+
+        edgeimg = cv2.Canny(grayimg, param_edges["Threshold I"], param_edges["Threshold II"], apertureSize=param_edges["Aperture Size"])
+        
+        img_list = [img, edgeimg]
+
+        lines = cv2.HoughLinesP(edgeimg, 1, np.pi/180, param_hough["Threshold"],minLineLength=param_hough["Minimum Line Length"], maxLineGap=param_hough["Maximum Line Gap"])
+
+        if lines is not None:
+            houghimg = img.copy()
+            for line in lines:
+                x1, y1, x2, y2 = line[0]
+                cv2.line(houghimg, (x1, y1), (x2, y2), (0, 0, 128), 1)
+
+            img_list.append(houghimg)
+
+        # open a topwindow with the edges of the currently displayed image computed via hough transform
+        tw.TopWindow(self, title="Hough Transform", dtype="img", value=img_list)

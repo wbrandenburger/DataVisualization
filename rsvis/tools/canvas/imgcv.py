@@ -261,6 +261,17 @@ class ImgCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def get_roi(self):
+        if sum(self._mouse_box):
+            roi_xy = self.resize_boxes(self._mouse_box, inversion=True)[0]
+            roi = [roi_xy[2], roi_xy[0], roi_xy[3]-roi_xy[2], roi_xy[1]-roi_xy[0]]
+        else:
+            roi = [0, 0, self._data_img.shape[1]-1, self._data_img.shape[0]-1]
+
+        return roi
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def mouse_button_1_released(self, event):
         self.focus_set()
         self._mouse_event = self.resize_event(event)

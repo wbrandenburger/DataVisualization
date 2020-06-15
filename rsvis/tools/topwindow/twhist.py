@@ -111,6 +111,15 @@ class TWHist(tw.TopWindow):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def set_threshold_mask(self, dst):      
+        mask_list, mask_color, mask_invert, mask_alpha = imgtools.set_threshold_mask(dst, self.get_obj().get_mask(index=0))
+
+        self.get_obj().set_mask(mask=mask_list, color=mask_color
+        , invert=mask_invert, alpha=mask_alpha, show=True)
+        self.update_hist()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
         """Show the next image of the given image set."""
         self.set_img()

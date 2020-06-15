@@ -13,7 +13,7 @@ import rsvis.utils.yaml
 import rsvis.tools.rscanvasframe
 import rsvis.tools.keys
 from rsvis.tools.widgets import settingsbox, combobox, widgets
-from rsvis.tools.topwindow import tw, twhist, twhnormal, twhfilter, twhfeatures, twhshadow, twhlecture, twhseg
+from rsvis.tools.topwindow import tw, twhist, twhnormal, twhfilter, twhfeatures, twhlecture, twhseg
 
 from tkinter import *
 import numpy as np
@@ -188,8 +188,6 @@ class RSShowUI():
                     t = twhlecture.TWHLecture(self._root,**kwargs)
                 elif self._cbox_test.get() == "Segmentation":
                     t = twhseg.TWHSeg(self._root, **kwargs)
-                elif self._cbox_test.get() == "Shadow":
-                    t = twhshadow.TWHShadow(self._root, **kwargs)
             else:
                 t = tw.TopWindow(self._root, **kwargs)
         else:
