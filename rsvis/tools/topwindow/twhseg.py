@@ -51,12 +51,8 @@ class TWHSeg(twhfilter.TWHFilter):
         self._csbox_difference.grid_forget()
 
         # set combobox and settingsbox for segmentation methods
-        self._csbox_seg = csbox.CSBox(self, cbox=[["Model"], [[ "SLIC",  "Normalized Cuts", "GrabCut",]], ["SLIC"], ["str"]], bbox=[["Image Segmentation"], [self.image_segmentation]]) # "Felzenswalb"
+        self._csbox_seg = csbox.CSBox(self, cbox=[["Model"], [[ "SLIC",  "Normalized Cuts", "GrabCut", "Felzenswalb"]], ["SLIC"], ["str"]], bbox=[["Image Segmentation"], [self.image_segmentation]]) 
         self._csbox_seg.grid(row=4, column=1, rowspan=2, sticky=N+W+S+E)
-
-        # # set combobox and settingsbox for the segmentation method felzenswalb
-        # self._csbox_felz = csbox.CSBox(self, sbox=[["scale", "sigma", "min_size"], [32, 0.5, 256], ["int", "float", "int"]], )
-        # self._csbox_felz.grid(row=6, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut k-means
         self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter", "convert2lab"], [20, 50, 100, 1], ["float", "int", "int", "bool"]])
@@ -66,7 +62,11 @@ class TWHSeg(twhfilter.TWHFilter):
         self._csbox_grab = csbox.CSBox(self, sbox=[["iterCount"], [5], ["int"]])
         self._csbox_grab.grid(row=10, column=1, rowspan=1, sticky=N+W+S+E)
 
-        self._button_quit.grid(row=11, column=0, columnspan=3, sticky=N+W+S+E)
+       # set combobox and settingsbox for the segmentation method felzenswalb
+        self._csbox_felz = csbox.CSBox(self, sbox=[["scale", "sigma", "min_size"], [32, 0.5, 256], ["int", "float", "int"]], )
+        self._csbox_felz.grid(row=11, column=1, rowspan=3, sticky=N+W+S+E)
+
+        self._button_quit.grid(row=14, column=0, columnspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for adding images boxes
         self._csbox_boxes = csbox.CSBox(self, bbox=[["Show Box"], [self.show_box]])
@@ -85,6 +85,8 @@ class TWHSeg(twhfilter.TWHFilter):
         # get the currently displayed image
         img = self.get_obj().get_img()
 
+        # define image list for visualization
+        img_list = [img]
         if param["Model"]=="SLIC" or param["Model"]=="Normalized Cuts":
             # https://scikit-image.org/docs/dev/api/skimage.segmentation.html#skimage.segmentation.slic
             # n_segments = the (approximate) number of labels in the segmented output image.
@@ -95,17 +97,17 @@ class TWHSeg(twhfilter.TWHFilter):
             seg_map_color = color.label2rgb(seg_map, img, kind='avg', bg_label=0)
 
             # define image list for visualization
-            img_list = [seg_map_bound, seg_map_color]
+            img_list.extend([seg_map_bound, seg_map_color])
 
         if param["Model"]=="Felzenswalb":
             # https://scikit-image.org/docs/dev/api/skimage.segmentation.html#skimage.segmentation.felzenszwalb.
-            # seg_map = segmentation.felzenszwalb(img, **self._csbox_felz.get_dict())
-            # seg_map_bound = segmentation.mark_boundaries(img, seg_map)
-            # seg_map_color = color.label2rgb(seg_map, img, kind='avg', bg_label=0)
+            seg_map = segmentation.felzenszwalb(img, **self._csbox_felz.get_dict())
+            seg_map_bound = segmentation.mark_boundaries(img, seg_map)
+            seg_map_color = color.label2rgb(seg_map, img, kind='avg', bg_label=0)
 
-            # # define image list for visualization
-            # img_list = [seg_map_bound, seg_map_color]
-            pass
+            # define image list for visualization
+            img_list.extend([seg_map_bound, seg_map_color])
+    
         elif param["Model"]=="Normalized Cuts":
             # https://scikit-image.org/docs/stable/api/skimage.future.graph.html#skimage.future.graph.cut_normalized
             # https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_ncut.html
