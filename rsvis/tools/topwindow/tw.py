@@ -116,6 +116,14 @@ class TopWindow(Toplevel):
         
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def update(self, img, index=None, **kwargs):
+        if index is None:
+            self._canvas.set_img(img)
+        else:
+            self._canvas[index].set_img(img)
+            
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_canvas(self, value, **kwargs):
         """Set the main image canvas with the image to be displayed
         """
