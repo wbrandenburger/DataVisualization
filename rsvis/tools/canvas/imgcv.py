@@ -244,7 +244,7 @@ class ImgCanvas(Canvas):
         self._img_draw.paste(image, (0, 0), image)
         
         self._img_canvas = ImageTk.PhotoImage(image=self._img_draw)
-        super(ImgCanvas, self).create_image(0, 0, image=self._img_canvas, anchor=NW)
+        self._img_on_canvas = super(ImgCanvas, self).create_image(0, 0, image=self._img_canvas, anchor=NW)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

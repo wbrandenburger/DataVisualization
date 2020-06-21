@@ -51,22 +51,26 @@ class TWHSeg(twhfilter.TWHFilter):
         self._csbox_difference.grid_forget()
 
         # set combobox and settingsbox for segmentation methods
-        self._csbox_seg = csbox.CSBox(self, cbox=[["Model"], [[ "SLIC",  "Normalized Cuts", "GrabCut", "Felzenswalb"]], ["SLIC"], ["str"]], bbox=[["Image Segmentation"], [self.image_segmentation]]) 
+        self._csbox_seg = csbox.CSBox(self, cbox=[["Model"], [[ "SLIC",  "Normalized Cuts", "Felzenswalb"]], ["SLIC"], ["str"]], bbox=[["Image Segmentation"], [self.image_segmentation]]) 
         self._csbox_seg.grid(row=4, column=1, rowspan=2, sticky=N+W+S+E)
-
-        # set combobox and settingsbox for the segmentation method grabcut k-means
-        self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter", "convert2lab"], [20, 50, 100, 1], ["float", "int", "int", "bool"]])
-        self._csbox_slic.grid(row=6, column=1, rowspan=4, sticky=N+W+S+E)
-
-        # set combobox and settingsbox for the segmentation method grabcut
-        self._csbox_grab = csbox.CSBox(self, sbox=[["iterCount"], [5], ["int"]])
-        self._csbox_grab.grid(row=10, column=1, rowspan=1, sticky=N+W+S+E)
 
        # set combobox and settingsbox for the segmentation method felzenswalb
         self._csbox_felz = csbox.CSBox(self, sbox=[["scale", "sigma", "min_size"], [32, 0.5, 256], ["int", "float", "int"]], )
-        self._csbox_felz.grid(row=11, column=1, rowspan=3, sticky=N+W+S+E)
+        self._csbox_felz.grid(row=6, column=1, rowspan=3, sticky=N+W+S+E)
 
-        self._button_quit.grid(row=14, column=0, columnspan=3, sticky=N+W+S+E)
+        # set combobox and settingsbox for the segmentation method grabcut k-means
+        self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter", "convert2lab"], [15, 5000, 250, 1], ["float", "int", "int", "bool"]])
+        self._csbox_slic.grid(row=9, column=1, rowspan=4, sticky=N+W+S+E)
+
+        # set combobox and settingsbox for the segmentation method grabcut
+        self._csbox_grab = csbox.CSBox(self, sbox=[["iterCount"], [5], ["int"]],  bbox=[["GrabCut Segmentation"], [self.image_segmentation_grabcut]])
+        self._csbox_grab.grid(row=13, column=1, rowspan=2, sticky=N+W+S+E)
+
+        # set combobox and settingsbox for the segmentation method grabcut
+        self._csbox_bp = csbox.CSBox(self, sbox=[["dim1", "dim2", "min_label", "max_label", "iterCount", "factor", "net"], [32, 64 , 4, 256, 160, 1.0, 1], ["int", "int", "int", "int", "int", "float", "int"]],  bbox=[["Unsupervised Segmentation via BP"], [self.image_segmentation_backpropagation]])
+        self._csbox_bp.grid(row=15, column=1, rowspan=7, sticky=N+W+S+E)
+
+        self._button_quit.grid(row=22, column=0, columnspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for adding images boxes
         self._csbox_boxes = csbox.CSBox(self, bbox=[["Show Box"], [self.show_box]])
@@ -75,7 +79,7 @@ class TWHSeg(twhfilter.TWHFilter):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def image_segmentation(self, **kwargs):
-        """Compute low-level segmentation methods like felzenswalb'efficient graph based segmentation or k-means based image segementation
+        """Compute low-level segmentation methods like felzenswalb' efficient graph based segmentation or k-means based image segementation
 
         https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_segmentations.html#sphx-glr-auto-examples-segmentation-plot-segmentations-py
         """
@@ -87,7 +91,8 @@ class TWHSeg(twhfilter.TWHFilter):
 
         # define image list for visualization
         img_list = [img]
-        if param["Model"]=="SLIC" or param["Model"]=="Normalized Cuts":
+
+        if param["Model"]=="SLIC":
             # https://scikit-image.org/docs/dev/api/skimage.segmentation.html#skimage.segmentation.slic
             # n_segments = the (approximate) number of labels in the segmented output image.
             # compactness: balances color proximity and space proximity.
@@ -99,7 +104,7 @@ class TWHSeg(twhfilter.TWHFilter):
             # define image list for visualization
             img_list.extend([seg_map_bound, seg_map_color])
 
-        if param["Model"]=="Felzenswalb":
+        elif param["Model"]=="Felzenswalb":
             # https://scikit-image.org/docs/dev/api/skimage.segmentation.html#skimage.segmentation.felzenszwalb.
             seg_map = segmentation.felzenszwalb(img, **self._csbox_felz.get_dict())
             seg_map_bound = segmentation.mark_boundaries(img, seg_map)
@@ -111,6 +116,11 @@ class TWHSeg(twhfilter.TWHFilter):
         elif param["Model"]=="Normalized Cuts":
             # https://scikit-image.org/docs/stable/api/skimage.future.graph.html#skimage.future.graph.cut_normalized
             # https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_ncut.html
+
+            seg_map = segmentation.slic(img, **self._csbox_slic.get_dict(), start_label=1)
+            seg_map_bound = segmentation.mark_boundaries(img, seg_map)
+            seg_map_color = color.label2rgb(seg_map, img, kind='avg', bg_label=0)
+
             g = graph.rag_mean_color(img, seg_map, mode='similarity')
             seg_map = graph.cut_normalized(seg_map, g)
             seg_map_bound = segmentation.mark_boundaries(img, seg_map)
@@ -119,34 +129,67 @@ class TWHSeg(twhfilter.TWHFilter):
             # define image list for visualization
             img_list.extend([seg_map_bound, seg_map_color])
 
-        elif param["Model"]=="GrabCut":
-            # https://docs.opencv.org/master/dd/dfc/tutorial_js_grabcut.html
-            
-            # get the region of interest
-            roi = self.get_obj().get_roi()
+        # open a topwindow with the segmentation results of the currently displayed image      
+        self._img_tw = tw.TopWindow(self, title="Segmentation", dtype="img", value=img_list)
+        
+        self._img_seg = img
+        self._seg_map = seg_map
 
-            # raise error if the width and height of the roi is not defined
-            if not sum(roi[2:4]):
-                raise IndexError("There are no images available.")
-            
-            # allocate mask, background and foreground model
-            mask = np.zeros(img.shape[:2],np.uint8)
-            bgdModel = np.zeros((1,65),np.float64)
-            fgdModel = np.zeros((1,65),np.float64)
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def image_segmentation_backpropagation(self, **kwargs):
+        """Compute low-level segmentation methods like felzenswalb' efficient graph based segmentation or k-means based image segementation
 
-            # this modifies mask 
-            cv2.grabCut(img, mask, roi, bgdModel, fgdModel, **self._csbox_grab.get_dict(), mode=cv2.GC_INIT_WITH_RECT)
+        https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_segmentations.html#sphx-glr-auto-examples-segmentation-plot-segmentations-py
+        """
+        # self.image_segmentation()
+        # define image list for visualization
+        import rsvis.segmentation.unsegbp
+        rsvis.segmentation.unsegbp.unsegbp(self._img_seg, self._seg_map, lambda img: self._img_tw.update(img, index=2), self._logger, **self._csbox_bp.get_dict())
 
-            # If mask==2 or mask== 1, mask2 get 0, other wise it gets 1 as 'uint8' type.
-            seg_map = np.where((mask==2)|(mask==0), 0, 1).astype('bool')
-            img_cut = img*seg_map[:,:,np.newaxis]
-            
-            # define image list for visualization
-            img_list = [img, img_cut, img[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2], :]]  
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def image_segmentation_grabcut(self, **kwargs):
+        """Compute low-level segmentation methods like felzenswalb' efficient graph based segmentation or k-means based image segementation
+
+        https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_segmentations.html#sphx-glr-auto-examples-segmentation-plot-segmentations-py
+        """
+        # get settings of combobox and fields 
+        param = self._csbox_seg.get_dict()
+
+        # get the currently displayed image
+        img = self.get_obj().get_img()
+
+        # define image list for visualization
+        img_list = [img]
+
+        # https://docs.opencv.org/master/dd/dfc/tutorial_js_grabcut.html
+        
+        # get the region of interest
+        roi = self.get_obj().get_roi()
+
+        # raise error if the width and height of the roi is not defined
+        if not sum(roi[2:4]):
+            raise IndexError("There are no images available.")
+        
+        # allocate mask, background and foreground model
+        mask = np.zeros(img.shape[:2],np.uint8)
+        bgdModel = np.zeros((1,65),np.float64)
+        fgdModel = np.zeros((1,65),np.float64)
+
+        # this modifies mask 
+        cv2.grabCut(img, mask, roi, bgdModel, fgdModel, **self._csbox_grab.get_dict(), mode=cv2.GC_INIT_WITH_RECT)
+
+        # If mask==2 or mask== 1, mask2 get 0, other wise it gets 1 as 'uint8' type.
+        seg_map = np.where((mask==2)|(mask==0), 0, 1).astype('bool')
+        img_cut = img*seg_map[:,:,np.newaxis]
+        
+        # define image list for visualization
+        img_list = [img, img_cut, img[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2], :]]  
 
         # open a topwindow with the segmentation results of the currently displayed image      
-        tw.TopWindow(self, title="Segmentation", dtype="img", value=img_list)      
-
+        tw.TopWindow(self, title="Segmentation", dtype="img", value=img_list)
+        
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def show_box(self, event=None):        

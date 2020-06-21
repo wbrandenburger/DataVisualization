@@ -39,7 +39,7 @@ class TopWindow(Toplevel):
         self.wm_title(title)
         
         self._logger = logger
-        
+ 
         #   general window settings -----------------------------------------
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
