@@ -39,7 +39,7 @@ class TWHFilter(twhist.TWHist):
         """Set the main image canvas with the image to be displayed and the corresponding histogram
         """        
         super(TWHFilter, self).set_canvas(img, **kwargs)
-
+        
         # set combobox and settingsbox for blurring parameters
         self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median", "Bilateral Filtering"]], ["Bilateral Filtering"], ["str"]], sbox=[["Kernel Size", "Sigma", "Diameter", "Sigma Color", "Sigma Space"], [5, 2.3, 7, 100, 500], ["int", "float", "int", "int", "int"]], bbox=[["Blur Image", "Gradient Image"], [self.blur_image, self.gradient_image]])
         self._csbox_blur.grid(row=2, column=0, rowspan=7, sticky=N+W+E+S)
@@ -49,11 +49,13 @@ class TWHFilter(twhist.TWHist):
         self._csbox_edges.grid(row=10, column=0, rowspan=4, sticky=N+W+E+S)
 
         # set combobox and settingsbox for thresholding parameters    
-        self._scbox_threshold = scalebox.ScaleBox(self, scbox=[["Thresh"], [[0, 255, 2, 0]], ["int"]],  orient=HORIZONTAL, func=self.set_simple_threshold, button="Simple Thresholding") 
-        self._scbox_threshold.grid(row=2, column=1, rowspan=2, sticky=N+W+S+E)
+        self._csbox_bthreshold = csbox.CSBox(self, bbox=[["Simple Thresholding"], [self.set_threshold_img]])
+        self._csbox_bthreshold.grid(row=2, column=1, rowspan=1, sticky=N+W+S+E)
+        self._csbox_threshold = scalebox.ScaleBox(self, scbox=[["Thresh"], [[0, 255, 2, 0]], ["int"]],  orient=HORIZONTAL, func=self.set_threshold_img_mask)
+        self._csbox_threshold.grid(row=3, column=1, rowspan=1, sticky=N+W+S+E)
 
-        self._csbox_threshold = csbox.CSBox(self, cbox=[["adaptiveMethod"], [["Mean", "Gaussian"]], ["Gaussian"], ["str"]], sbox=[["blockSize", "C"], [5, 2], ["int", "int"]], bbox=[["Adaptive Thresholding"], [self.set_adaptive_thresholding]])
-        self._csbox_threshold.grid(row=4, column=1, rowspan=3, sticky=N+W+S+E)
+        self._csbox_athreshold = csbox.CSBox(self, cbox=[["adaptiveMethod"], [["Mean", "Gaussian"]], ["Gaussian"], ["str"]], sbox=[["blockSize", "C"], [5, 2], ["int", "int"]], bbox=[["Adaptive Thresholding"], [self.set_adaptive_thresholding]])
+        self._csbox_athreshold.grid(row=4, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for building difference images
         self._csbox_difference = csbox.CSBox(self, bbox=[["Clear Image List", "Add Image to Image List", "Compute Difference (Image)", "Show Image List"], [self.reset_dimage, self.set_dimage, self.compute_dimage, self.show_dimage]])
@@ -189,25 +191,55 @@ class TWHFilter(twhist.TWHist):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_simple_threshold(self, event=None, otsu=False):
-        
+    def set_threshold(self, event=None):
+        """Set a threshold via input of windows's slider
+        """
         # get settings of combobox and fields 
-        param = self._scbox_threshold.get_dict()
-        thresh = cv2.THRESH_BINARY if param["Thresh"] else cv2.THRESH_BINARY + cv2.THRESH_OTSU
-        
-        # set threshold
-        ret, dst = cv2.threshold(imgtools.gray_image(self._img), param["Thresh"], 255, thresh)
+        param = self._csbox_threshold.get_dict()
+        thresh = param["Thresh"]
+        method = cv2.THRESH_BINARY if param["Thresh"] else cv2.THRESH_BINARY + cv2.THRESH_OTSU
+
+        # get the currently displayed image
+        grayimg = imgtools.gray_image(self.get_obj().get_img(show=True))
+
+        # implement thresholding and assign the result to the variable dst
+        ret, dst = cv2.threshold(grayimg, thresh, 255, method)
 
         self._logger("Simple Thresholding with thresh: {}".format(ret))
+
+        return ret, dst
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_threshold_img_mask(self, event=None):
+        """Set a threshold via input of windows's slider and display as a mask
+        """
+        
+        # set a threshold via input of windows's slider and display as a mask
+        ret, dst = self.set_threshold()  
         
         # visualize the binary mask in the currently displayed image   
         self.set_threshold_mask(dst)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def set_threshold_img(self, event=None):
+        """Set a threshold via input of windows's slider and display as a mask
+        """
+
+        # set a threshold via input of windows's slider and display as a mask
+        ret, dst = self.set_threshold()  
+        
+        # set image in canvas and update histogram
+        self.get_obj().set_img(imgtools.project_data_to_img(dst, dtype=np.uint8, factor=255), clear_mask=True)
+
+        self.set_img()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_adaptive_thresholding(self, event=None):
         # get settings of combobox and fields 
-        param = self._csbox_threshold.get_dict()
+        param = self._csbox_athreshold.get_dict()
         
         if  param["adaptiveMethod"] == "Mean":
             param_method = cv2.ADAPTIVE_THRESH_MEAN_C

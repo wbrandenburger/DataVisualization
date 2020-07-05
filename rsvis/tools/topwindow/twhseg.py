@@ -45,7 +45,7 @@ class TWHSeg(twhfilter.TWHFilter):
         """        
         super(TWHSeg, self).set_canvas(img, **kwargs)
 
-        self._csbox_threshold.grid_forget()
+        self._csbox_athreshold.grid_forget()
         self._csbox_edges.grid_forget()
         self._csbox_hough.grid_forget()
         self._csbox_difference.grid_forget()

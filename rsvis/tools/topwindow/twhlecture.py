@@ -60,8 +60,10 @@ class TWHLecture(twhist.TWHist):
         self._csbox_grab.grid(row=12, column=0, rowspan=1, sticky=N+W+S+E)
 
         # set combobox and settingsbox for thresholding parameters    
-        self._csbox_threshold = scalebox.ScaleBox(self, scbox=[["Thresh"], [[0, 255, 2, 0]], ["int"]],  orient=HORIZONTAL, func=self.set_simple_threshold, button="Simple Thresholding") 
-        self._csbox_threshold.grid(row=2, column=1, rowspan=2, sticky=N+W+S+E)
+        self._csbox_bthreshold = csbox.CSBox(self, bbox=[["Simple Thresholding"], [self.set_threshold_img]])
+        self._csbox_bthreshold.grid(row=2, column=1, rowspan=1, sticky=N+W+S+E)
+        self._csbox_threshold = scalebox.ScaleBox(self, scbox=[["Thresh"], [[0, 255, 2, 0]], ["int"]],  orient=HORIZONTAL, func=self.set_threshold_img_mask)
+        self._csbox_threshold.grid(row=3, column=1, rowspan=1, sticky=N+W+S+E)
 
         # set combobox and settingsbox for building difference images
         self._csbox_difference = csbox.CSBox(self, bbox=[["Clear Image List", "Add Image to Image List", "Compute Difference (Image)", "Show Image List"], [self.reset_dimage, self.set_dimage, self.compute_dimage, self.show_dimage]])
@@ -71,8 +73,9 @@ class TWHLecture(twhist.TWHist):
         self._csbox_boxes = csbox.CSBox(self, bbox=[[ "Show Box"], [self.show_box]])
         self._csbox_boxes.grid(row=8, column=1, rowspan=1, sticky=N+W+S+E)  
 
-        self._button_quit.grid(row=13, column=0, columnspan=3, sticky=N+W+S+E)
-
+        self._button_quit.grid(row=14, column=0, columnspan=3, sticky=N+W+S+E)
+        self._csbox_shadow = csbox.CSBox(self, bbox=[["Shadow orientation"], [self.shadow_orientation]])
+        self._csbox_shadow.grid(row=13, column=0, columnspan=3, sticky=N+W+S+E)
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def blur_image(self):
@@ -269,33 +272,63 @@ class TWHLecture(twhist.TWHist):
             bgdModel = np.zeros((1,65),np.float64)
             fgdModel = np.zeros((1,65),np.float64)
 
-            # implement the grabcut algorithm and assign the result of the algorithm to variable img_cut
+            # this modifies mask 
+            cv2.grabCut(img, mask, roi, bgdModel, fgdModel, **self._csbox_grab.get_dict(), mode=cv2.GC_INIT_WITH_RECT)
+
+            # If mask==2 or mask== 1, mask2 get 0, other wise it gets 1 as 'uint8' type.
+            seg_map = np.where((mask==2)|(mask==0), 0, 1).astype('bool')
+            img_cut = img*seg_map[:,:,np.newaxis]
 
             # define image list for visualization
             img_list = [img, img_cut, img[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2], :]]  
 
         # open a topwindow with the segmentation results of the currently displayed image      
         tw.TopWindow(self, title="Segmentation", dtype="img", value=img_list)      
-
+    
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_simple_threshold(self, event=None):
+    def set_threshold(self, event=None):
         """Set a threshold via input of windows's slider
         """
-
         # get settings of combobox and fields 
         param = self._csbox_threshold.get_dict()
         thresh = param["Thresh"]
+        method = cv2.THRESH_BINARY if param["Thresh"] else cv2.THRESH_BINARY + cv2.THRESH_OTSU
 
         # get the currently displayed image
-        grayimg = imgtools.gray_image(self._img)
+        grayimg = imgtools.gray_image(self.get_obj().get_img(show=True))
 
         # implement thresholding and assign the result to the variable dst
+        ret, dst = cv2.threshold(grayimg, thresh, 255, method)
 
-        # implement erosion and dilation and assign the result to the variable dst
+        self._logger("Simple Thresholding with thresh: {}".format(ret))
 
+        return ret, dst
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_threshold_img_mask(self, event=None):
+        """Set a threshold via input of windows's slider and display as a mask
+        """
+        
+        # set a threshold via input of windows's slider and display as a mask
+        ret, dst = self.set_threshold()  
+        
         # visualize the binary mask in the currently displayed image   
         self.set_threshold_mask(dst)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_threshold_img(self, event=None):
+        """Set a threshold via input of windows's slider and display as a mask
+        """
+
+        # set a threshold via input of windows's slider and display as a mask
+        ret, dst = self.set_threshold()  
+        
+        # set image in canvas and update histogram
+        self.get_obj().set_img(imgtools.project_data_to_img(dst, dtype=np.uint8, factor=255), clear_mask=True)
+        self.set_img()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -322,4 +355,67 @@ class TWHLecture(twhist.TWHist):
     # kernel = np.convolve(kernel, np.poly1d([-1,1])) # [1, -1, -1, 1]
     # kernel = np.convolve(kernel, np.poly1d([-1,1])) # [-1, 2, 0, -2, 1]
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def shadow_orientation(self, event=None):
+        labelimg = imgtools.get_mask_image(
+                    self.get_obj().get_img_from_label("{label}"), 
+                    index=self.get_obj().get_class(value=False)
+                )
 
+        # define the structuring element and apply the opening operation
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(75,75))
+        labelimg = cv2.morphologyEx(labelimg, cv2.MORPH_ELLIPSE , kernel)
+
+        # get the currently displayed image
+        grayimg = imgtools.gray_image(self.get_obj().get_img(show=True))
+        grayimg = cv2.medianBlur(grayimg, 7)
+        grayimg_label =  grayimg*labelimg
+
+        # get settings of combobox and fields 
+        param = self._csbox_threshold.get_dict()
+        thresh = param["Thresh"]
+        method = cv2.THRESH_BINARY if param["Thresh"] else cv2.THRESH_BINARY + cv2.THRESH_OTSU
+
+        # implement thresholding and assign the result to the variable dst
+        ret, dst = cv2.threshold(grayimg_label[grayimg_label!=0], thresh, 255, method)
+        dst = np.where(grayimg_label<ret,0,1)
+        labelimg_skel = skeletonize(labelimg.astype(np.uint8))
+
+        shdwimg = imgtools.gray_image(np.stack([imgtools.project_data_to_img(labelimg, dtype=np.uint8, factor=255), np.zeros(dst.shape, dtype=np.uint8),  imgtools.project_data_to_img(dst, dtype=np.uint8,factor=255)], axis=2)) 
+        shdwimg = np.where(labelimg_skel>0, 255, shdwimg)
+        shdwimg = np.where(shdwimg==0, 105, shdwimg)
+        shdwimg = np.where(shdwimg==29, 0, shdwimg)
+        
+        dispimg = self.get_obj().get_img(show=True)
+        dispimg[:,:,0] = np.where(labelimg_skel>0, 0, dispimg[:,:,0])
+        dispimg[:,:,1] = np.where(labelimg_skel>0, 255, dispimg[:,:,1])
+        dispimg[:,:,2] = np.where(labelimg_skel>0, 0, dispimg[:,:,2])
+        for r in range(1,shdwimg.shape[0]-1):
+            for c in range(1,shdwimg.shape[1]-1):
+                if  len(np.unique(shdwimg[r-1:r+2,c-1:c+2]))==3:
+                    cv2.circle(dispimg, (c,r), 3, 255, 2)
+
+        tw.TopWindow(self, title="Segmentation", dtype="img", value=[grayimg, shdwimg, grayimg_label, dispimg])
+        
+def skeletonize(img):
+    """ OpenCV function to return a skeletonized version of img, a Mat object"""
+
+    #  hat tip to http://felix.abecassis.me/2011/09/opencv-morphological-skeleton/
+
+    img = img.copy() # don't clobber original
+    skel = img.copy()
+
+    skel[:,:] = 0
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))
+
+    while True:
+        eroded = cv2.morphologyEx(img, cv2.MORPH_ERODE, kernel)
+        temp = cv2.morphologyEx(eroded, cv2.MORPH_DILATE, kernel)
+        temp  = cv2.subtract(img, temp)
+        skel = cv2.bitwise_or(skel, temp)
+        img[:,:] = eroded[:,:]
+        if cv2.countNonZero(img) == 0:
+            break
+
+    return skel
