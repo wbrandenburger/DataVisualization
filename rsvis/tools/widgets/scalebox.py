@@ -43,7 +43,7 @@ class ScaleBox(Frame):
             row = Frame(self)
             lab = Label(row, width=16, text=label, anchor='w')
 
-            sli = Scale(row, from_=param[0], to=param[1], orient=self._orient, command=lambda x=None: self._func(), resolution=param[2], showvalue=0)
+            sli = Scale(row, from_=param[0], to=param[1], orient=self._orient, command=lambda x=None: self._func(), resolution=param[2], showvalue=1)
             sli.set(param[3]) 
             row.pack(side=TOP, fill=X)
             lab.pack(side=LEFT)

@@ -7,7 +7,7 @@
 from rsvis.utils import imgtools
 import rsvis.utils.imgcontainer
 
-from rsvis.tools.canvas import imgcv, extimgcv, extimgconcv
+from rsvis.tools.canvas import imgcv, extimgcv, extimgconcv, rsviscv
 from rsvis.tools.widgets import widgets
 
 import math
@@ -25,7 +25,7 @@ class TopWindow(Toplevel):
             self, 
             parent,
             title="Message Canvas",  
-            dtype="msg", 
+            # dtype="msg", 
             value="",
             q_cmd=None,
             options=list(),
@@ -66,10 +66,7 @@ class TopWindow(Toplevel):
             self._button_quit.grid(row=1, column=0, columnspan=1)
 
         #   main image window -----------------------------------------------
-        if dtype=="msg":
-            self.set_msg(value)
-        elif dtype=="img":          
-            self.set_canvas(value, **canvas)
+        self.set_canvas(value, **canvas)
         
         #   menubar (Options) -----------------------------------------------
         if options:
@@ -104,13 +101,6 @@ class TopWindow(Toplevel):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_msg(self, msg):
-        frame = ttk.Label(self, text=msg)
-
-        frame.grid(row=0, column=0, sticky=N+S+W+E)
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
     def set_img(self, **kwargs):
         self._img = self._canvas.get_img(show=True)
         
@@ -127,6 +117,13 @@ class TopWindow(Toplevel):
     def set_canvas(self, value, **kwargs):
         """Set the main image canvas with the image to be displayed
         """
+        if isinstance(value, str):
+            frame = ttk.Label(self, text=msg)
+            frame.grid(row=0, column=0, sticky=N+S+W+E)
+        elif isinstance(value, rsvis.utils.rsioobject.RSIOObject):
+                self._canvas = rsviscv.RSVisCanvas(self, value, **kwargs)
+                self._canvas.set_container()
+                self._canvas.grid(row=0, column=0, sticky=N+S+W+E)
         if isinstance(value, rsvis.utils.imgcontainer.ImgListContainer):
             self._canvas = extimgconcv.ExtendedImgConCv(self, logger=self._logger, **kwargs)
             self._canvas.set_img_container(value)
@@ -137,7 +134,7 @@ class TopWindow(Toplevel):
             self._canvas.set_img(value)
             self._img = self._canvas.get_img()
             self._canvas.grid(row=0, column=0, sticky=N+S+W+E)
-        elif isinstance(value, list):
+        elif isinstance(value, list): 
             dim = math.ceil(math.sqrt(len(value))) if len(value) > 4 else len(value)
             grid = np.indices((dim, dim))
             grid_y = grid[0].reshape(dim**2)
@@ -151,8 +148,8 @@ class TopWindow(Toplevel):
                 self._canvas[-1].grid(row=grid_y[idx], column=grid_x[idx], sticky=N+S+W+E)
                 
                 self.rowconfigure(grid_y[idx], weight=1)
-                self.columnconfigure(grid_x[idx], weight=1)
-                
+                self.columnconfigure(grid_x[idx], weight=1)            
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_r(self, event, **kwargs):

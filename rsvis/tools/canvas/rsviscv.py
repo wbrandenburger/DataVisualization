@@ -25,7 +25,6 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     def __init__(
         self, 
         parent,
-        images,
         data,
         popup=None, 
         classes=dict(),
@@ -35,11 +34,12 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
         #   settings --------------------------------------------------------
         super(RSVisCanvas, self).__init__(parent, shift=[4,4], **kwargs)
         
-        self._set_popup = popup if popup else (lambda x: x)
+        self._set_popup = popup if popup else (lambda *args, **kwargs: None)
 
         self._data = data
-        self._images = images
-        self._idx_list = rsvis.utils.index.Index(len(self._images))
+        self._images = data.get_img_in()
+        self._show_log = data.show_log()
+        self._idx_list = rsvis.utils.index.Index(len(self))
 
         self._area_event = 0
         self._object_flag = 0
@@ -55,6 +55,7 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
 
         #   key bindings ----------------------------------------------------
         self.bind("<ButtonRelease-2>", self.mouse_button_2_released)
+        self.bind("<Control-Double-Button-1>", self.ctrl_mouse_button_2_released)
         # self.bind("<Double-Button-1>", self.mouse_double_1_button)
 
         self.bind("<w>", self.key_w)
@@ -70,6 +71,36 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
             "f": "Show or hide the objects for a given image set.",           
             "g": "Remove the selected object."
         })
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def __iter__(self):
+        self._idx_list.__iter__()
+        return self
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def __len__(self):
+        return len(self._images)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def __next__(self):
+        self._idx_list.__next__()
+        self.set_container(index=self._idx_list())
+        return self
+        
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def next(self):
+        index = self._idx_list.next()
+        self.set_container(index=index)
+        
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def last(self):
+        index = self._idx_list.last()
+        self.set_container(index=index)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -170,10 +201,9 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_log(self):
-        log = self._data.get_log_in(self.get_img_path(), default="")
-        if log and self._logger:
-            self._logger(log)
-
+        filename = pathlib.Path(self.get_img_path())
+        log = self._show_log(self.get_img_path(), path_dir=filename.parent, name=filename.stem, ext=".log")
+        
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_popup(self, bbox, histogram=True):
@@ -181,6 +211,11 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
             img_container = self._img_container.copy()
             img_container.set_bbox(bbox)
             self._set_popup(title="Histogram Canvas" if histogram else "Patch Canvas", dtype="img", value=img_container, histogram=histogram) 
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_popup_images(self, histogram=True):
+        self._set_popup(title="Histogram Canvas" if histogram else "Patch Canvas", dtype="img", value=self._data, histogram=histogram) 
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -226,6 +261,24 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def ctrl_mouse_button_2_released(self, event, histogram=True):
+        self.focus_set()
+        self.set_popup_images(histogram=histogram)
+
+        # idx_list = rsvis.utils.index.Index(len(self._images))
+
+        # a = self._data.get_img_out()
+        # b = self._data.show_log()
+        # c = self._data.get_log_out()
+
+        # for idx, imgcon in enumerate(self._images):
+        #     a(imgcon[0].path, imgcon[0].data, prefix="arsch", ext=".png")
+        #     c(imgcon[0].path, "HAHA - {} - HUHU".format(idx))
+        #     b(imgcon[0].path)
+
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def key_w(self, event, **kwargs):
         """Show the next image of the given image set."""
         super(RSVisCanvas, self).key_w(event)
@@ -242,15 +295,13 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     # -----------------------------------------------------------------------
     def key_d(self, event, **kwargs):
         """Show the next image in given image list (see listbox)."""
-        index = self._idx_list.next()
-        self.set_container(index=index)
+        self.next()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def key_a(self, event, **kwargs):
         """Show the previous image in given image list (see listbox)."""
-        index = self._idx_list.last()
-        self.set_container(index=index)
+        self.last()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

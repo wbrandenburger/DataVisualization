@@ -41,7 +41,7 @@ class TWHFilter(twhist.TWHist):
         super(TWHFilter, self).set_canvas(img, **kwargs)
         
         # set combobox and settingsbox for blurring parameters
-        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median", "Bilateral Filtering"]], ["Bilateral Filtering"], ["str"]], sbox=[["Kernel Size", "Sigma", "Diameter", "Sigma Color", "Sigma Space"], [5, 2.3, 7, 100, 500], ["int", "float", "int", "int", "int"]], bbox=[["Blur Image", "Gradient Image"], [self.blur_image, self.gradient_image]])
+        self._csbox_blur = csbox.CSBox(self, cbox=[["Model"], [["Average", "Gaussian", "Median", "Bilateral Filtering"]], ["Bilateral Filtering"], ["str"]], sbox=[["Kernel Size", "Sigma", "d", "sigmaColor", "sigmaSpace"], [5, 2.3, 7, 100, 500], ["int", "float", "int", "int", "int"]], bbox=[["Blur Image", "Gradient Image"], [self.blur_image, self.gradient_image]])
         self._csbox_blur.grid(row=2, column=0, rowspan=7, sticky=N+W+E+S)
 
         # set combobox and settingsbox for edge detection parameters
@@ -151,7 +151,7 @@ class TWHFilter(twhist.TWHist):
             img = cv2.medianBlur(img, kernel_size[0])
         elif param["Model"] == "Bilateral Filtering":
             # https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#ga9d7064d478c95d60003cf839430737ed
-            img = cv2.bilateralFilter(img, param["Diameter"], param["Sigma Color"], param["Sigma Space"])
+            img = cv2.bilateralFilter(img, param["d"], param["sigmaColor"], param["sigmaSpace"])
 
         # set image in canvas and update histogram
         self.get_obj().set_img(img, clear_mask=False)

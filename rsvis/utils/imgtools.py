@@ -9,6 +9,7 @@ import rsvis.utils.patches
 
 import cv2
 import numpy as np
+import math
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -17,7 +18,7 @@ from scipy import ndimage
 from scipy.stats import norm
 from PIL import Image
 from io import BytesIO
-
+from skimage import morphology 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_array_info(img, verbose=False):
@@ -97,6 +98,14 @@ def resize_img(img, scale):
 
     img = cv2.resize(img, dim,  interpolation=cv2.INTER_NEAREST)
     return img
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def resize_image(img, factor):
+    new_shape = (math.ceil(img.shape[0]*factor), math.ceil(img.shape[1]*factor))
+    img = cv2.resize(img, (new_shape[1], new_shape[0]), interpolation=cv2.INTER_CUBIC)
+    return img
+
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -331,15 +340,18 @@ def get_connected_components(img, connectivity=8):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_distance_transform(labelimg, label=0, index=None, threshold=10):
+def get_distance_transform(labelimg, label=0, index=None, non_class=True,**kwargs):
     labelimg = reduce_image_dim(labelimg)
 
     if index is not None:
         label = np.unique(labelimg)[index]
 
-    mask_class = ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=True).astype(float))
-    mask_non_class = ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=False).astype(float))
-    return mask_non_class
+    if non_class:
+        return ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=False).astype(float))
+    else:
+        return ndimage.distance_transform_edt(get_label_mask(labelimg, label_list=[label], equal=True).astype(float))
+    
+    
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -411,3 +423,37 @@ def set_threshold_mask(dst, mask):
     mask_invert.extend([False])
 
     return mask_list, mask_color, mask_invert, mask_alpha
+
+#   function ------------------------------------------------------------
+# -----------------------------------------------------------------------
+def get_placeholder(img, seg_map,start=1, stop=255, step=3, min_size=200, **kwargs):
+
+    grayimg = gray_image(img)
+    gray_seg_map = gray_image(seg_map)
+    grayimga = np.where(gray_seg_map<255, grayimg, 255)
+    # grayimg = quantize_image(img, 32)
+    placex = np.arange(start, stop, step)
+    placeh = np.zeros((len(placex)))
+    placei = np.zeros((len(placex)))
+    placej = np.zeros((len(placex)))
+
+    for value in range(len(placeh)):
+        thresh_img = np.where(grayimg<(value+1)*step, 1, 0).astype(np.bool)
+        thresh_img_label, num = morphology.label(thresh_img, connectivity=1, return_num=True)
+        placeh[value] = num
+        thresh_img_label_hist = np.histogram(thresh_img_label, range(0, len(np.unique(thresh_img_label))+1))
+        pp = thresh_img_label_hist[0]>min_size
+        placei[value-1] = np.count_nonzero(thresh_img_label_hist[0]>min_size)
+
+    for value in range(len(placeh)):
+        thresh_img = np.where(grayimga<(value+1)*step, 1, 0).astype(np.bool)
+        thresh_img_label, num = morphology.label(thresh_img, connectivity=1, return_num=True)
+        placej[value] = num
+        # thresh_img_label_hist = np.histogram(thresh_img_label, range(0, len(np.unique(thresh_img_label))+1))
+        # pp = thresh_img_label_hist[0]>min_size
+        # placei[value-1] = np.count_nonzero(thresh_img_label_hist[0]>min_size)
+
+    placeh = placeh/np.max(placeh)
+    placej = placej/np.max(placej) 
+    # placej = (placej)/np.max(placej)
+    return placeh, placej, placej, placex, grayimga

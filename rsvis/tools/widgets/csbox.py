@@ -20,7 +20,6 @@ class CSBox(Frame):
         bbox=list(),
         cbox=list(),
         sbox=list(),
-        button="",
         **kwargs
     ):
         super(CSBox, self).__init__(parent, **kwargs)

@@ -8,7 +8,9 @@ from rsvis.__init__ import _logger
 import rsvis.config.settings
 import rsvis.utils.general as gu
 
-import rsvis.rsshow.rsshow
+import rsvis.tasks.rsshow
+import rsvis.tasks.rsexpseg
+import rsvis.tasks.rsexpsegthresh
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -19,7 +21,7 @@ def task_default():
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def task_rsshow(setting="training"):
-    rsvis.rsshow.rsshow.run(
+    rsvis.tasks.rsshow.run(
         rsvis.config.settings.get_data(setting),
         rsvis.config.settings._SETTINGS["param_specs"],
         rsvis.config.settings._SETTINGS["param_in"], 
@@ -33,6 +35,41 @@ def task_rsshow(setting="training"):
             rsvis.config.settings._SETTINGS,"param_vis", dict()),            
         param_show=gu.get_value(
             rsvis.config.settings._SETTINGS,"param_show", dict())     
+    )
+
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def task_segmentation(setting="training"):
+    rsvis.tasks.rsexpseg.run(
+        rsvis.config.settings.get_data(setting),
+        rsvis.config.settings._SETTINGS["param_specs"],
+        rsvis.config.settings._SETTINGS["param_in"], 
+        param_out=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_out", dict()), 
+        param_classes=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_classes", list()),
+        param_exp=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_exp", list()),
+        param_show=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_show", dict())   
+    )
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def task_segmentation_threshold(setting="training"):
+    rsvis.tasks.rsexpsegthresh.run(
+        rsvis.config.settings.get_data(setting),
+        rsvis.config.settings._SETTINGS["param_specs"],
+        rsvis.config.settings._SETTINGS["param_in"], 
+        param_out=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_out", dict()), 
+        param_classes=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_classes", list()),
+        param_exp=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_exp", list()),
+        param_show=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_show", dict())   
     )
 
 #   function ----------------------------------------------------------------

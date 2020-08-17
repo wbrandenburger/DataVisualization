@@ -7,6 +7,7 @@ from rsvis.__init__ import _logger
 import rsvis.utils.general as gu
 import rsvis.utils.imgcontainer
 from rsvis.utils import imgtools
+import rsvis.utils.yaml
 
 import numpy as np
 import pathlib
@@ -91,6 +92,20 @@ def set_object(path, obj, scale=100, logger=None, **kwargs):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def read_yaml(path, logger=None):
+    show_read_str(path, logger=logger)
+
+    return rsvis.utils.yaml.data_to_yaml(path)
+        
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def write_yaml(path, data, logger=None):
+    show_write_str(path, logger=logger)
+
+    rsvis.utils.yaml.data_to_yaml(path, data)
+    
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def read_log(path, logger=None):
     show_read_str(path, logger=logger)
 
@@ -102,13 +117,25 @@ def read_log(path, logger=None):
 def write_log(path, log, logger=None):
     show_write_str(path, logger=logger)
 
+    with open(path, "w") as f:
+        f.write(log)
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def get_log(path, default="", logger=None, **kwargs):
+def get_log(path, logger=None, **kwargs):
     if not pathlib.Path(path).exists():
-        return default
+        return
     return read_log(path, logger=logger)
-        
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def show_log(path, default="There is no logging information.", logger=None, **kwargs):
+    log_str = get_log(path, logger=logger)
+    if not log_str:
+        show_info_str(default, logger=logger)
+    else:
+        show_io_str(log_str, logger=logger)
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def read_image(path, logger=None,):
@@ -129,7 +156,7 @@ def write_image(path, img, logger=None,):
     if str(path).endswith(".tif"):
         tifffile.imwrite(path, img)
     else:
-        PIL.Image.fromarray(img).write(path)
+        PIL.Image.fromarray(img).save(path)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
