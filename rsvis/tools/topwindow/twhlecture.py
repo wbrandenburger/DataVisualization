@@ -358,16 +358,18 @@ class TWHLecture(twhist.TWHist):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def shadow_orientation(self, event=None):
+        
+        # get annotation of impervious surface
         labelimg = imgtools.get_mask_image(
                     self.get_obj().get_img_from_label("{label}"), 
                     index=self.get_obj().get_class(value=False)
                 )
 
-        # define the structuring element and apply the opening operation
+        # define the structuring element and apply the opening operation for removing holes and connecting regions
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(75,75))
         labelimg = cv2.morphologyEx(labelimg, cv2.MORPH_ELLIPSE , kernel)
 
-        # get the currently displayed image
+        # get the currently displayed image, blur the image 
         grayimg = imgtools.gray_image(self.get_obj().get_img(show=True))
         grayimg = cv2.medianBlur(grayimg, 7)
         grayimg_label =  grayimg*labelimg
