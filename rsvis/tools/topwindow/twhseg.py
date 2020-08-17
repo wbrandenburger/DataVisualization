@@ -59,7 +59,7 @@ class TWHSeg(twhfilter.TWHFilter):
         self._csbox_felz.grid(row=6, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut k-means
-        self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter", "convert2lab"], [15, 5000, 250, 1], ["float", "int", "int", "bool"]])
+        self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter", "convert2lab"], [15, 500, 250, 0], ["float", "int", "int", "bool"]])
         self._csbox_slic.grid(row=9, column=1, rowspan=4, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut
@@ -67,7 +67,7 @@ class TWHSeg(twhfilter.TWHFilter):
         self._csbox_grab.grid(row=13, column=1, rowspan=2, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut
-        self._csbox_bp = csbox.CSBox(self, sbox=[["dim1", "dim2", "min_label", "max_label", "iterCount", "factor", "net"], [32, 64 , 4, 256, 160, 1.0, 1], ["int", "int", "int", "int", "int", "float", "int"]],  bbox=[["Unsupervised Segmentation via BP"], [self.image_segmentation_backpropagation]])
+        self._csbox_bp = csbox.CSBox(self, sbox=[["dim1", "dim2", "min_label", "max_label", "iterCount", "factor", "net", "height"], [32, 64 , 4, 256, 32, 1.0, 1, False], ["int", "int", "int", "int", "int", "float", "int", "bool"]],  bbox=[["Unsupervised Segmentation via BP"], [self.image_segmentation_backpropagation]])
         self._csbox_bp.grid(row=15, column=1, rowspan=7, sticky=N+W+S+E)
 
         self._button_quit.grid(row=22, column=0, columnspan=3, sticky=N+W+S+E)
@@ -130,11 +130,8 @@ class TWHSeg(twhfilter.TWHFilter):
             img_list.extend([seg_map_bound, seg_map_color])
 
         # open a topwindow with the segmentation results of the currently displayed image      
-        self._img_tw = tw.TopWindow(self, title="Segmentation", dtype="img", value=img_list)
+        tw.TopWindow(self, title="Segmentation", dtype="img", value=img_list)
         
-        self._img_seg = img
-        self._seg_map = seg_map
-
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def image_segmentation_backpropagation(self, **kwargs):
@@ -145,7 +142,42 @@ class TWHSeg(twhfilter.TWHFilter):
         # self.image_segmentation()
         # define image list for visualization
         import rsvis.segmentation.unsegbp
-        rsvis.segmentation.unsegbp.unsegbp(self._img_seg, self._seg_map, lambda img: self._img_tw.update(img, index=2), self._logger, **self._csbox_bp.get_dict())
+        import math
+        # get the currently displayed image
+        img = self.get_obj().get_img()
+        factor = self._csbox_bp.get_dict()["factor"]
+        new_shape = (math.ceil(img.shape[0]*factor), math.ceil(img.shape[1]*factor))
+        img = cv2.resize(img, (new_shape[1], new_shape[0]), dst=cv2.CV_8UC3,interpolation=cv2.INTER_CUBIC)
+
+        # define image list for visualization
+        img_list = [img]
+
+        # https://scikit-image.org/docs/dev/api/skimage.segmentation.html#skimage.segmentation.slic
+        # n_segments = the (approximate) number of labels in the segmented output image.
+        # compactness: balances color proximity and space proximity.
+        # max_iter: maximum number of iterations of k-means.
+        seg_map = segmentation.slic(img, **self._csbox_slic.get_dict(), start_label=1)
+        seg_map_bound = segmentation.mark_boundaries(img, seg_map)
+        seg_map_color = color.label2rgb(seg_map, img, kind='avg', bg_label=0)
+
+        # param = self._csbox_slic.get_dict()
+        # param["compactness"] = 2
+
+        # seg_map_all = segmentation.slic(np.concatenate([img, imgtools.project_data_to_img( self._canvas.get_img_from_label("{height}"), dtype=np.uint8, factor=255)], axis=1), **param, start_label=1)
+        # print(seg_map_all.shape)
+
+        # a =np.concatenate([imgtools.project_data_to_img( self._canvas.get_img_from_label("{height}"), dtype=np.uint8, factor=255)]*3, axis=2)
+        # print(a.shape)
+        # seg_map_height = segmentation.slic(a, **param, start_label=1)
+        # seg_map_bound_height= segmentation.mark_boundaries(a, seg_map_height)
+        # seg_map_color_height = color.label2rgb(seg_map_height, a, kind='avg', bg_label=0)
+
+        # tw.TopWindow(self, title="Segmentation", dtype="img", value=
+        # [img, seg_map_bound, seg_map_color, self._canvas.get_img_from_label("{height}"), seg_map_bound_height, seg_map_color_height])
+
+        # define image list for visualization
+        img_list.extend([seg_map, seg_map_color])
+        rsvis.segmentation.unsegbp.unsegbp(self, img_list, self._logger, **self._csbox_bp.get_dict(), segments=self._csbox_slic.get_dict()["n_segments"])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

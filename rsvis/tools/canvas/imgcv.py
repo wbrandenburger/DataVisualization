@@ -146,7 +146,7 @@ class ImgCanvas(Canvas):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_img(self, img, clear_mask=True):
+    def set_img(self, img, clear_mask=True, update=False):
         if not isinstance(img, np.ndarray):
             return
 
@@ -161,6 +161,17 @@ class ImgCanvas(Canvas):
             self.set_mask(show=False)
 
         self.create_image()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def attempt(self, img):
+        self._img_size = [img.shape[1], img.shape[0]]
+        self._data_img = imgtools.expand_image_dim(img)
+        if not isinstance(img.dtype, np.uint8):
+            img = imgtools.project_and_stack(img, dtype=np.uint8, factor=255)
+        self._img = Image.fromarray(img)
+
+        self.update_image()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -245,6 +256,29 @@ class ImgCanvas(Canvas):
         
         self._img_canvas = ImageTk.PhotoImage(image=self._img_draw)
         self._img_on_canvas = super(ImgCanvas, self).create_image(0, 0, image=self._img_canvas, anchor=NW)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def update_image(self, **kwargs):
+        self._img_draw = self._img.resize(self.get_size())
+        if isinstance(self._mask[0], np.ndarray):
+            for idx, (mask, color, alpha, invert) in enumerate(zip(self._mask, self._mask_color, self._mask_alpha, self._mask_invert)):
+                mask = self.get_mask(index=idx, resize=True)
+                mask = mask if not invert else imgtools.invert_bool_img(mask)
+                mask = Image.fromarray(
+                    imgtools.get_transparent_image(
+                        imgtools.bool_to_img(mask, value=-1, dtype=np.int16, color=color, factor=255),
+                        value=alpha
+                    )
+                )
+                self._img_draw.paste(mask, (0, 0), mask)
+
+        image = Image.fromarray(
+            imgtools.get_transparent_image(self.draw_image(), value=200))
+        self._img_draw.paste(image, (0, 0), image)
+        self._img_canvas = ImageTk.PhotoImage(image=self._img_draw)
+        self._img_on_canvas = super(ImgCanvas, self).create_image(0, 0, image=self._img_canvas, anchor=NW)
+        # self.itemconfig(self._img_on_canvas, image=self._img_canvas)
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

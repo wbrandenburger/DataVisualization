@@ -39,7 +39,7 @@ class TopWindow(Toplevel):
         self.wm_title(title)
         
         self._logger = logger
- 
+
         #   general window settings -----------------------------------------
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -118,10 +118,18 @@ class TopWindow(Toplevel):
     # -----------------------------------------------------------------------
     def update(self, img, index=None, **kwargs):
         if index is None:
-            self._canvas.set_img(img)
+            self._canvas.attempt(img)
         else:
-            self._canvas[index].set_img(img)
-            
+            self._canvas[index].attempt(img)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def update_image(self, index=None, **kwargs):
+        if index is None:
+            self._canvas.update_image()
+        else:
+            self._canvas[index].update_image()
+   
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_canvas(self, value, **kwargs):
