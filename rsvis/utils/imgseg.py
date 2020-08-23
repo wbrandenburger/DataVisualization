@@ -37,6 +37,7 @@ class ImgSeg:
         self._convert2lab = param["convert2lab"] if "convert2lab" in param.keys() else True
         self._color = param["color"] if "color" in param.keys() else True
         self._position = param["position"] if "position" in param.keys() else False
+        self._img_ref = param["reference"] if "reference" in param.keys() else None
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -116,13 +117,17 @@ class ImgSeg:
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------  
     def get_seg_map_color(self):
+        img_ref =  self._img
+        if img_ref.ndim!=3 or img_ref.shape[2]!=3: 
+            img_ref = self._img_ref
+
         if self._kind=="avg" or self._kind=="overlay":
-            seg_map_color = color.label2rgb(self._seg_map, self._img, kind=self._kind, bg_label=-1)
+            seg_map_color = color.label2rgb(self._seg_map, img_ref, kind=self._kind, bg_label=-1)
         elif self._kind == "min" or self._kind == "max":
             factor = -1.0 if self._kind == "min" else 1.0
-            seg_map_color = np.zeros(self._img.shape, dtype=np.uint8)
+            seg_map_color = np.zeros(img_ref.shape, dtype=np.uint8)
             for label in self.get_label():
-                values = self._img[self._seg_map==label]
+                values = img_ref[self._seg_map==label]
                 
                 value = np.mean(values, axis=0) + factor*np.std(values, axis=0)
                 value = np.where(value<0, 0, value)
@@ -140,11 +145,14 @@ class ImgSeg:
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_seg_map_boundaries(self):
-        img = self.get_seg_map_color()
+        img_ref =  self.get_seg_map_color()
+        if img_ref.ndim!=3 or img_ref.shape[2]!=3: 
+            img_ref = self._img_ref
+            
         if self._boundaries=="mark":
-            return segmentation.mark_boundaries(img, self._seg_map, mode="subpixel")
+            return segmentation.mark_boundaries(img_ref, self._seg_map, mode="subpixel")
         elif self._boundaries=="find":
-            return segmentation.find_boundaries(img, self._seg_map, mode="subpixel")
+            return segmentation.find_boundaries(img_ref, self._seg_map, mode="subpixel")
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------

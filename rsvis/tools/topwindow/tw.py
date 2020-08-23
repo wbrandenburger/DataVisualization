@@ -118,7 +118,7 @@ class TopWindow(Toplevel):
         """Set the main image canvas with the image to be displayed
         """
         if isinstance(value, str):
-            frame = ttk.Label(self, text=msg)
+            frame = ttk.Label(self)
             frame.grid(row=0, column=0, sticky=N+S+W+E)
         elif isinstance(value, rsvis.utils.rsioobject.RSIOObject):
                 self._canvas = rsviscv.RSVisCanvas(self, value, **kwargs)

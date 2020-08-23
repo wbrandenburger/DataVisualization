@@ -26,6 +26,7 @@ import numpy as np
 from tkinter import *
 from tkinter import ttk
 
+import rsvis.segmentation.unsegbp
 import math
 
 from matplotlib import pyplot as plt
@@ -62,7 +63,7 @@ class TWHSeg(twhfilter.TWHFilter):
         self._csbox_difference.grid_forget()
 
         # set combobox and settingsbox for segmentation methods
-        self._csbox_seg = csbox.CSBox(self, cbox=[["mode", "kind", "boundaries"], [[ "SLIC", "SLIC-0", "Normalized Cuts", "Felzenswalb", "SLIC+Felzenswalb", "KMeans"], ["avg", "overlay", "min", "max"], ["mark", "find"]], ["SLIC", "min", "mark"], ["str", "str", "str"]], sbox = [["convert2lab", "color", "position"], [ 1, 1, 0], ["int", "int", "int"]], bbox=[["Image Segmentation", "Distance Transform"], [self.image_segmentation, self.distance_transform]]) 
+        self._csbox_seg = csbox.CSBox(self, cbox=[["mode", "kind", "boundaries"], [[ "SLIC", "SLIC-0", "Normalized Cuts", "Felzenswalb", "SLIC+Felzenswalb", "KMeans"], ["avg", "overlay", "min", "max"], ["mark", "find"]], ["SLIC-0", "avg", "mark"], ["str", "str", "str"]], sbox = [["convert2lab", "color", "position"], [ 1, 1, 0], ["int", "int", "int"]], bbox=[["Image Segmentation", "Distance Transform"], [self.image_segmentation, self.distance_transform]]) 
         self._csbox_seg.grid(row=4, column=1, rowspan=8, sticky=N+W+S+E)
 
        # set combobox and settingsbox for the segmentation method felzenswalb
@@ -70,7 +71,7 @@ class TWHSeg(twhfilter.TWHFilter):
         self._csbox_felz.grid(row=12, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut k-means
-        self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter"], [10, 250, 15], ["float", "int", "int"]])
+        self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter"], [10, 2500, 15], ["float", "int", "int"]])
         self._csbox_slic.grid(row=15, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut k-means
@@ -85,7 +86,7 @@ class TWHSeg(twhfilter.TWHFilter):
         # self._csbox_bp = csbox.CSBox(self, sbox=[["dim1", "dim2", "min_label", "max_label", "iterCount", "factor", "net"], [32, 64 , 4, 256, 160, 1.0, 1], ["int", "int", "int", "int", "int", "float", "int"]],  bbox=[["Unsupervised Segmentation via BP"], [self.image_segmentation_backpropagation]])
         # self._csbox_bp.grid(row=21, column=1, rowspan=7, sticky=N+W+S+E)
 
-        self._button_quit.grid(row=19, column=0, columnspan=3, sticky=N+W+S+E)
+        self._button_quit.grid(row=25, column=0, columnspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for adding images boxes
         self._csbox_resize = csbox.CSBox(self, sbox=[["factor"], [1.0], ["float"]], bbox=[["Resize Image"], [self.resize_image]])
@@ -98,6 +99,11 @@ class TWHSeg(twhfilter.TWHFilter):
 
         # self._csbox_lthreshold = scalebox.ScaleBox(self, scbox=[["Thresh"], [[0, 100, 1, 0]], ["int"]],  orient=HORIZONTAL, func=self.set_lthreshold)
         # self._csbox_lthreshold.grid(row=16, column=0, rowspan=2, sticky=N+W+S+E)
+
+        # set combobox and settingsbox for the segmentation method grabcut
+        self._csbox_bp = csbox.CSBox(self, sbox=[["dim1", "dim2", "min_label", "max_label", "iterCount", "factor", "height"], [64, 128 , 4, 32, 250, 1.0, 0], ["int", "int", "int", "int", "int", "float", "int", "bool"]],  bbox=[["Unsupervised Segmentation via BP"], [self.image_segmentation_backpropagation]])
+        self._csbox_bp.grid(row=19, column=1, rowspan=6, sticky=N+W+S+E)
+
         self._csbox_blubb = csbox.CSBox(self, bbox=[["Blubb"], [self.blubb]]) 
         self._csbox_blubb.grid(row=16, column=0, rowspan=1, sticky=N+W+S+E)
     #   method --------------------------------------------------------------
@@ -252,6 +258,47 @@ class TWHSeg(twhfilter.TWHFilter):
 
 
         # watershed(-distance, markers, mask=image)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def image_segmentation_backpropagation(self, **kwargs):
+        """Compute low-level segmentation methods like felzenswalb' efficient graph based segmentation or k-means based image segementation
+
+        https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_segmentations.html#sphx-glr-auto-examples-segmentation-plot-segmentations-py
+        """
+
+        # get settings of combobox and fields 
+        param_seg = self._csbox_seg.get_dict()
+        param_bp = self._csbox_bp.get_dict()
+
+        # get the currently displayed image
+        img = self.get_obj().get_img()
+
+        # resize image
+        factor = param_bp["factor"]
+        new_shape = (math.ceil(img.shape[0]*factor), math.ceil(img.shape[1]*factor))
+        img = cv2.resize(img, (new_shape[1], new_shape[0]), dst=cv2.CV_8UC3,interpolation=cv2.INTER_CUBIC)
+
+        mode = param_seg["mode"]
+        if mode == "SLIC" or mode=="SLIC-0" or mode=="Normalized Cuts":
+            param_model = self._csbox_slic.get_dict()
+        elif mode == "Felzenswalb":
+            param_model = self._csbox_felz.get_dict()
+        elif mode == "KMeans" :
+            param_model = self._csbox_kmeans.get_dict()          
+ 
+        seg = rsvis.utils.imgseg.ImgSeg(**param_seg)
+        seg.predict(img, **param_model)
+
+
+        # define image list for visualization
+        img_list = [img]
+
+        # height = imgtools.project_data_to_img(self.get_obj().get_img_from_label("height"), dtype= np.uint8, factor=255)
+
+        # define image list for visualization
+        img_list.extend([seg.get_seg_map(), seg.get_seg_map_color()])
+        rsvis.segmentation.unsegbp.unsegbp(self, img, img_list, self._logger, **param_bp, segments=self._csbox_slic.get_dict()["n_segments"])
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -450,6 +497,8 @@ class TWHSeg(twhfilter.TWHFilter):
 
         # get the currently displayed image
         img = self.get_obj().get_img()
+        # img = self.get_obj().get_img_from_label("height")
+        # param_seg["reference"] = imga
 
         # define image list for visualization
         img_list = [img]
@@ -472,17 +521,6 @@ class TWHSeg(twhfilter.TWHFilter):
             self._img_tw = tw.TopWindow(self, title="Segmentation", dtype="img", value=img_list)
 
         return img_list
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def image_segmentation_backpropagation(self, **kwargs):
-        """Compute low-level segmentation methods like felzenswalb' efficient graph based segmentation or k-means based image segementation
-
-        https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_segmentations.html#sphx-glr-auto-examples-segmentation-plot-segmentations-py
-        """
-        # self.image_segmentation()
-        # define image list for visualization
-        import rsvis.segmentation.unsegbp
-        rsvis.segmentation.unsegbp.unsegbp(self._img_seg, self._seg_map, lambda img: self._img_tw.update(img, index=2), self._logger, **self._csbox_bp.get_dict())
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
