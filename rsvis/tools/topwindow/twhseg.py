@@ -71,7 +71,7 @@ class TWHSeg(twhfilter.TWHFilter):
         self._csbox_felz.grid(row=12, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut k-means
-        self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter"], [10, 2500, 15], ["float", "int", "int"]])
+        self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter"], [10, 250, 15], ["float", "int", "int"]])
         self._csbox_slic.grid(row=15, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut k-means
@@ -498,8 +498,8 @@ class TWHSeg(twhfilter.TWHFilter):
         # get the currently displayed image
         img = self.get_obj().get_img()
         # img = self.get_obj().get_img_from_label("height")
-        # param_seg["reference"] = imga
-
+        # param_seg["reference"] = self.get_obj().get_img_from_label("height")
+        param_seg["boundaries"] = "find"
         # define image list for visualization
         img_list = [img]
 
@@ -513,13 +513,17 @@ class TWHSeg(twhfilter.TWHFilter):
  
         seg = rsvis.utils.imgseg.ImgSeg(**param_seg)
         seg.predict(img, **param_model)
-        img_list.extend(seg.get_visualization())# , seg.get_seg_map_boundaries(**self._csbox_bound.get_dict())])    
+        img_list.extend([seg.get_seg_map_color(), seg.get_seg_map_boundaries(img=imgtools.project_and_stack(self.get_obj().get_img_from_label("{height}"),  dtype=np.uint8, factor=255))])    
+        
         print("Number of segments: {}".format(seg.get_num_label()))
 
         # open a topwindow with the segmentation results of the currently displayed image
-        if show:
-            self._img_tw = tw.TopWindow(self, title="Segmentation", dtype="img", value=img_list)
 
+        if show:
+            self.get_obj().set_img(img_list[2], clear_mask=False)
+            self.set_img()
+
+            self._img_tw = tw.TopWindow(self, title="Segmentation", dtype="img", value=img_list)
         return img_list
 
     #   method --------------------------------------------------------------
