@@ -141,20 +141,23 @@ class ImgSeg:
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_seg_map_boundaries(self, img=None):
-        # colored boundaries
-        # seg_map_bin = segmentation.find_boundaries(self._seg_map, mode="subpixel")
-        # return cv2.resize(self._img, (seg_map_bin.shape[1],seg_map_bin.shape[0]))*seg_map_bin[:,:,np.newaxis]
+    def get_seg_map_boundaries(self, img=None, mode="inner"):
 
         if not isinstance(img, np.ndarray):
             img = self._img
         
         # img = imgtools.stack_image_dim(img)
+        seg_map_bin = segmentation.find_boundaries(self._seg_map, mode=mode)
+        if mode=="inner":
+            img = cv2.resize(img, (seg_map_bin.shape[1],seg_map_bin.shape[0]))
 
-        seg_map_bin = segmentation.find_boundaries(self._seg_map, mode="inner")
-        img =cv2.resize(img, (seg_map_bin.shape[1],seg_map_bin.shape[0]))
-        img_y = np.stack([np.zeros(seg_map_bin.shape, dtype=np.uint8),np.full(seg_map_bin.shape, 255, dtype=np.uint8), np.zeros(seg_map_bin.shape, dtype=np.uint8)], axis=2)
-        return (img+1)*np.invert(seg_map_bin)[:,:,np.newaxis] + img_y
+        # colored boundaries
+        # return img*seg_map_bin[:,:,np.newaxis]
+
+        img_colorize = np.stack([np.zeros(seg_map_bin.shape, dtype=np.uint8),np.full(seg_map_bin.shape, 255, dtype=np.uint8), np.zeros(seg_map_bin.shape, dtype=np.uint8)], axis=2)
+
+        return img*np.invert(seg_map_bin)[:,:,np.newaxis] + img_colorize*seg_map_bin[:,:,np.newaxis]
+
         # if self._boundaries=="mark":
         #     return segmentation.mark_boundaries(self._img, self._seg_map, mode="subpixel")
         # elif self._boundaries=="find":

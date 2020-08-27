@@ -63,20 +63,20 @@ class TWHSeg(twhfilter.TWHFilter):
         self._csbox_difference.grid_forget()
 
         # set combobox and settingsbox for segmentation methods
-        self._csbox_seg = csbox.CSBox(self, cbox=[["mode", "kind", "boundaries"], [[ "SLIC", "SLIC-0", "Normalized Cuts", "Felzenswalb", "SLIC+Felzenswalb", "KMeans"], ["avg", "overlay", "min", "max"], ["mark", "find"]], ["SLIC-0", "avg", "mark"], ["str", "str", "str"]], sbox = [["convert2lab", "color", "position"], [ 1, 1, 0], ["int", "int", "int"]], bbox=[["Image Segmentation", "Distance Transform"], [self.image_segmentation, self.distance_transform]]) 
-        self._csbox_seg.grid(row=4, column=1, rowspan=8, sticky=N+W+S+E)
+        self._csbox_seg = csbox.CSBox(self, cbox=[["mode", "kind", "boundaries", "domain", "reference"], [[ "SLIC", "SLIC-0", "Normalized Cuts", "Felzenswalb", "SLIC+Felzenswalb", "KMeans"], ["avg", "overlay", "min", "max"], ["mark", "find"], ["image", "height", "label"], ["image", "height", "label"]], ["SLIC-0", "avg", "mark", "image", "image"], ["str", "str", "str", "str", "str"]], sbox = [["convert2lab", "color", "position"], [ 1, 1, 0], ["int", "int", "int"]], bbox=[["Image Segmentation", "Distance Transform"], [self.image_segmentation, self.distance_transform]]) 
+        self._csbox_seg.grid(row=4, column=1, rowspan=10, sticky=N+W+S+E)
 
        # set combobox and settingsbox for the segmentation method felzenswalb
         self._csbox_felz = csbox.CSBox(self, sbox=[["scale", "sigma", "min_size"], [32, 0.5, 256], ["int", "float", "int"]], )
-        self._csbox_felz.grid(row=12, column=1, rowspan=3, sticky=N+W+S+E)
+        self._csbox_felz.grid(row=14, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut k-means
         self._csbox_slic = csbox.CSBox(self, sbox=[["compactness", "n_segments", "max_iter"], [10, 250, 15], ["float", "int", "int"]])
-        self._csbox_slic.grid(row=15, column=1, rowspan=3, sticky=N+W+S+E)
+        self._csbox_slic.grid(row=17, column=1, rowspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut k-means
         self._csbox_kmeans = csbox.CSBox(self, sbox=[["n_clusters"], [6], ["int"]])
-        self._csbox_kmeans.grid(row=18, column=1, rowspan=1, sticky=N+W+S+E)
+        self._csbox_kmeans.grid(row=20, column=1, rowspan=1, sticky=N+W+S+E)
 
         # # set combobox and settingsbox for the segmentation method grabcut
         # self._csbox_grab = csbox.CSBox(self, sbox=[["iterCount"], [5], ["int"]],  bbox=[["GrabCut Segmentation"], [self.image_segmentation_grabcut]])
@@ -86,26 +86,26 @@ class TWHSeg(twhfilter.TWHFilter):
         # self._csbox_bp = csbox.CSBox(self, sbox=[["dim1", "dim2", "min_label", "max_label", "iterCount", "factor", "net"], [32, 64 , 4, 256, 160, 1.0, 1], ["int", "int", "int", "int", "int", "float", "int"]],  bbox=[["Unsupervised Segmentation via BP"], [self.image_segmentation_backpropagation]])
         # self._csbox_bp.grid(row=21, column=1, rowspan=7, sticky=N+W+S+E)
 
-        self._button_quit.grid(row=25, column=0, columnspan=3, sticky=N+W+S+E)
+        self._button_quit.grid(row=27, column=0, columnspan=3, sticky=N+W+S+E)
 
         # set combobox and settingsbox for adding images boxes
         self._csbox_resize = csbox.CSBox(self, sbox=[["factor"], [1.0], ["float"]], bbox=[["Resize Image"], [self.resize_image]])
-        self._csbox_resize.grid(row=10, column=0, rowspan=2, sticky=N+W+S+E)  
+        self._csbox_resize.grid(row=9, column=0, rowspan=2, sticky=N+W+S+E)  
 
         # self._csbox_seg_mt = csbox.CSBox(self, sbox=[["factor", "n_filters"], [1.0, 3], ["float", "int"]], bbox=[["MTARSI Segmentation"], [self.mtarsi_segmentation]]) 
         # self._csbox_seg_mt.grid(row=12, column=0, rowspan=3, sticky=N+W+S+E)
         self._csbox_shdw_mt = csbox.CSBox(self, sbox=[["min_size", "n_filters", "quantize"], [50, 3, 16], ["int", "int", "int"]], bbox=[["MTARSI Shadow"], [self.mtarsi_shadow]]) 
-        self._csbox_shdw_mt.grid(row=12, column=0, rowspan=4, sticky=N+W+S+E)
+        self._csbox_shdw_mt.grid(row=11, column=0, rowspan=4, sticky=N+W+S+E)
 
         # self._csbox_lthreshold = scalebox.ScaleBox(self, scbox=[["Thresh"], [[0, 100, 1, 0]], ["int"]],  orient=HORIZONTAL, func=self.set_lthreshold)
         # self._csbox_lthreshold.grid(row=16, column=0, rowspan=2, sticky=N+W+S+E)
 
         # set combobox and settingsbox for the segmentation method grabcut
         self._csbox_bp = csbox.CSBox(self, sbox=[["dim1", "dim2", "min_label", "max_label", "iterCount", "factor", "height"], [64, 128 , 4, 32, 250, 1.0, 0], ["int", "int", "int", "int", "int", "float", "int", "bool"]],  bbox=[["Unsupervised Segmentation via BP"], [self.image_segmentation_backpropagation]])
-        self._csbox_bp.grid(row=19, column=1, rowspan=6, sticky=N+W+S+E)
+        self._csbox_bp.grid(row=21, column=1, rowspan=6, sticky=N+W+S+E)
 
         self._csbox_blubb = csbox.CSBox(self, bbox=[["Blubb"], [self.blubb]]) 
-        self._csbox_blubb.grid(row=16, column=0, rowspan=1, sticky=N+W+S+E)
+        self._csbox_blubb.grid(row=15, column=0, rowspan=1, sticky=N+W+S+E)
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_lthreshold(self, event=None):
@@ -496,13 +496,13 @@ class TWHSeg(twhfilter.TWHFilter):
         param_seg = self._csbox_seg.get_dict()
 
         # get the currently displayed image
-        img = self.get_obj().get_img()
+        img = imgtools.project_and_stack(self.get_obj().get_img_from_label(param_seg["domain"], dtype=np.uint8, factor=255))
         # img = self.get_obj().get_img_from_label("height")
         # param_seg["reference"] = self.get_obj().get_img_from_label("height")
         param_seg["boundaries"] = "find"
         # define image list for visualization
         img_list = [img]
-
+        
         mode = param_seg["mode"]
         if mode == "SLIC" or mode=="SLIC-0" or mode=="Normalized Cuts":
             param_model = self._csbox_slic.get_dict()
@@ -513,7 +513,7 @@ class TWHSeg(twhfilter.TWHFilter):
  
         seg = rsvis.utils.imgseg.ImgSeg(**param_seg)
         seg.predict(img, **param_model)
-        img_list.extend([seg.get_seg_map_color(), seg.get_seg_map_boundaries(img=imgtools.project_and_stack(self.get_obj().get_img_from_label("{height}"),  dtype=np.uint8, factor=255))])    
+        img_list.extend([seg.get_seg_map_color(), seg.get_seg_map_boundaries(img=imgtools.project_and_stack(self.get_obj().get_img_from_label(param_seg["reference"]),  dtype=np.uint8, factor=255))])    
         
         print("Number of segments: {}".format(seg.get_num_label()))
 
