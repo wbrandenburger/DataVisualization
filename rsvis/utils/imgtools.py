@@ -18,7 +18,8 @@ from scipy import ndimage
 from scipy.stats import norm
 from PIL import Image
 from io import BytesIO
-from skimage import morphology 
+from skimage import morphology, color
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_array_info(img, verbose=False):
@@ -52,6 +53,15 @@ def bool_img_to_uint8(img):
 def img_to_bool(img, inverted=False):
     img = np.where(img>0, 1, 0).astype(np.uint8)
     return img if not inverted else invert_bool_img(img) 
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def get_color_map(seg_map, img, alpha=0.0):
+    img = stack_image_dim(img)
+    img_color = color.label2rgb(np.squeeze(seg_map), img, kind="overlay", bg_label=-1, alpha=alpha)
+    print(img_color.shape)
+    return img_color
+
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

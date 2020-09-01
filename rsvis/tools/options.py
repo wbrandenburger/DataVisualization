@@ -110,7 +110,7 @@ def get_label_options():
         { 
             "require" : "label",
             "label" : "Image",
-            "name" : "Projection",
+            "name" : "Projection - Single Class",
             "key" : None,
             "description": "Show the mask of one label in current image.",
             "command": lambda obj: obj.set_mask(
@@ -120,7 +120,16 @@ def get_label_options():
                     ),
                     invert=True
                 )
-        },       
+        },
+        { 
+            "require" : "label",
+            "label" : "Image",
+            "name" : "Projection - All Classes",
+            "key" : None,
+            "description": "Show the mask of one label in current image.",
+            "command": lambda obj: obj.set_img(imgtools.get_color_map(
+                    obj.get_img_from_label("{label}"), obj.get_img(), alpha=0.2))
+        },              
         { 
             "require" : "label",
             "label" : "Image",
