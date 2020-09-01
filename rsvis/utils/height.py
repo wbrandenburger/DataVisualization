@@ -16,7 +16,7 @@ import tempfile
 #   method --------------------------------------------------------------
 # -----------------------------------------------------------------------
 def get_array_info(height, verbose=False):
-    return "[PCL] Shape: {}, Type: {}, Range: {:.3f}, {:.3f}".format(height.shape, height.dtype, np.min(height), np.max(height))
+    return "[PCL] Shape: {}, Type: {}, Range: {:.3f}, {:.3f}, {:.3f}".format(height.shape, height.dtype, np.min(height), np.max(height), np.mean(height))
 
 #   class -------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -111,7 +111,7 @@ class Height():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def set_param_normal(self, radius="AUTO", model="TRI"):
+    def set_param_normal(self, radius="AUTO", model="TRI", **kwargs):
         self._param_normal_radius = radius
         self._param_normal_model = model
 
@@ -257,13 +257,16 @@ class Height():
 
         # normals_x = normals_x*(-1.)+1.
 
-        normals_x = imgtools.project_data_to_img(normals_x, limits=[-1., 1.])
-        normals_y = imgtools.project_data_to_img(normals_y, limits=[-1., 1.])
+        normals_x = imgtools.project_data_to_img(normals_x, limits=[-1., 1.])*(-1.0)+1
+        normals_y = imgtools.project_data_to_img(normals_y, limits=[-1., 1.])*(-1.0)+1
         
         normals_z = normals_z*(-1.)+1.
         normals_z = -np.log(np.where(normals_z>0., normals_z, np.min(normals_z[normals_z>0.])))
         self._logger(get_array_info(normals_z))
-        normals_z = imgtools.project_data_to_img(normals_z, limits=[.0, 10.])
+        print(get_array_info(normals_z))
+        normals_z = imgtools.project_data_to_img(normals_z, limits=[np.mean(normals_z)-np.std(normals_z), np.mean(normals_z)+np.std(normals_z)])
+
+       # normals_z = np.zeros(self._shape, dtype=np.float32)+1
 
         self._logger(get_array_info(normals_x))
         self._logger(get_array_info(normals_y))
