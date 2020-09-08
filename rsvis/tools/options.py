@@ -129,7 +129,7 @@ def get_label_options():
             "description": "Show the mask of one label in current image.",
             "command": lambda obj: obj.set_img(imgtools.get_color_map(
                     obj.get_img_from_label("{label}"), obj.get_img(), alpha=0.2))
-        },              
+        },                      
         { 
             "require" : "label",
             "label" : "Image",
@@ -267,7 +267,7 @@ def get_height_options(param=dict()):
             "key" : "Control-Shift-B",
             "description": "Compute and show the normal image.",
             "command": lambda obj: obj.set_img(
-                Height(param).get_normal_img(obj.get_img_from_label("{height}"))
+                Height(param).get_normal_img(obj.get_img_from_label("{height}"),log=True)
             )
         },
         { 
@@ -278,7 +278,7 @@ def get_height_options(param=dict()):
             "description": "Compute and show the normal image.",
             "command": lambda obj: Height(param).open("normal", [obj.get_img_from_label("{height}"),[],[]], opener="editor"
             )
-        },                 
+        }                    
     ]
 
 #   function ----------------------------------------------------------------

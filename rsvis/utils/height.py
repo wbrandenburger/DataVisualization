@@ -217,13 +217,26 @@ class Height():
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_normal_img(self, heightmap, bins=None, log=False, **kwargs):
+    def get_normal_img(self, heightmap, bins=None, log=True, ntype="z",**kwargs):
         self.set_normal([heightmap, [], []], **kwargs)
-        normalimg = self.read(level="points")["nz"].to_numpy().reshape(self._shape)
+
+        # print(self.read(level="points"))
+        if ntype=="z":
+            scalar= "nz"
+            limits = [.0, 1.]
+        else:
+            scalar = "scalar_Dip_direction_(degrees)"
+            log = 0
+            limits = list()
+        
+
+        normalimg = self.read(level="points")[scalar].to_numpy().reshape(self._shape)
 
         self._logger(get_array_info(normalimg))
+        
+        normalimg = imgtools.project_data_to_img(normalimg)
+        
 
-        limits = [.0, 1.]
         if log:
             normalimg = normalimg*(-1.)+1.
             normalimg = -np.log(np.where(normalimg>0., normalimg, np.min(normalimg[normalimg>0.])))
@@ -238,7 +251,7 @@ class Height():
                 normalimg_binned += np.where(np.logical_and(normalimg>limit, normalimg<=i), limit, 0.)
                 limit = i
             normalimg = normalimg_binned + np.where(normalimg>limit, limit, 0.)
-        
+
         return normalimg
 
     #   method --------------------------------------------------------------
