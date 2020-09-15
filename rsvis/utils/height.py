@@ -217,7 +217,7 @@ class Height():
     
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def get_normal_img(self, heightmap, bins=None, log=True, ntype="z",**kwargs):
+    def get_normal_img(self, heightmap, bins=None, log=True, ntype="z", llimits=list(), **kwargs):
         self.set_normal([heightmap, [], []], **kwargs)
 
         # print(self.read(level="points"))
@@ -240,7 +240,7 @@ class Height():
         if log:
             normalimg = normalimg*(-1.)+1.
             normalimg = -np.log(np.where(normalimg>0., normalimg, np.min(normalimg[normalimg>0.])))
-            limits = [.0, 10.]
+            limits=llimits
 
         normalimg = imgtools.project_data_to_img(normalimg, limits=limits)
         if bins is not None:
@@ -276,7 +276,7 @@ class Height():
         normals_z = normals_z*(-1.)+1.
         normals_z = -np.log(np.where(normals_z>0., normals_z, np.min(normals_z[normals_z>0.])))
         self._logger(get_array_info(normals_z))
-        print(get_array_info(normals_z))
+        # print(get_array_info(normals_z))
         normals_z = imgtools.project_data_to_img(normals_z, limits=[np.mean(normals_z)-np.std(normals_z), np.mean(normals_z)+np.std(normals_z)])
 
        # normals_z = np.zeros(self._shape, dtype=np.float32)+1

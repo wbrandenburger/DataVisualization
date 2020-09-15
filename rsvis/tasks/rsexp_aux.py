@@ -51,7 +51,10 @@ def run(
 
                 param = dict()
                 for key, item in exp["param"].items():
-                     param[key] = item[idx_exp]
+                    if len(item)==1:
+                        param[key] = item[0]
+                    else:
+                        param[key] = item[idx_exp]
 
                 src_img = img_container.get_img_from_label(exp["label"]).data
                 src_path = img_container.get_img_from_label(exp["label"]).path
