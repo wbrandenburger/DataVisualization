@@ -10,6 +10,8 @@ import rsvis.utils.index
 # ---------------------------------------------------------------------------
 class ObjIndex(rsvis.utils.index.Index):
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def __init__(self, obj):
         self._obj = obj
         try:
@@ -18,6 +20,8 @@ class ObjIndex(rsvis.utils.index.Index):
             print("Object does not have a iterator.")
             raise
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def __call__(self, index=None):
         if not index:
             index = super(ObjIndex, self).__call__(index=index)

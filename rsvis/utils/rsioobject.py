@@ -30,6 +30,7 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
     # -----------------------------------------------------------------------
     def get_object_in(self, path, default=list(), **kwargs):
         if self._param_obj_in:
+            print(self._io(path, **self._param_obj_in, **kwargs))
             return imgio.get_object(
                 self._io(path, **self._param_obj_in, **kwargs), 
                 default=default, 

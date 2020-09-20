@@ -6,6 +6,7 @@
 # ---------------------------------------------------------------------------
 import rsvis.__init__
 import rsvis.utils.patches
+import rsvis.utils.bbox
 
 import cv2
 import numpy as np
@@ -374,18 +375,11 @@ def draw_box(img, shape, boxes, color=[255, 255, 255], dtype=np.uint8):
     if not hasattr(img, "shape"):
         img = np.zeros(shape, dtype=dtype)
 
-    boxes = boxes if isinstance(boxes[0], list) else [boxes]
+    boxes = boxes if isinstance(boxes[0], list) and len(boxes[0])!=2 else [boxes]
     for idx, box in enumerate(boxes):
-        box = box.copy()
-        for i in range(len(box)):
-            box[i] = box[i]-1 if box[i] else box[i]
-
         c = color if isinstance(color[0], int) else color[idx]
-   
-        img[box[0]:box[1] + 1, box[2], :] = np.array(c)
-        img[box[0]:box[1] + 1, box[3], :] = np.array(c)
-        img[box[0], box[2]:box[3] + 1, :] = np.array(c)
-        img[box[1], box[2]:box[3] + 1, :] = np.array(c)
+        box = np.int0(np.array(rsvis.utils.bbox.BBox().get_polyline(box)))
+        img = cv2.drawContours(img, [box], -1, c, 1)
     return img
 
 #   function ----------------------------------------------------------------

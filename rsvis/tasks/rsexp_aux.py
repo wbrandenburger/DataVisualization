@@ -61,7 +61,10 @@ def run(
 
                 if exp["name"] == "normal":
                     dst = set_normal_img(src_img, param, param_cloud)
-            
+                if exp["name"] == "ndsm2float":
+                    print(imgtools.get_array_info(src_img))
+                    dst = src_img.astype(np.float32)[:,:,0]/255.
+                    print(imgtools.get_array_info(dst))
                 path_dir = str(str_basis_path / "{}-{}".format(exp["name"], idx_exp))
                 images_out(src_path, dst, path_dir=path_dir)
                 # images_log_out(src_path, param, path_dir=path_dir)

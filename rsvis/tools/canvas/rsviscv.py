@@ -175,8 +175,9 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_object(self):
+        print(self._images[self._idx_list()][0].path)
         self._boxes = self._data.get_object_in(self._images[self._idx_list()][0].path, default=list())
-
+    
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def write_object(self):

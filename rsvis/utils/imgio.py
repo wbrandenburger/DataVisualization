@@ -7,6 +7,7 @@ from rsvis.__init__ import _logger
 import rsvis.utils.general as gu
 import rsvis.utils.imgcontainer
 from rsvis.utils import imgtools
+import rsvis.utils.bbox
 import rsvis.utils.yaml
 
 import numpy as np
@@ -14,6 +15,7 @@ import pathlib
 import PIL
 import shutil
 import tifffile
+import xml.etree.ElementTree as ET
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -57,8 +59,18 @@ def show_io_str(io_str, logger=None):
 # ---------------------------------------------------------------------------
 def read_object(path, logger=None):
     show_read_str(path, logger=logger)
+    
+    objects = list()
+    if pathlib.Path(path).suffix==".yaml":
+        objects = rsvis.utils.yaml.yaml_to_data(path)
+    if pathlib.Path(path).suffix==".xml":
+        root = ET.parse(path).getroot()
+        for xml_obj in root.find("objects").findall("object"):
+            obj = {"box":list(), "label": xml_obj.find("possibleresult").find("name").text}
+            for xml_obj_child in xml_obj.find("points"):
+                obj["box"].append([int(float(n)) for n in xml_obj_child.text.split(",")])
+            objects.append(obj)
 
-    objects = rsvis.utils.yaml.yaml_to_data(path)
     return objects
 
 #   function ----------------------------------------------------------------

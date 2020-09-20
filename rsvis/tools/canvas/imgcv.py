@@ -94,16 +94,19 @@ class ImgCanvas(Canvas):
         if inversion:
             scale = [1/s for s in scale]
 
-        boxes = boxes if isinstance(boxes[0], list) else [boxes]
+        boxes = boxes if isinstance(boxes[0], list) and len(boxes[0]) !=2 else [boxes]
         return [self.resize_bbox(box, scale) for box in boxes]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def resize_bbox(self, box, scale):  
-        return [
-            int(box[0]*scale[1]), int(box[1]*scale[1]), 
-            int(box[2]*scale[0]), int(box[3]*scale[0])
-        ]
+    def resize_bbox(self, box, scale):
+        if len(box)==4:  
+            return [
+                int(box[0]*scale[1]), int(box[1]*scale[1]), 
+                int(box[2]*scale[0]), int(box[3]*scale[0])
+            ]
+        else:
+            return [[int(n[0] *scale[0]), int(n[1]*scale[1])] for n in box ]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
