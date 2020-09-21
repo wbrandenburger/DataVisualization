@@ -70,6 +70,16 @@ def read_object(path, logger=None):
             for xml_obj_child in xml_obj.find("points"):
                 obj["box"].append([int(float(n)) for n in xml_obj_child.text.split(",")])
             objects.append(obj)
+    if pathlib.Path(path).suffix==".json":
+        root = rsvis.utils.yaml.yaml_to_data(path)
+        root = [root] if not isinstance(root, list) else root
+        for coco_obj in root:
+            if isinstance(coco_obj["segmentation"][0], str):
+                box = [ int(c) for c in coco_obj["segmentation"][0].split(" ")]
+            else:
+                box = coco_obj["segmentation"][0]
+            obj = {"box": rsvis.utils.bbox.BBox().coco2polyline(box), "label": str(coco_obj["category_id"])}
+            objects.append(obj)
 
     return objects
 
