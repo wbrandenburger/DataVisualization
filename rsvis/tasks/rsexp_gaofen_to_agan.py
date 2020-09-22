@@ -60,13 +60,14 @@ def run(
         src_path = img_container.get_img_from_label(param["label"]).path
 
         objects = rsio.get_object_in(src_path)
-        patches = rsvis.utils.patches_ordered_ext.OrderedPatchesExt(src_img, limit=param["limit"], stride=param["stride"])
+        patches = rsvis.utils.patches_ordered_ext.OrderedPatchesExt(src_img, limit=param["limit"], num_patches=param["num_patches"], stride=param["stride"])
         
         objects_cowc = [rsvis.utils.bbox.BBox().get_cowc(obj["box"], dtype="polyline") for obj in objects]
 
         for patch in patches:
             patch_write = False
             patch_meta_write=""
+
             for idx_obj, (obj, obj_cowc) in enumerate(zip(objects, objects_cowc)):
                 if patch.is_point_in_current_bbox([obj_cowc[0], obj_cowc[1]]):
                     count_patches += 1
@@ -86,8 +87,6 @@ def run(
             if patch_write: 
                 patch_data = dict()
                 patch_data["raw"] = patch.get_current_patch()
-
-                print(patch_data["raw"] .shape)
 
                 width = int(np.floor(patch_data["raw"].shape[1] / param["mod_scale"]))
                 height = int(np.floor(patch_data["raw"].shape[0] / param["mod_scale"]))

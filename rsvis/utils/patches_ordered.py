@@ -29,6 +29,7 @@ class OrderedPatches(rsvis.utils.patches.Patches):
         self._margin = margin if margin else [0, 0]
 
         self._num_patches = num_patches if num_patches else [self.get_num_patches(self._img.shape[i], self._limit[i], self._margin[i]) for i in range(2)] 
+
         
         self._len = reduce((lambda x, y: x * y), self._num_patches)
 
@@ -48,7 +49,7 @@ class OrderedPatches(rsvis.utils.patches.Patches):
     # -----------------------------------------------------------------------
     def get_num_patches_indices(self, number, shape):    
         indices = [i*int(shape/float(number)) for i in range(number+1)]
-        indices[-1] = shape
+        # indices[-1] = shape
         return indices
 
     #   method --------------------------------------------------------------
@@ -68,6 +69,7 @@ class OrderedPatches(rsvis.utils.patches.Patches):
         self._bbox_margin = [[0,0,0,0] for i in range(self._len)]
         
         steps = [self.get_num_patches_indices(self._num_patches[i], self._img.shape[i]) for i in range(2)]
+        print(steps)
         for y in range(self._num_patches[1]):
             for x in range(self._num_patches[0]):
                 self._bbox[self._num_patches[0]*y+x] = [steps[0][x], steps[0][x+1], steps[1][y], steps[1][y+1]]
