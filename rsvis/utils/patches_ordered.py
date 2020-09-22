@@ -69,7 +69,7 @@ class OrderedPatches(rsvis.utils.patches.Patches):
         self._bbox_margin = [[0,0,0,0] for i in range(self._len)]
         
         steps = [self.get_num_patches_indices(self._num_patches[i], self._img.shape[i]) for i in range(2)]
-        print(steps)
+
         for y in range(self._num_patches[1]):
             for x in range(self._num_patches[0]):
                 self._bbox[self._num_patches[0]*y+x] = [steps[0][x], steps[0][x+1], steps[1][y], steps[1][y+1]]

@@ -36,7 +36,7 @@ class OrderedPatchesExt(rsvis.utils.patches_ordered.OrderedPatches):
                 strides_tmp[1] = int(math.floor(idx[0]*spacing[0]))
                 strides_tmp[2] = int(math.floor(idx[1]*spacing[1]))
                 strides_tmp[3] = int(math.floor(idx[1]*spacing[1]))
-                # print(strides_tmp)
+
                 self._strides.append(strides_tmp.copy())
 
                 for bbox in bboxes:
