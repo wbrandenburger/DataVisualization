@@ -10,7 +10,7 @@ import rsvis.utils.general as gu
 
 import rsvis.tasks.rsshow
 import rsvis.tasks.rsexp_aux
-import rsvis.tasks.rsexp_gao
+import rsvis.tasks.rsexp_gaofen_to_agan
 import rsvis.tasks.rsexp_uncty
 
 
@@ -64,7 +64,7 @@ def task_auxiliary_data(setting="training"):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def task_gaofen_data(setting="training"):
-    rsvis.tasks.rsexp_gao.run(
+    rsvis.tasks.rsexp_gaofen_to_agan.run(
         rsvis.config.settings.get_data(setting),
         rsvis.config.settings._SETTINGS["param_specs"],
         rsvis.config.settings._SETTINGS["param_in"], 

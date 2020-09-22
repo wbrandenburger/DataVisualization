@@ -72,7 +72,7 @@ def run(
                     count_patches += 1
                     blubb=[(obj_cowc[0]-patch.bbox[0])/patches.spacing[0], (obj_cowc[1]- patch.bbox[2])/patches.spacing[1], obj_cowc[2]/patches.spacing[0], obj_cowc[3]/patches.spacing[1]]
                     
-                    if blubb[2] < 0.4 or blubb[3] < 0.4:
+                    if blubb[2] < 0.3 or blubb[3] < 0.3:
 
                         patch_meta_write = "{}{} {} {} {} {}\n".format(patch_meta_write, label_id[obj["label"]], *blubb)
 
@@ -80,10 +80,14 @@ def run(
 
                     else:
                         patches_rejected += 1
+                        patch_write=False
+                        continue
 
             if patch_write: 
                 patch_data = dict()
                 patch_data["raw"] = patch.get_current_patch()
+
+                print(patch_data["raw"] .shape)
 
                 width = int(np.floor(patch_data["raw"].shape[1] / param["mod_scale"]))
                 height = int(np.floor(patch_data["raw"].shape[0] / param["mod_scale"]))
@@ -103,6 +107,8 @@ def run(
                     images_out(src_path, patch_data[patch_key], **param["dir"][patch_key], name=name)
 
                     images_log_out(src_path, patch_meta_write, **param["dir"][patch_key], name=name)
+
+
                 # images_log_out(src_path, param, path_dir=path_dir)
 
     print("Out: {}, Rejected: {}".format(count_patches-patches_rejected, patches_rejected))
