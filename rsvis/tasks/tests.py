@@ -27,3 +27,10 @@ def task_auxiliary_data():
     """Call the main routine for evaluation of a single task classification model"""
 
     rsvis.tasks.tasks.task_auxiliary_data(setting="test")    
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def task_gaofen_data():
+    """Call the main routine for evaluation of a single task classification model"""
+
+    rsvis.tasks.tasks.task_gaofen_data(setting="test")    

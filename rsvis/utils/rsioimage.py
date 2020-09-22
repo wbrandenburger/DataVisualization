@@ -36,6 +36,7 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
         self._log_name = "log"
 
         self._param_log = gu.get_value(self._param_in, self._log_name, dict())
+        
         self._log_io = gu.PathCreator(**self._param_log)
 
     #   method --------------------------------------------------------------
@@ -95,24 +96,27 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_log_in(self, **kwargs):
+        updated_dict = gu.update_dict(self._param_in[self._log_name], kwargs)
         return lambda path, logger=self._logger, **kwargs: imgio.get_log(
-            self._log_io(path, **gu.update_dict(self._param_in[self._log_name], **kwargs)),
+            self._log_io(path, **gu.update_dict(updated_dict, kwargs)),
             logger=logger
         )
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def show_log(self, **kwargs):
+        updated_dict = gu.update_dict(self._param_log, kwargs)
         return lambda path, logger=self._logger, **kwargs: imgio.show_log(
-            self._log_io(path, **gu.update_dict(self._param_log, kwargs)),
+            self._log_io(path, **gu.update_dict(updated_dict, kwargs)),
             logger=logger
         )
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_log_out(self, **kwargs):
+        updated_dict = gu.update_dict(self._param_log, kwargs)
         return lambda path, log, logger=self._logger, **kwargs: imgio.write_log(
-            self._log_io(path, **gu.update_dict(self._param_log, kwargs)), 
+            self._log_io(path, **gu.update_dict(updated_dict, kwargs)), 
             log,
             logger=logger
         )
@@ -120,10 +124,9 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_param_out(self, **kwargs):
-        a = gu.update_dict(self._param_log, kwargs)
-        print(a)
+        updated_dict = gu.update_dict(self._param_log, kwargs)
         return lambda path, log, logger=self._logger, **kwargs: imgio.write_yaml(
-            self._log_io(path, **gu.update_dict(self._param_log, kwargs)), 
+            self._log_io(path, **gu.update_dict(updated_dict, kwargs)), 
             log,
             logger=logger
         )

@@ -54,5 +54,9 @@ try:
     else:
         _logger.setLevel(logging.INFO)
 
+    
+    if os.environ.get("RSVIS_DEBUG")=="RUN":
+        _logger.setLevel(logging.WARNING)
+
 except ImportError:
     pass

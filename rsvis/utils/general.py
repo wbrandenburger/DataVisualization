@@ -116,7 +116,7 @@ class PathCreator():
         else:
             path_dir = pathlib.Path(path_dir)
             path_dir.mkdir(parents=parents, exist_ok=exist_ok)
-
+            
         if name is None:
             name = self._name
 

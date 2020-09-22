@@ -30,7 +30,7 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
     # -----------------------------------------------------------------------
     def get_object_in(self, path, default=list(), **kwargs):
         if self._param_obj_in:
-            print(self._io(path, **self._param_obj_in, **kwargs))
+            # print(self._io(path, **self._param_obj_in, **kwargs))
             return imgio.get_object(
                 self._io(path, **self._param_obj_in, **kwargs), 
                 default=default, 
@@ -54,6 +54,7 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
     # -----------------------------------------------------------------------
     def set_files_out(self, path, obj, **kwargs):
         if self._param_obj_out:
+            # print(self._io(path, **self._param_obj_out, **kwargs))
             imgio.write_object(
                 self._io(path, **self._param_obj_out, **kwargs), 
                 obj,

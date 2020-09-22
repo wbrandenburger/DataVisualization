@@ -10,6 +10,7 @@ from rsvis.utils import imgtools
 import rsvis.utils.bbox
 import rsvis.utils.yaml
 
+import cv2
 import numpy as np
 import pathlib
 import PIL
@@ -63,10 +64,12 @@ def read_object(path, logger=None):
     objects = list()
     if pathlib.Path(path).suffix==".yaml":
         objects = rsvis.utils.yaml.yaml_to_data(path)
+        for obj in objects:
+            obj["dtype"] = "corner"
     if pathlib.Path(path).suffix==".xml":
         root = ET.parse(path).getroot()
         for xml_obj in root.find("objects").findall("object"):
-            obj = {"box":list(), "label": xml_obj.find("possibleresult").find("name").text}
+            obj = {"box":list(), "label": xml_obj.find("possibleresult").find("name").text, "dtype": "polyline"}
             for xml_obj_child in xml_obj.find("points"):
                 obj["box"].append([int(float(n)) for n in xml_obj_child.text.split(",")])
             objects.append(obj)
@@ -78,7 +81,7 @@ def read_object(path, logger=None):
                 box = [ int(c) for c in coco_obj["segmentation"][0].split(" ")]
             else:
                 box = coco_obj["segmentation"][0]
-            obj = {"box": rsvis.utils.bbox.BBox().coco2polyline(box), "label": str(coco_obj["category_id"])}
+            obj = {"box": rsvis.utils.bbox.BBox().get_polyline(box, dtype="coco_polyline"), "label": str(coco_obj["category_id"]), "dtype": "polyline"}
             objects.append(obj)
 
     return objects
@@ -178,7 +181,8 @@ def write_image(path, img, logger=None,):
     if str(path).endswith(".tif"):
         tifffile.imwrite(path, img)
     else:
-        PIL.Image.fromarray(img).save(path)
+        cv2.imwrite(path, cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        # PIL.Image.fromarray(img).save(path)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

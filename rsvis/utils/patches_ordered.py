@@ -28,7 +28,7 @@ class OrderedPatches(rsvis.utils.patches.Patches):
         self._limit = limit if limit else self._img.shape[0:2]
         self._margin = margin if margin else [0, 0]
 
-        self._num_patches = num_patches if num_patches else [self.get_num_patches(self._img.shape[i], limit[i], margin[i]) for i in range(2)] 
+        self._num_patches = num_patches if num_patches else [self.get_num_patches(self._img.shape[i], self._limit[i], self._margin[i]) for i in range(2)] 
         
         self._len = reduce((lambda x, y: x * y), self._num_patches)
 

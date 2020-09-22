@@ -59,9 +59,27 @@ class Patches():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     @property
+    def index(self):
+        if self._index >= 0:    
+            return self._index
+        else:
+            return 0
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    @property
     def bbox(self):
         if self._index >= 0:    
             return self._bbox[self._index]
+        else:
+            return self._bbox[0]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    @property
+    def spacing(self):
+        bbox = self.bbox
+        return [bbox[1]-bbox[0], bbox[3]-bbox[2]]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -92,7 +110,7 @@ class Patches():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_patch(self, bbox=list(), index=None):
-        if index:
+        if index is not None:
             bbox = self._bbox[index]
         return self._img[bbox[0]:bbox[1], bbox[2]:bbox[3], :]
 
@@ -102,6 +120,20 @@ class Patches():
         if indices:
             return [self.get_patch(index=idx) for idx in indices]
         return [self.get_patch(bbox=box) for box in self._bbox]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_current_patch(self):
+        return self.get_patch(index=self.index)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def is_point_in_current_bbox(self, point):
+        bbox = rsvis.utils.bbox.BBox().get_corner(self.bbox.copy())
+        if point[0] >= bbox[0] and point[0] < bbox[1] and point[1] >= bbox[2] and point[1] < bbox[3]:
+    
+            self.logger("Patch '{}' with index '{}'".format(bbox, self._index))
+            return True
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
