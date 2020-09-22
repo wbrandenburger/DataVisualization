@@ -11,6 +11,7 @@ import rsvis.utils.general as gu
 import rsvis.tasks.rsshow
 import rsvis.tasks.rsexp_aux
 import rsvis.tasks.rsexp_gaofen_to_agan
+import rsvis.tasks.rsexp_agan_valid
 import rsvis.tasks.rsexp_uncty
 
 
@@ -79,6 +80,26 @@ def task_gaofen_data(setting="training"):
         param_show=gu.get_value(
             rsvis.config.settings._SETTINGS,"param_show", dict())   
     )
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def task_gaofen_valid(setting="training"):
+    rsvis.tasks.rsexp_agan_valid.run(
+        rsvis.config.settings.get_data(setting),
+        rsvis.config.settings._SETTINGS["param_specs"],
+        rsvis.config.settings._SETTINGS["param_in"], 
+        param_out=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_out", dict()), 
+        param_classes=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_classes", list()),
+        param_exp=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_exp", list()),
+        param_cloud=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_cloud", dict()),
+        param_show=gu.get_value(
+            rsvis.config.settings._SETTINGS,"param_show", dict())   
+    )
+
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

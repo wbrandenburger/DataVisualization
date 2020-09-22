@@ -53,7 +53,7 @@ class OrderedPatches(rsvis.utils.patches.Patches):
         return indices
 
     #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
+    # ------------0-----------------------------------------------------------
     def set_bbox_margins(self, bbox, margin):
         shape = self._img.shape
         bbox[0] = bbox[0]-margin[0] if bbox[0]-margin[0] > 0 else bbox[0]
