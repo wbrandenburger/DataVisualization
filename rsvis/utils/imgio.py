@@ -69,7 +69,7 @@ def read_object(path, logger=None):
     if pathlib.Path(path).suffix==".xml":
         root = ET.parse(path).getroot()
         for xml_obj in root.find("objects").findall("object"):
-            obj = {"box":list(), "label": xml_obj.find("possibleresult").find("name").text, "dtype": "polyline"}
+            obj = {"box":list(), "label": xml_obj.find("possibleresult").find("name").text, "dtype": "polyline", "probability": xml_obj.find("possibleresult").find("probability").text}
             for xml_obj_child in xml_obj.find("points"):
                 obj["box"].append([int(float(n)) for n in xml_obj_child.text.split(",")])
             objects.append(obj)

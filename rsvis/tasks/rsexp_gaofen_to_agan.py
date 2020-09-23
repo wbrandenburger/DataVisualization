@@ -74,8 +74,10 @@ def run(
                     blubb=[(obj_cowc[0]-patch.bbox[0])/patches.spacing[0], (obj_cowc[1]- patch.bbox[2])/patches.spacing[1], obj_cowc[2]/patches.spacing[0], obj_cowc[3]/patches.spacing[1]]
                     
                     if blubb[2] < param["reject"] or blubb[3] < param["reject"]:
-
-                        patch_meta_write = "{}{} {} {} {} {}\n".format(patch_meta_write, label_id[obj["label"]], *blubb)
+                        label = 1
+                        if param["use-class"]:
+                            label = label_id[obj["label"]]
+                        patch_meta_write = "{}{} {} {} {} {}\n".format(patch_meta_write, label, *blubb)
 
                         patch_write=True
 
