@@ -71,13 +71,17 @@ def run(
             for idx_obj, (obj, obj_cowc) in enumerate(zip(objects, objects_cowc)):
                 if patch.is_point_in_current_bbox([obj_cowc[0], obj_cowc[1]]):
                     count_patches += 1
-                    blubb=[(obj_cowc[0]-patch.bbox[0])/patches.spacing[0], (obj_cowc[1]- patch.bbox[2])/patches.spacing[1], obj_cowc[2]/patches.spacing[0], obj_cowc[3]/patches.spacing[1]]
+                    point_x= (obj_cowc[1]-patch.bbox[2])/patches.spacing[1]
+                    diff_x = obj_cowc[3]/patches.spacing[1]
+                    point_y=(obj_cowc[0]-patch.bbox[0])/patches.spacing[0]
+                    diff_y = obj_cowc[2]/patches.spacing[0]
+                    cowc=[point_x, point_y, diff_x, diff_y]
                     
-                    if blubb[2] < param["reject"] or blubb[3] < param["reject"]:
+                    if cowc[2] < param["reject"] or cowc[3] < param["reject"]:
                         label = 1
                         if param["use-class"]:
                             label = label_id[obj["label"]]
-                        patch_meta_write = "{}{} {} {} {} {}\n".format(patch_meta_write, label, *blubb)
+                        patch_meta_write = "{}{} {} {} {} {}\n".format(patch_meta_write, label, *cowc)
 
                         patch_write=True
 
