@@ -140,3 +140,11 @@ class RSIOImage(rsvis.utils.rsio.RSIO):
     # -----------------------------------------------------------------------
     def set_log_out(self, path, log, **kwargs):
         pass
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_label(self, query=None):
+        labels = self._labels
+        if query is not None:
+            labels = [l for l in labels if query in l]
+        return labels

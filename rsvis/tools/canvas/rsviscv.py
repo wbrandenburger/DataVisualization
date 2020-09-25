@@ -28,11 +28,13 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
         data,
         popup=None, 
         classes=dict(),
+        variables=dict(),
+        objects=dict(),
         **kwargs
     ):
 
         #   settings --------------------------------------------------------
-        super(RSVisCanvas, self).__init__(parent, shift=[4,4], **kwargs)
+        super(RSVisCanvas, self).__init__(parent, shift=[4,4], variables=variables, **kwargs)
         
         self._set_popup = popup if popup else (lambda *args, **kwargs: None)
 
@@ -42,7 +44,10 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
         self._idx_list = rsvis.utils.index.Index(len(self))
 
         self._area_event = 0
+        self._objects = objects
+        self._obj_idx_list = rsvis.utils.index.Index(len(self._objects))
         self._object_flag = 0
+        self._object_path = None if "objects" not in variables.keys() else variables["objects"]
 
         self._patches_bbox = None
         self._grid_bboxes = None
@@ -64,6 +69,8 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
         self.bind("<d>", self.key_d)
         self.bind("<f>", self.key_f)
         self.bind("<g>", self.key_g)
+        self.bind("<o>", self.key_o)
+        self.bind("<Return>", self.key_return)
 
         self._keys.update({
             "d": "Show the next image in given image list (see listbox).",
@@ -140,8 +147,8 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def set_container(self, index=None):
-        index = self._idx_list() if index is None else index   
-        self.get_object()
+        index = self._idx_list() if index is None else index
+        self.set_object()   
         self.set_img_container(self._images[index])
         self.set_log()        
 
@@ -167,10 +174,19 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def show_objects(self, force=False):
+        self.set_object()
         self._object_flag = 0 if self._object_flag else 1
         if force:
             self._object_flag = 1
         self.create_image()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def set_object(self):
+        if self._objects:
+            path_dir = list(self._objects.values())[self._obj_idx_list()]
+            self._data.set_param_object_in(path_dir=path_dir)
+        self.get_object()
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -314,3 +330,19 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     def key_g(self, event=None):
         "Remove the selected object."
         self.remove_object()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_o(self, event=None):
+        "Remove the selected object."
+        self._obj_idx_list.next()
+        self.set_object()
+        self.create_image()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def key_return(self, event=None):
+        "Remove the selected object."
+        self.set_object()
+        self.set_log() 
+        self.create_image()

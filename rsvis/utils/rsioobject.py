@@ -52,6 +52,11 @@ class RSIOObject(rsvis.utils.rsioimage.RSIOImage):
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def set_param_object_in(self, **kwargs):
+        self._param_obj_in = gu.update_dict(self._param_obj_in, kwargs)
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def set_files_out(self, path, obj, **kwargs):
         if self._param_obj_out:
             # print(self._io(path, **self._param_obj_out, **kwargs))

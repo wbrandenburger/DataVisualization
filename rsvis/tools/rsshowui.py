@@ -26,12 +26,13 @@ class RSShowUI():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
-    def __init__(self, data, options=list(), show=dict(), classes=dict, param=dict(), **kwargs):
-        
+    def __init__(self, data, options=list(), show=dict(), classes=dict, param=dict(), obj=dict(), **kwargs):
+
         self._data = data
         self._options = options
 
         self._param = param
+        self._obj = obj
 
         self.initialize_window(show=show, classes=classes)
 
@@ -63,8 +64,6 @@ class RSShowUI():
         self._root.rowconfigure(0, weight=1)
         self._root.rowconfigure(1, weight=0)
 
-        self._row_settings = 6
-
         #   key bindings ----------------------------------------------------
         self._root.bind("q", self.key_q)
         self._keys = {
@@ -75,48 +74,65 @@ class RSShowUI():
             if o["key"] is not None:
                 self._keys.update({o["key"]: o["description"]}) 
 
-        #   textfield (grid) ------------------------------------------------
-        self._textbox_scrollbar = Scrollbar(self._root)
-        self._textbox = Text(self._root, height=3, font=("Courier", 8))
-        self._textbox_scrollbar.grid(row=1, column=2, rowspan=self._row_settings, sticky=N+S)
-        self._textbox.grid(row=1, column=1, rowspan=self._row_settings, sticky=N+S+W+E)
-        self._textbox_scrollbar.config(command=self._textbox.yview)
-        self._textbox.config(yscrollcommand=self._textbox_scrollbar.set)
-        
         #   set the input / output logger
         self._logger =  rsvis.utils.logger.Logger(logger=lambda log: self._textbox.insert("1.0", "{}\n".format(log)))
         self._data.logger = self._logger
         self._opener = opener.GeneralOpener(logger=self._logger)
 
         #   comboboxes (mouse behavior/ classes) ----------------------------
+        idx_row = 1
         self._cbox_area = combobox.ComboBox(self._root, [["Histogram"], [["Grid", "Objects"]], ["Grid"], ["str"]], func=self.set_area_event)
-        self._cbox_area.grid(row=1, column=0, sticky=N+W+S+E)
+        self._cbox_area.grid(row=idx_row, column=0, sticky=N+W+S+E)
+        idx_row += 1
         self._cbox_class = combobox.ComboBox(self._root, [["Class"], [[c["name"] for c in classes]], [classes[0]["name"]], ["str"]], func=self.set_class)
-        self._cbox_class.grid(row=2, column=0, sticky=N+W+S+E)
+        self._cbox_class.grid(row=idx_row, column=0, sticky=N+W+S+E)
+        idx_row += 1
         self._cbox_test =combobox.ComboBox(self._root, [["Testing"],  [self._param["vis"]["test_menu"]], [self._param["vis"]["test"]], ["str"]])
-        self._cbox_test.grid(row=3, column=0, sticky=N+W+S+E)
-
-        #   settingsboxes (label image) -------------------------------------
-        self._sbox_label_img = settingsbox.SettingsBox(self._root, sbox=[["Label Image"], ["label"], ["str"]])
-        self._sbox_label_img.grid(row=4, column=0, sticky=N+W+S+E)
-
-        #   settingsboxes (label image) -------------------------------------
-        self._sbox_height_img = settingsbox.SettingsBox(self._root, sbox=[["Height Image"], ["height"], ["str"]])
-        self._sbox_height_img.grid(row=5, column=0, sticky=N+W+S+E)
-
-        #   settingsboxes (grid) --------------------------------------------
-        self._sbox_grid = settingsbox.SettingsBox(self._root, sbox=[["Dimension x (Grid)", "Dimension y (Grid)"], show["grid"], ["int", "int"]], func=self.set_grid)
-        self._sbox_grid.grid(row=6, column=0, sticky=N+W+S+E)
+        self._cbox_test.grid(row=idx_row, column=0, sticky=N+W+S+E)
+        idx_row += 1
 
         #   canvas variables ------------------------------------------------
         self._variables = {
-            "class": lambda value=False: self._cbox_class.get(value=value),
-            "labelimg": lambda: self._sbox_label_img.get(),
-            "heightimg": lambda: self._sbox_height_img.get()
+            "class": lambda value=False: self._cbox_class.get(value=value)
         }
+        #   settingsboxes (label image) -------------------------------------
+        if self._data.get_label(query="label"):
+            self._sbox_label_img = combobox.ComboBox(self._root, cbox=[["Label Image"], [self._data.get_label(query="label")], [0], ["str"]])
+            self._sbox_label_img.grid(row=idx_row, column=0, sticky=N+W+S+E)
+            self._variables["labelimg"]= lambda: self._sbox_label_img.get()
+            idx_row += 1
+
+        #   settingsboxes (label image) -------------------------------------
+        if self._data.get_label(query="height"):
+            self._sbox_height_img = combobox.ComboBox(self._root, cbox=[["Label Image"], [self._data.get_label(query="height")], [0], ["str"]])
+            self._sbox_height_img.grid(row=idx_row, column=0, sticky=N+W+S+E)
+            self._variables["heightimg"]= lambda: self._sbox_height_img.get()
+            idx_row += 1
+
+        if self._obj:
+            self._sbox_objects = combobox.ComboBox(self._root, cbox=[["Objects"], [list(self._obj.keys())], [0], ["str"]])
+            self._sbox_objects.grid(row=idx_row, column=0, sticky=N+W+S+E)
+            self._variables["objects"]=lambda: self._sbox_objects.get()
+            idx_row += 1
+
+        #   settingsboxes (grid) --------------------------------------------
+        self._sbox_grid = settingsbox.SettingsBox(self._root, sbox=[["Dimension x (Grid)", "Dimension y (Grid)"], show["grid"], ["int", "int"]], func=self.set_grid)
+        self._sbox_grid.grid(row=idx_row, column=0, sticky=N+W+S+E)
+        idx_row += 1
+
+        #   textfield (grid) ------------------------------------------------
+        self._row_settings = idx_row - 1
+        self._textbox_scrollbar = Scrollbar(self._root)
+        self._textbox = Text(self._root, height=3, font=("Courier", 8))
+        self._textbox_scrollbar.grid(row=1, column=2, rowspan=self._row_settings, sticky=N+S)
+        self._textbox.grid(row=1, column=1, rowspan=self._row_settings, sticky=N+S+W+E)
+        
+        self._textbox_scrollbar.config(command=self._textbox.yview)
+        self._textbox.config(yscrollcommand=self._textbox_scrollbar.set)
+        
 
         #   main image window -----------------------------------------------
-        self._frame = rsvis.tools.rscanvasframe.RSVisCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, variables=self._variables, logger=self._logger, **show)
+        self._frame = rsvis.tools.rscanvasframe.RSVisCanvasFrame(self._root, self._data.get_img_in(), self._data, popup=self.set_popup, classes=classes, variables=self._variables, objects=self._obj, logger=self._logger, **show)
         self._frame.grid(row=0, column=0, columnspan=3, sticky=N+S+W+E)
         
         #   menubar (File / Options / Information) --------------------------

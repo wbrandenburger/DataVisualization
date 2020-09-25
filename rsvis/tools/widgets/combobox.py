@@ -37,7 +37,11 @@ class ComboBox(Frame):
             lab = Label(row, width=16, text=label, anchor='w')
 
             variable = StringVar(self)
-            variable.set(default[idx])
+            if isinstance(default[idx], int):
+                d = fields[idx][default[idx]]
+            else:
+                d = default[idx]
+            variable.set(d)
             cbox = ttk.Combobox(row, textvariable=variable, values=fields[idx], state="readonly")
             cbox.bind("<<ComboboxSelected>>", self._func)
 
