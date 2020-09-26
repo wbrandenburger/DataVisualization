@@ -78,11 +78,19 @@ def run(
             
             src_img  = os.path.join(path[key], file)
             dest_img = os.path.join(val_dir, file)
-            shutil.move(src_img, dest_img)
+
+            if param["action"]=="move":
+                shutil.move(src_img, dest_img)
+            else:
+                shutil.copy(src_img, dest_img)
             
             src_meta  = os.path.join(path[key], basename + ".txt")
             dest_meta = os.path.join(val_dir, basename + ".txt")
-            shutil.move(src_meta, dest_meta)
+            
+            if param["action"]=="move":
+                shutil.move(src_meta, dest_meta)
+            else:
+                shutil.copy(src_meta, dest_meta)            
 
             # print(src_img)
             # print(dest_img)

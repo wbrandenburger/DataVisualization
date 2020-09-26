@@ -45,7 +45,7 @@ def run(
 
     images_in = rsio.get_img_in()
     images_out = rsio.get_img_out(img_name="image")
-    images_log_out = rsio.get_param_out(**param_out["log"])
+    images_log_out = rsio.get_log_out(**param_out["log"])
   
     label_id = dict()
     for c in param_classes:
@@ -71,7 +71,7 @@ def run(
             patch_meta_write=""
 
             if param["objects"]:
-                for idx_obj, (obj, obj_cowc) in enumerate(zip(objects, objects_cowc)):
+                for obj, obj_cowc in zip(objects, objects_cowc):
                     if patch.is_point_in_current_bbox([obj_cowc[0], obj_cowc[1]]):
                         count_patches += 1
                         point_x= (obj_cowc[1]-patch.bbox[2])/patches.spacing[1]
@@ -80,7 +80,7 @@ def run(
                         diff_y = obj_cowc[2]/patches.spacing[0]
                         cowc=[point_x, point_y, diff_x, diff_y]
                         
-                        if cowc[2] < param["reject"] or cowc[3] < param["reject"]:
+                        if cowc[2] < param["reject"] and cowc[3] < param["reject"]:
                             label = 1
                             if param["use-class"]:
                                 label = label_id[obj["label"]]
