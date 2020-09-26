@@ -54,12 +54,20 @@ class BBox():
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
+    def cowc2polyline(self, box):
+        return self.corner2polyline([int(box[1]-box[3]/2),  int(box[1]+box[3]/2), int(box[0]-box[2]/2), int(box[0]+box[2]/2)])
+
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
     def get_polyline(self, box, dtype=None):
         dst = box
         if dtype=="corner":
             dst = self.corner2polyline(box)
         elif dtype=="coco_polyline":
             dst = self.coco2polyline(box)
+        elif dtype=="cowc":
+            dst = self.cowc2polyline(box)
         elif len(box)==4:
             dst = self.corner2polyline(box)
         return dst

@@ -119,7 +119,9 @@ class PathCreator():
             
         if name is None:
             name = self._name
-
+        
+        # print(pathlib.Path(path).stem)
+        # print(self._regex(pathlib.Path(path).stem))
         filename = name.format(self._regex(pathlib.Path(path).stem))
 
         if prefix is not None:
@@ -129,4 +131,5 @@ class PathCreator():
             ext = pathlib.Path(path).suffix if not self._ext else self._ext
             
         filename = "".join([filename, ext])
+        # print(str(pathlib.Path.joinpath(path_dir, filename)))
         return str(pathlib.Path.joinpath(path_dir, filename))

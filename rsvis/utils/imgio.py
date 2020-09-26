@@ -60,8 +60,15 @@ def show_io_str(io_str, logger=None):
 # ---------------------------------------------------------------------------
 def read_object(path, logger=None):
     show_read_str(path, logger=logger)
-    
+
     objects = list()
+    if pathlib.Path(path).suffix==".txt":
+        root = [o.split(" ") for o in read_log(path, logger=logger)]
+
+        for txt_obj in root:
+            box = [float(b)*255 for b in txt_obj[1:5]]
+            obj = {"label": txt_obj[0], "box": rsvis.utils.bbox.BBox().get_polyline(box, dtype="cowc"),"dtype": "polyline"}
+            objects.append(obj)
     if pathlib.Path(path).suffix==".yaml":
         objects = rsvis.utils.yaml.yaml_to_data(path)
         for obj in objects:
@@ -135,7 +142,7 @@ def read_log(path, logger=None):
     show_read_str(path, logger=logger)
 
     with open(path, "r") as f:
-        return f.read()
+        return f.read().splitlines()
         
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
