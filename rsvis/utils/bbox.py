@@ -57,6 +57,10 @@ class BBox():
     def cowc2polyline(self, box):
         return self.corner2polyline([int(box[1]-box[3]/2),  int(box[1]+box[3]/2), int(box[0]-box[2]/2), int(box[0]+box[2]/2)])
 
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def cowc2minmax(self, box):
+        return [ int(box[0]-box[2]/2),  int(box[1]-box[3]/2),int(box[0]+box[2]/2), int(box[1]+box[3]/2)]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -90,6 +94,13 @@ class BBox():
             dst = self.polyline2cowc(box)            
         return dst
         
-    
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_minmax(self, box, dtype=None):
+        dst = box
+        if dtype=="cowc":
+            dst = self.cowc2minmax(box)            
+        return dst
+        
 
     
