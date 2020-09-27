@@ -51,7 +51,7 @@ def run(
     for c in param_classes:
         label_id[c["name"]] = c["id"]
 
-    patches_rejected = 0
+    aircraft_rejected = 0
     count_patches = 0
     param = param_exp
     for img_container in tqdm(images_in):              
@@ -67,7 +67,6 @@ def run(
             objects_cowc = [rsvis.utils.bbox.BBox().get_cowc(obj["box"], dtype="polyline") for obj in objects]
 
         for patch in patches:
-            patch_write = False
             patch_meta_write=""
 
             if param["objects"]:
@@ -80,22 +79,19 @@ def run(
                         diff_y = obj_cowc[2]/patches.spacing[0]
                         cowc=[point_x, point_y, diff_x, diff_y]
                         
-                        if cowc[2] < param["reject"] and cowc[3] < param["reject"]:
+                        if cowc[2] < param["reject"][0] or cowc[3] < param["reject"][0] or cowc[2] > param["reject"][1] or cowc[3] > param["reject"][1]:
+                            aircraft_rejected += 1
+                        else:
                             label = 1
                             if param["use-class"]:
                                 label = label_id[obj["label"]]
                             patch_meta_write = "{}{} {} {} {} {}\n".format(patch_meta_write, label, *cowc)
 
-                            patch_write=True
+            if param["empty_patches"] or patch_meta_write:
 
-                        else:
-                            patches_rejected += 1
-                            patch_write=False
-                            continue
-            else:
-                patch_write=True
+                if patch_meta_write =="":
+                    patch_meta_write = "0"
 
-            if patch_write: 
                 patch_data = dict()
                 patch_raw = patch.get_current_patch()
                 width = int(np.floor(patch_raw.shape[1] / param["mod_scale"]))
@@ -121,6 +117,6 @@ def run(
                         images_log_out(src_path, patch_meta_write, **param["dir"][patch_key], name=name)
 
 
-                # images_log_out(src_path, param, path_dir=path_dir)
+                    # images_log_out(src_path, param, path_dir=path_dir)
 
-    print("Out: {}, Rejected: {}".format(count_patches-patches_rejected, patches_rejected))
+    print("Out: {}, Rejected: {}".format(count_patches-aircraft_rejected, aircraft_rejected))
