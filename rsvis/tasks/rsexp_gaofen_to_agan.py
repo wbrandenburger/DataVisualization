@@ -89,7 +89,7 @@ def run(
 
             if param["empty_patches"] or patch_meta_write:
 
-                if patch_meta_write =="":
+                if patch_meta_write == "":
                     patch_meta_write = "0"
 
                 patch_data = dict()
@@ -106,7 +106,6 @@ def run(
                     patch_data["lr"] = rsvis.utils.utils_gan.imresize_np(patch_data["hr"], 1 / param["up_scale"], True)
                 if "bic" in param["process"]:
                     patch_data["bic"] = rsvis.utils.utils_gan.imresize_np(patch_data["lr"], param["up_scale"], True)
-                # print(patch_meta_write)
 
                 for patch_key in param["process"]:
                     

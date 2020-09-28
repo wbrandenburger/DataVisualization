@@ -8,6 +8,7 @@ import rsvis.utils.general as gu
 import rsvis.utils.imgtools as imgtools
 import rsvis.utils.patches_ordered
 import rsvis.utils.patches_unordered
+from rsvis.utils.xml2txt import getXml
 
 from rsvis.tools.canvas import extimgconcv
 
@@ -48,6 +49,7 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
         self._obj_idx_list = rsvis.utils.index.Index(len(self._objects))
         self._object_flag = 0
         self._object_path = None if "objects" not in variables.keys() else variables["objects"]
+        self._classes = [c["name"] for c in classes]
 
         self._patches_bbox = None
         self._grid_bboxes = None
@@ -249,12 +251,19 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     def mouse_button_1_released(self, event, histogram=True):
         super(RSVisCanvas, self).mouse_button_1_released(event)
         if self.is_mouse_event(self._mouse_box):
+            point = self._mouse_selection
+            #print(self._mouse_selection)
+            point = [str(point[2]), str(point[3]), str(point[0]), str(point[1])]
+            class_point = self._classes[self._variables["class"]()]
+            print(class_point)
+            getXml([[class_point, str(1), *point]])
             if self._area_event==0:
-                self.set_popup(self._mouse_selection, histogram=histogram)
+                pass
+                # self.set_popup(self._mouse_selection, histogram=histogram)
             elif self._area_event==1:
                 self.set_object_boxes(self._mouse_box, resize=True)
                 self.create_image()
-
+                
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def mouse_double_1_button(self, event):
@@ -335,6 +344,8 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     # -----------------------------------------------------------------------
     def key_o(self, event=None):
         "Remove the selected object."
+        if not self._object_flag:
+            self.show_objects()
         self._obj_idx_list.next()
         self.set_object()
         self.create_image()

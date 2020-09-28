@@ -23,7 +23,6 @@ class Opener():
     # -----------------------------------------------------------------------
     def __call__(self, opener, *args, wait=False):
         cmd = self.get_args(self._opener[opener], *args)
-        
         self._logger("[CMD] {}".format(cmd))
         process = subprocess.Popen(cmd)
         if wait:

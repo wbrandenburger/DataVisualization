@@ -75,7 +75,7 @@ def run(
             for r in root:
                 if(r):
                     
-                    box = [float(r[1])*255, float(r[2])*255, float(r[3])*255, float(r[4])*255]
+                    box = [float(r[1])*255*param["factor"][0], float(r[2])*255*param["factor"][1], float(r[3])*255*param["factor"][0], float(r[4])*255*param["factor"][1]]
                     box = rsvis.utils.bbox.BBox().get_minmax(box, dtype="cowc")
                     box = [box[0]+o["box"][2], box[1]+o["box"][0], box[2]+o["box"][2], box[3]+o["box"][0]]
                     msg = "{}{} : {} :  [{}, {}, {}, {}]\n".format(
