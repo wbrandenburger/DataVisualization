@@ -61,7 +61,8 @@ def run(
 
         
         patches = rsvis.utils.patches_ordered_ext.OrderedPatchesExt(src_img, limit=param["limit"], num_patches=param["num_patches"], stride=param["stride"])
-        
+
+        objects = objects_cowc = list()
         if param["objects"]:
             objects = rsio.get_object_in(src_path)
             objects_cowc = [rsvis.utils.bbox.BBox().get_cowc(obj["box"], dtype="polyline") for obj in objects]
