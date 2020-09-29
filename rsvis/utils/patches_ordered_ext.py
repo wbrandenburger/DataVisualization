@@ -41,7 +41,7 @@ class OrderedPatchesExt(rsvis.utils.patches_ordered.OrderedPatches):
 
                 for bbox in bboxes:
                     bbox_temp =  [bbox[0]+strides_tmp[0], bbox[1]+strides_tmp[1], bbox[2]+strides_tmp[2], bbox[3]+strides_tmp[3]]
-                    if not bbox_temp[1] >= img.shape[0] and not bbox_temp[3] >= img.shape[1]: 
+                    if not bbox_temp[1] > img.shape[0] and not bbox_temp[3] > img.shape[1]: 
                         self._bbox.append(bbox_temp)
 
         self._len = len(self._bbox)
