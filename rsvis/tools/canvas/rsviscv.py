@@ -251,15 +251,15 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     def mouse_button_1_released(self, event, histogram=True):
         super(RSVisCanvas, self).mouse_button_1_released(event)
         if self.is_mouse_event(self._mouse_box):
-            point = self._mouse_selection
-            #print(self._mouse_selection)
-            point = [str(point[2]), str(point[3]), str(point[0]), str(point[1])]
-            class_point = self._classes[self._variables["class"]()]
-            print(class_point)
-            getXml([[class_point, str(1), *point]])
+            # point = self._mouse_selection
+            # #print(self._mouse_selection)
+            # point = [str(point[2]), str(point[3]), str(point[0]), str(point[1])]
+            # class_point = self._classes[self._variables["class"]()]
+            # print(class_point)
+            # getXml([[class_point, str(1), *point]])
             if self._area_event==0:
-                pass
-                # self.set_popup(self._mouse_selection, histogram=histogram)
+                # pass
+                self.set_popup(self._mouse_selection, histogram=histogram)
             elif self._area_event==1:
                 self.set_object_boxes(self._mouse_box, resize=True)
                 self.create_image()
