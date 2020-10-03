@@ -44,12 +44,10 @@ class BBox():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def polyline2cowc(self, box):
-        box_arr = np.array(box)
-        box_min = np.min(box_arr, axis=0)
-        box_max = np.max(box_arr, axis=0)
-        box_0_diff = box_max[0]-box_min[0] 
-        box_1_diff = box_max[1]-box_min[1] 
-        return [box_min[1]+ box_1_diff/2, box_min[0]+ box_0_diff/2, box_1_diff, box_0_diff]
+        minmax = self.polyline2minmax(box)
+        box_0_diff = minmax[3] - minmax[1] # [box_max[0]-box_min[0] 
+        box_1_diff = minmax[2] - minmax[0] # box_max[1]-box_min[1] 
+        return [minmax[0]+ box_1_diff/2, minmax[1] + box_0_diff/2, box_1_diff, box_0_diff]
 
 
     #   method --------------------------------------------------------------
@@ -61,6 +59,14 @@ class BBox():
     # -----------------------------------------------------------------------
     def cowc2minmax(self, box):
         return [ int(box[0]-box[2]/2),  int(box[1]-box[3]/2),int(box[0]+box[2]/2), int(box[1]+box[3]/2)]
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def polyline2minmax(self, box):
+        box_arr = np.array(box)
+        box_min = np.min(box_arr, axis=0)
+        box_max = np.max(box_arr, axis=0)
+        return [box_min[1], box_min[0], box_max[1], box_max[0]]
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -99,8 +105,17 @@ class BBox():
     def get_minmax(self, box, dtype=None):
         dst = box
         if dtype=="cowc":
-            dst = self.cowc2minmax(box)            
+            dst = self.cowc2minmax(box)
+        if dtype=="polyline":
+            dst = self.polyline2minmax(box)                    
         return dst
-        
 
-    
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def get_min(self, box, dtype=None):
+        dst = box
+        if dtype=="cowc":
+            dst = self.cowc2minmax(box)            
+        if dtype=="polyline":
+            dst = self.polyline2minmax(box)
+        return dst[0:2]

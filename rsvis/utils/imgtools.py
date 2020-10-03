@@ -384,6 +384,39 @@ def draw_box(img, shape, boxes, color=[255, 255, 255], dtype=np.uint8):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def draw_box_ext(img, shape, boxes, color=[255, 255, 255], dtype=np.uint8):
+    if not hasattr(img, "shape"):
+        img = np.zeros(shape, dtype=dtype)
+
+    boxes = boxes if isinstance(boxes[0], list) and len(boxes[0])!=2 else [boxes]
+    for idx, box in enumerate(boxes):
+        c = color if isinstance(color[0], int) else color[idx]
+        box = np.int0(np.array(rsvis.utils.bbox.BBox().get_polyline(box)))
+        img = cv2.drawContours(img, [box], -1, c, 1)
+    return img
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def draw_detection_boxes(img, shape, boxes, color=[255, 255, 255], dtype=np.uint8):
+    if not hasattr(img, 'shape'):
+        img = np.zeros(shape, dtype=dtype)
+
+    # boxes = boxes if isinstance(boxes[0], list) and len(boxes[0])!=2 else [boxes]
+    for idx, box in enumerate(boxes):
+        c = color if isinstance(color[0], int) else color[idx]
+        # print(c)
+        # print(box['box'])
+        box_poly = np.int0(np.array(rsvis.utils.bbox.BBox().get_polyline(box['box'])))
+        img = cv2.drawContours(img, [box_poly], -1, c, 1)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+
+        box_min = rsvis.utils.bbox.BBox().get_min(box_poly, 'polyline')
+        cv2.putText(img, "{}/{:.2f}".format(box['label'], float(box['probability'])), (box_min[1]-2, box_min[0]-2), font, 0.275, c, 1, cv2.LINE_AA)
+    
+    return img
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def get_transparent_image(img, method="any", value=255, dtype=np.uint8):
     # Creating RGBA images
     # https://pythoninformer.com/python-libraries/numpy/numpy-and-images/

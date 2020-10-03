@@ -120,7 +120,7 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
         self._patches_bbox = rsvis.utils.patches_unordered.UnorderedPatches(np.asarray(self._img_draw), bbox=boxes)
         
         if self._object_flag and boxes:
-            img = imgtools.draw_box(self.get_intial_draw_image(), [], boxes, self.get_object_colors(), dtype=np.int16)            
+            img = imgtools.draw_detection_boxes(self.get_intial_draw_image(), [], boxes, self.get_object_colors(), dtype=np.int16)            
             img_assembly = np.where(img_assembly>=0, img_assembly, img)
 
         return img_assembly
@@ -139,7 +139,12 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     # -----------------------------------------------------------------------
     def get_object_boxes(self, resize=True):
         boxes = [b["box"] for b in self._boxes if b]
-        return self.resize_boxes(boxes) if resize and boxes else boxes 
+        boxes = self.resize_boxes(boxes) if resize and boxes else boxes 
+
+        boxes_resized = self._boxes.copy()
+        for b, bb in zip (boxes, boxes_resized):
+            bb["box"] = b
+        return boxes_resized
 
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
@@ -194,11 +199,11 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     # -----------------------------------------------------------------------
     def get_object(self):
         self._boxes = self._data.get_object_in(self._images[self._idx_list()][0].path, default=list())
-    
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def write_object(self):
-        self._data.set_object_in(self._images[self._idx_list()][0].path, self._boxes) 
+
+    # #   method --------------------------------------------------------------
+    # # -----------------------------------------------------------------------
+    # def write_object(self):
+    #     self._data.set_object_in(self._images[self._idx_list()][0].path, self._boxes) 
         
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
