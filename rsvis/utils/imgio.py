@@ -9,6 +9,7 @@ import rsvis.utils.imgcontainer
 from rsvis.utils import imgtools
 import rsvis.utils.bbox
 import rsvis.utils.yaml
+import rsvis.utils.obj
 
 import cv2
 import numpy as np
@@ -58,38 +59,28 @@ def show_io_str(io_str, logger=None):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+def read_xml(path, logger=None):
+    show_read_str(path, logger=logger)
+    
+    return ET.parse(path).getroot()
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def read_object(path, logger=None):
     show_read_str(path, logger=logger)
 
     objects = list()
     if pathlib.Path(path).suffix==".txt":
-        root = [o.split(" ") for o in read_log(path, logger=logger)]
-
-        for txt_obj in root:
-            box = [float(b)*255 for b in txt_obj[1:5]]
-            obj = {"label": txt_obj[0], "box": rsvis.utils.bbox.BBox().get_polyline(box, dtype="cowc"),"dtype": "polyline"}
-            objects.append(obj)
-    if pathlib.Path(path).suffix==".yaml":
-        objects = rsvis.utils.yaml.yaml_to_data(path)
-        for obj in objects:
-            obj["dtype"] = "corner"
+        root = read_log(path, logger=logger)
+        objects = rsvis.utils.obj.ObjConverter().get_obj_from_yolo(root)
+        
     if pathlib.Path(path).suffix==".xml":
-        root = ET.parse(path).getroot()
-        for xml_obj in root.find("objects").findall("object"):
-            obj = {"box":list(), "label": xml_obj.find("possibleresult").find("name").text, "dtype": "polyline", "probability": xml_obj.find("possibleresult").find("probability").text}
-            for xml_obj_child in xml_obj.find("points"):
-                obj["box"].append([int(float(n)) for n in xml_obj_child.text.split(",")])
-            objects.append(obj)
+        root = read_xml(path, logger=logger)
+        objects = rsvis.utils.obj.ObjConverter().get_obj_from_voc(root)
+
     if pathlib.Path(path).suffix==".json":
-        root = rsvis.utils.yaml.yaml_to_data(path)
-        root = [root] if not isinstance(root, list) else root
-        for coco_obj in root:
-            if isinstance(coco_obj["segmentation"][0], str):
-                box = [ int(c) for c in coco_obj["segmentation"][0].split(" ")]
-            else:
-                box = coco_obj["segmentation"][0]
-            obj = {"box": rsvis.utils.bbox.BBox().get_polyline(box, dtype="coco_polyline"), "label": str(coco_obj["category_id"]), "dtype": "polyline"}
-            objects.append(obj)
+        root = read_yaml(path, logger=logger)
+        objects = rsvis.utils.obj.ObjConverter().get_obj_from_coco(root)
 
     return objects
 

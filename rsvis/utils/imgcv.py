@@ -41,7 +41,7 @@ def get_bbox(labelimg, index, label=None, margin=0, connectivity=8, equal=True):
     boxes = list()
     for s in stats[1:]:
         boxes.append({
-                "box": crop_box([
+                "bbox": crop_box([
                     s[1]-margin, 
                     s[1]+s[3]+margin, 
                     s[0]-margin, 

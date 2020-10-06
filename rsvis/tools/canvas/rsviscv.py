@@ -130,7 +130,7 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     def set_object_boxes(self, box, resize=False, append=True):
         box = self.resize_boxes(box, inversion=True)[0] if resize else box
         if append:
-            self._boxes.append({"box": box, "label": self._label})
+            self._boxes.append({"bbox": box, "label": self._label})
         else:
             self._boxes = box
         self.show_objects(force=True)
@@ -138,12 +138,12 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_object_boxes(self, resize=True):
-        boxes = [b["box"] for b in self._boxes if b]
-        boxes = self.resize_boxes(boxes) if resize and boxes else boxes 
+        boxes = [b["bbox"].copy() for b in self._boxes if b]
+        boxes = self.resize_boxes(boxes) if resize and boxes else boxes
 
-        boxes_resized = self._boxes.copy()
-        for b, bb in zip (boxes, boxes_resized):
-            bb["box"] = b
+        boxes_resized = [b.copy() for b in self._boxes if b]
+        for b, b_r in zip (boxes, boxes_resized):
+            b_r["bbox"] = b
         return boxes_resized
 
     #   method --------------------------------------------------------------
