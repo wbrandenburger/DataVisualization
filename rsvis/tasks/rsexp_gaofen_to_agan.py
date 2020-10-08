@@ -8,6 +8,7 @@ import rsvis.utils.rsioobject
 import rsvis.utils.general as gu
 from rsvis.utils import opener, imgtools
 import rsvis.utils.logger
+import rsvis.utils.system
 
 import rsvis.utils.bbox 
 import rsvis.utils.patches_ordered_ext
@@ -54,18 +55,24 @@ def run(
     aircraft_rejected = 0
     count_patches = 0
     param = param_exp
+
+    for patch_key in param["process"]:
+        rsvis.utils.system.rmdir(param["dir"][patch_key]["path_dir"])
+        
     for img_container in tqdm(images_in):              
 
+        # get image anfd path
         src_img = img_container.get_img_from_label(param["label"]).data
         src_path = img_container.get_img_from_label(param["label"]).path
 
-        
+        # create patch generator    
         patches = rsvis.utils.patches_ordered_ext.OrderedPatchesExt(src_img, limit=param["limit"], num_patches=param["num_patches"], stride=param["stride"])
 
+        # get objects
         objects = objects_cowc = list()
         if param["objects"]:
             objects = rsio.get_object_in(src_path)
-            objects_cowc = [rsvis.utils.bbox.BBox().get_cowc(obj["box"], dtype="polyline") for obj in objects]
+            objects_cowc = [rsvis.utils.bbox.BBox().get_cowc(obj["bbox"], dtype="polyline") for obj in objects]
 
         for patch in patches:
             patch_meta_write=""

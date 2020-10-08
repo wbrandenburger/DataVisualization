@@ -22,32 +22,27 @@ import xml.etree.ElementTree as ET
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def show_copy_str(path, logger=None):
-    copy_str = "[COPY] {}".format(path)
-    show_io_str(copy_str, logger=logger)
+    show_io_str("[COPY] {}".format(path), logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def show_info_str(info, logger=None):
-    info_str = "[INFO] {}".format(info)
-    show_io_str(info_str, logger=logger)
+    show_io_str("[INFO] {}".format(info), logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def show_open_str(path, logger=None):
-    open_str = "[OPEN] {}".format(path)
-    show_io_str(open_str, logger=logger)
+    show_io_str("[OPEN] {}".format(path), logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def show_read_str(path, logger=None):
-    read_str = "[READ] {}".format(path)
-    show_io_str(read_str, logger=logger)
+    show_io_str("[READ] {}".format(path), logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def show_write_str(path, logger=None):
-    write_str = "[WRITE] {}".format(path)
-    show_io_str(write_str, logger=logger)
+    show_io_str("[WRITE] {}".format(path), logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
