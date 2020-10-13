@@ -41,3 +41,10 @@ def task_agan_join():
     """Call the main routine for evaluation of a single task classification model"""
 
     rsvis.tasks.tasks.task_agan_join(setting="test")    
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def task_add_label_gaofen():
+    """Call the main routine for evaluation of a single task classification model"""
+
+    rsvis.tasks.tasks.task_add_label_gaofen(setting="test")

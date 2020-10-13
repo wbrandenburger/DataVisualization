@@ -51,7 +51,8 @@ class GeneralOpener(Opener):
     def __init__(self, opener=dict(), **kwargs):
 
         opener.update({
-                "files": "explorer.exe"
+                "files": "explorer.exe",
+                "xml": "code.cmd"
             }
         )
 
