@@ -32,7 +32,7 @@ def mkdir(path, logger=None):
     path = path if isinstance(path, list) else [path]
     for p in path:
         if not Path(p).exists():
-            show_mk_str(str(path), logger=logger)
+            show_mk_str(str(p), logger=logger)
             Path(p).mkdir(parents=True, exist_ok=True)
 
 #   function ----------------------------------------------------------------
