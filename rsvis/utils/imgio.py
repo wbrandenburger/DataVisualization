@@ -4,10 +4,7 @@
 
 #   import ------------------------------------------------------------------
 from rsvis.__init__ import _logger
-import rsvis.utils.general as gu
-import rsvis.utils.imgcontainer
 from rsvis.utils import imgtools
-import rsvis.utils.bbox
 import rsvis.utils.yaml
 import rsvis.utils.obj
 
@@ -82,9 +79,7 @@ def read_object(path, logger=None):
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def write_object(path, obj, logger=None,):
-    show_write_str(path, logger=logger)
-
-    rsvis.utils.yaml.data_to_yaml(path, obj) 
+    write_yaml(path, obj, logger=logger)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -113,7 +108,7 @@ def set_object(path, obj, scale=100, logger=None, **kwargs):
 def read_yaml(path, logger=None):
     show_read_str(path, logger=logger)
 
-    return rsvis.utils.yaml.data_to_yaml(path)
+    return rsvis.utils.yaml.yaml_to_data(path)
         
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
