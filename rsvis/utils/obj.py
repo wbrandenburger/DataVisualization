@@ -58,9 +58,9 @@ class ObjConverter():
             dtype = 'coco'
             if 'segmentation' in r:
                 if isinstance(r['segmentation'][0], str):
-                    box = [ int(p) for c in s['segmentation'][0].split(" ")]
+                    box = [ int(p) for p in r['segmentation'][0].split(" ")]
                 else:
-                    box = coco_obj["segmentation"][0]
+                    box = r["segmentation"][0]
 
                 dtype = 'polyline'
             
