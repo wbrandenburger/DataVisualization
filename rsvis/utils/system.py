@@ -41,7 +41,7 @@ def rmdir(path, logger=None):
     path = path if isinstance(path, list) else [path]
     for p in path:
         if Path(p).exists():
-            show_rm_str(str(path), logger=logger)
+            show_rm_str(str(p), logger=logger)
             shutil.rmtree(p)
 
 #   function ----------------------------------------------------------------
