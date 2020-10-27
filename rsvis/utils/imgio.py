@@ -77,7 +77,16 @@ def read_object(path, logger=None, label2id=None):
         objects = rsvis.utils.obj.ObjConverter(label2id=label2id).get_obj_from_coco(root)
     
     for idx in range(len(objects)):
-        objects[idx]["bbox"] = BBox().corner2polyline(objects[idx]["bbox"])
+        # pass
+        # objects[idx]["bbox"] = BBox().corner2polyline(objects[idx]["bbox"])
+        box = objects[idx]["bbox"] # rsvis normal
+        objects[idx]["bbox"] = [[box[0], box[1]], # rsvis normal
+                [box[0], box[3]], # rsvis normal
+                [box[2], box[3]], # rsvis normal
+                [box[2], box[1]], # rsvis normal
+                [box[0], box[1]]] # rsvis normal
+
+    # print(objects)
     return objects
 
 #   function ----------------------------------------------------------------
