@@ -39,6 +39,7 @@ setuptools.setup(
         "pyyaml>=5.3.1",
         "pandas>=1.0.3",
         "natsort>=7.0.0",
+        "json5>=0.9.5"
         # - python image processing packages -
         "opencv-python>=4.2.0.34",
         # "opencv-contrib-python>=4.2.0.34",        
