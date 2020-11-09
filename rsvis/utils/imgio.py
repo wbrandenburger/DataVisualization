@@ -72,7 +72,7 @@ def read_object(path, logger=None, label2id=None):
         root = read_xml(path, logger=logger)
         objects = rsvis.utils.obj.ObjConverter(label2id=label2id).get_obj_from_voc(root)
 
-    if pathlib.Path(path).suffix==".json":
+    if pathlib.Path(path).suffix==".json" or pathlib.Path(path).suffix==".json5":
         root = read_json(path, logger=logger)
         objects = rsvis.utils.obj.ObjConverter(label2id=label2id).get_obj_from_coco(root)
     
@@ -101,7 +101,7 @@ def write_object(path, objects, logger=None):
     if pathlib.Path(path).suffix==".xml":
         pass
 
-    if pathlib.Path(path).suffix==".json":
+    if pathlib.Path(path).suffix==".json" or pathlib.Path(path).suffix==".json5":
         for obj in objects:
             obj['probability'] = np.float64(obj['probability'])
             obj['bbox'] = list(np.array(obj['bbox'], dtype=np.float64))

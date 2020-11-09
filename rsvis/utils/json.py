@@ -7,8 +7,9 @@
 import logging
 import os
 import json
+import json5
 import numpy as np
-json.encoder.FLOAT_REPR = lambda o: format(o, '.4f' )
+# json.encoder.FLOAT_REPR = lambda o: format(o, '.4f' )
 
 #   settings ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -33,6 +34,7 @@ def pretty_floats(obj):
         return list(map(pretty_floats, obj))
     return obj
 
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def data_to_json(path, data):
@@ -45,13 +47,21 @@ def data_to_json(path, data):
     :param data: Data in a dictionary
     :type  data: dict
     """
-    with open(path, 'w+') as f:
-        json.dump(
+    json_str = json5.dumps(
             pretty_floats(data),
-            f,
-            #allow_unicode=True/False),
             sort_keys=False
-        )
+            )
+    with open(path, 'w+') as f:
+        f.write(json_str)
+
+    # with open(path, 'w+') as f:
+    #     json5.dump(
+    #         pretty_floats(data),
+    #         f,
+    #         allow_unicode=True,
+    #         sort_keys=False
+    #     )
+
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -88,7 +98,7 @@ def file_to_data(path, raise_exception=False):
     """
     with open(path) as f:
         try:
-            data = json.load(f)
+            data = json5.load(f)
         except Exception as e:
             if raise_exception:
                 raise ValueError(e)
@@ -112,7 +122,7 @@ def string_to_data(string, raise_exception=False):
     :raises ValueError: If a json parsing error happens
     """
     try:
-        data = json.loads(string)
+        data = json5.loads(string)
     except Exception as e:
         if raise_exception:
             raise ValueError(e)
