@@ -149,7 +149,7 @@ class RSVisCanvas(extimgconcv.ExtendedImgConCv):
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_object_colors(self):
-        self._boxes
+        # print(self._boxes)
         return [self._color[b["label"]] for b in self._boxes if b]
 
     #   method --------------------------------------------------------------
