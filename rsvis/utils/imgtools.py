@@ -405,7 +405,7 @@ def draw_detection_boxes(img, shape, boxes, color=[255, 255, 255], dtype=np.uint
     for idx, box in enumerate(boxes):
         c = color if isinstance(color[0], int) else color[idx]
         # print(c)
-        # print(box['box'])
+        #print(box['box'])
         box_poly = np.int0(np.array(rsvis.utils.bbox.BBox().get_polyline(box['bbox'])))
         img = cv2.drawContours(img, [box_poly], -1, c, 1)
         font = cv2.FONT_HERSHEY_SIMPLEX

@@ -83,19 +83,18 @@ def read_object(path, logger=None, label2id=None):
     if pathlib.Path(path).suffix==".json":
         root = read_json(path, logger=logger)
         objects = rsvis.utils.obj.ObjConverter(label2id=label2id).get_obj_from_coco(root)
+
     
     for idx in range(len(objects)):
+        objects[idx]["bbox"] = [objects[idx]["bbox"][1], objects[idx]["bbox"][3], objects[idx]["bbox"][0], objects[idx]["bbox"][2]]
         objects[idx]["bbox"] = BBox().corner2polyline(objects[idx]["bbox"])
+
+    print(objects[0]) 
     return objects
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-<<<<<<< HEAD
-def write_object(path, obj, logger=None,):
-    show_write_str(path, logger=logger)
 
-    rsvis.utils.yaml.data_to_yaml(path, obj) 
-=======
 def write_object(path, objects, logger=None):
     show_write_str(path, logger=logger)
 
@@ -111,8 +110,6 @@ def write_object(path, objects, logger=None):
             obj['probability'] = np.float64(obj['probability'])
             obj['bbox'] = list(np.array(obj['bbox'], dtype=np.float64))
         write_json(path, {'annotations': objects}, logger=logger)
-
->>>>>>> 3eb9f98 (deleted torch usage)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

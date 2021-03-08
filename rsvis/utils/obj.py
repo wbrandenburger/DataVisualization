@@ -62,18 +62,9 @@ class ObjConverter():
             bbox = list()
             if 'segmentation' in r:
                 if isinstance(r['segmentation'][0], str):
-<<<<<<< HEAD
-                    box = [ int(p) for c in s['segmentation'][0].split(" ")]
-                else:
-                    box = coco_obj["segmentation"][0]
-
-                dtype = 'polyline'
-=======
                     bbox = [ float(p) for p in r['segmentation'][0].split(" ")]
                 else:
                     bbox = r["segmentation"][0]
->>>>>>> 3eb9f98 (deleted torch usage)
-            
             r['bbox'] = bbox if not 'bbox' in r else [float(b) for b in r['bbox']]
             r['label'] = r['label'] if 'label' in r else self.label2id( r['category_id'] ) # @todo: changed
             if 'area' in r:
