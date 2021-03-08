@@ -28,8 +28,8 @@ def run(
 
     #   settings ------------------------------------------------------------
     # -----------------------------------------------------------------------
-    param_label = [c["label"] for c in param_classes]
-    param_color = [c["color"] for c in param_classes]
+    param_label = [c["label"] for c in param_classes if "label" in c]
+    param_color = [c["color"] for c in param_classes if "label" in c]
     rsio = rsvis.utils.rsioobject.RSIOObject(files, label, param_in, param_out, param_show, label=param_label, color=param_color
     )
 
