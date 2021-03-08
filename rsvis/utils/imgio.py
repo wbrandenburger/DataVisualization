@@ -3,12 +3,14 @@
 # ===========================================================================
 
 #   import ------------------------------------------------------------------
+from rsvis.utils.bbox import BBox
 from rsvis.__init__ import _logger
 import rsvis.utils.general as gu
 import rsvis.utils.imgcontainer
 from rsvis.utils import imgtools
 import rsvis.utils.bbox
 import rsvis.utils.yaml
+import rsvis.utils.json
 import rsvis.utils.obj
 
 import cv2
@@ -66,30 +68,51 @@ def read_xml(path, logger=None):
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-def read_object(path, logger=None):
+def read_object(path, logger=None, label2id=None):
     show_read_str(path, logger=logger)
 
     objects = list()
     if pathlib.Path(path).suffix==".txt":
         root = read_log(path, logger=logger)
-        objects = rsvis.utils.obj.ObjConverter().get_obj_from_yolo(root)
+        objects = rsvis.utils.obj.ObjConverter(label2id=label2id).get_obj_from_yolo(root)
         
     if pathlib.Path(path).suffix==".xml":
         root = read_xml(path, logger=logger)
-        objects = rsvis.utils.obj.ObjConverter().get_obj_from_voc(root)
+        objects = rsvis.utils.obj.ObjConverter(label2id=label2id).get_obj_from_voc(root)
 
     if pathlib.Path(path).suffix==".json":
-        root = read_yaml(path, logger=logger)
-        objects = rsvis.utils.obj.ObjConverter().get_obj_from_coco(root)
-
+        root = read_json(path, logger=logger)
+        objects = rsvis.utils.obj.ObjConverter(label2id=label2id).get_obj_from_coco(root)
+    
+    for idx in range(len(objects)):
+        objects[idx]["bbox"] = BBox().corner2polyline(objects[idx]["bbox"])
     return objects
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+<<<<<<< HEAD
 def write_object(path, obj, logger=None,):
     show_write_str(path, logger=logger)
 
     rsvis.utils.yaml.data_to_yaml(path, obj) 
+=======
+def write_object(path, objects, logger=None):
+    show_write_str(path, logger=logger)
+
+    if pathlib.Path(path).suffix==".txt":
+        np.matrix(objects)
+        np.savetxt(path, objects, fmt="%i : %1.3f : [%1.3f, %1.3f, %1.3f, %1.3f]")
+        # np.savetxt(path, obj, fmt="%i %1.3f %1.3f %1.3f %1.3f %1.3f")
+    if pathlib.Path(path).suffix==".xml":
+        pass
+
+    if pathlib.Path(path).suffix==".json":
+        for obj in objects:
+            obj['probability'] = np.float64(obj['probability'])
+            obj['bbox'] = list(np.array(obj['bbox'], dtype=np.float64))
+        write_json(path, {'annotations': objects}, logger=logger)
+
+>>>>>>> 3eb9f98 (deleted torch usage)
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -126,7 +149,21 @@ def write_yaml(path, data, logger=None):
     show_write_str(path, logger=logger)
 
     rsvis.utils.yaml.data_to_yaml(path, data)
-    
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def read_json(path, logger=None):
+    show_read_str(path, logger=logger)
+
+    return rsvis.utils.json.json_to_data(path)
+        
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def write_json(path, data, logger=None):
+    show_write_str(path, logger=logger)
+
+    rsvis.utils.json.data_to_json(path, data)
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def read_log(path, logger=None):
@@ -167,7 +204,10 @@ def read_image(path, logger=None,):
     if str(path).endswith(".tif"):
         img = tifffile.imread(path)
     else:
-        img = np.asarray(PIL.Image.open(path))
+        img = cv2.imread(path, 1)
+        if img.ndim == 3 and img.shape[2] == 3:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # img = np.asarray(PIL.Image.open(path))
     
     return img
 
@@ -179,8 +219,7 @@ def write_image(path, img, logger=None,):
     if str(path).endswith(".tif"):
         tifffile.imwrite(path, img)
     else:
-        cv2.imwrite(path, cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        # PIL.Image.fromarray(img).save(path)
+        cv2.imwrite(path, cv2.cvtColor(img[:,:, 0:3], cv2.COLOR_BGR2RGB))
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------

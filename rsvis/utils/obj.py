@@ -5,7 +5,7 @@
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 import xml.etree.ElementTree as ET
-
+import numpy as np
 # difference between coco, pascal voc and ylo format
 # https://towardsdatascience.com/coco-data-format-for-object-detection-a4c5eaf518c5
 
@@ -19,7 +19,7 @@ class ObjConverter():
     # -----------------------------------------------------------------------
     def __init__(
         self,
-        label2id=dict(),
+        label2id=None,
         ):
 
         self.label2id = label2id
@@ -29,21 +29,25 @@ class ObjConverter():
     def get_obj_from_yolo(self, root):
         obj_list = list()
         for txt_obj in root:
-            r = txt_obj.split(":")
 
-            label = r[0]
-            probability = r[1]
-            category_id = self.label2id[label] if self.label2id else 0
-            box = [float(p) for p in eval(r[2])]
-            dtype = "minmax"
+            probability = 1
+            category_id = 0
+            bbox = list()
+
+            r = txt_obj.split(" ")
+            category_id = int(r[0])
+            if len(r) > 1:
+                probability = 1
+                bbox = [float(p) for p in r[1:5]]
+            
             obj_list.append(
                 {
-                    'bbox': box,
-                    'label': label,
+                    'bbox': bbox,
+                    'label': category_id,
                     'probability': probability,
+                    'iscrowd': 0,
                     'category_id': category_id,
-                    'ignore': 0,
-                    'dtype': 'dtype'
+                    'ignore': 0
                 } 
             )         
         return obj_list
@@ -51,24 +55,30 @@ class ObjConverter():
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def get_obj_from_coco(self, root):
-        root = [root] if not isinstance(root, list) else root
+        # root = [root] if not isinstance(root, list) else root
+        root = root['annotations']
         for r in root:
             
-            box = list()
-            dtype = 'coco'
+            bbox = list()
             if 'segmentation' in r:
                 if isinstance(r['segmentation'][0], str):
+<<<<<<< HEAD
                     box = [ int(p) for c in s['segmentation'][0].split(" ")]
                 else:
                     box = coco_obj["segmentation"][0]
 
                 dtype = 'polyline'
+=======
+                    bbox = [ float(p) for p in r['segmentation'][0].split(" ")]
+                else:
+                    bbox = r["segmentation"][0]
+>>>>>>> 3eb9f98 (deleted torch usage)
             
-                r['bbox'] = box
-                r['dtype'] = dtype
-                r['probability'] = 1 if not 'probability' in r else r['probability']
-                # r['category_id'] = self.label2id[r['label']] if self.label2id else 0
-        
+            r['bbox'] = bbox if not 'bbox' in r else [float(b) for b in r['bbox']]
+            r['label'] = r['label'] if 'label' in r else self.label2id( r['category_id'] ) # @todo: changed
+            if 'area' in r:
+                r['area'] = float(r['area'])
+            r['probability'] = 1 if not 'probability' in r else float(r['probability'])
         return root
 
     #   method --------------------------------------------------------------
@@ -77,42 +87,37 @@ class ObjConverter():
         obj_list = list()
         for r in root.find("objects").findall("object"):   
             label = r.findtext('name') if r.find('name') else r.find('possibleresult').findtext('name')
-            probability = 1  if r.find('name')  else r.find("possibleresult").findtext('probability')
-            category_id = self.label2id[label] if self.label2id else 0
+            probability = 1 if r.find('name')  else r.find("possibleresult").findtext('probability')
+            category_id = self.label2id(label) if self.label2id else 0
             
             bndbox = r.find('bndbox')
             points = r.find('points')
 
-            box = list()
+            bbox = list()
             if bndbox:
-                xmin = float(bndbox.findtext('xmin')) - 1
-                ymin = float(bndbox.findtext('ymin')) - 1
+                xmin = float(bndbox.findtext('xmin'))
+                ymin = float(bndbox.findtext('ymin'))
                 xmax = float(bndbox.findtext('xmax'))
                 ymax = float(bndbox.findtext('ymax'))
-                box =  [xmin, ymin, xmax, ymax], # bbox
-                dtype = 'minmax'
+                bbox =  [xmin, ymin, xmax, ymax], # bbox
             elif points:
                 for pts in points:
-                    box.append([float(p) for p in pts.text.split(",")][0:8])
-                dtype = 'polyline'
+                    bbox.append ([float(p) for p in pts.text.split(",")][0:8])
+                    
+                bbox_arr = np.array(bbox)
+                bbox_min = np.min(bbox_arr, axis=0)
+                bbox_max = np.max(bbox_arr, axis=0)
+                bbox = [bbox_min[0], bbox_min[1], bbox_max[0], bbox_max[1]]
 
             obj_list.append(
                 {
-                    'bbox': box,
+                    'area': (bbox[3]-bbox[1])*(bbox[2]-bbox[0]),
+                    'bbox': bbox,
                     'label': label,
                     'probability': probability,
                     'category_id': category_id,
-                    'ignore': 0,
-                    'dtype': 'dtype'
+                    'iscrowd': 0,
+                    'ignore': 0
                 }
             )
         return obj_list
-
-    #   method --------------------------------------------------------------
-    # -----------------------------------------------------------------------
-    def get_label2id(self, path: str):
-        """id is 1 start"""
-        with open(path, 'r') as f:
-            labels_str = f.read().split()
-        labels_ids = list(range(1, len(labels_str)+1))
-        self.labelid = dict(zip(labels_str, labels_ids))
