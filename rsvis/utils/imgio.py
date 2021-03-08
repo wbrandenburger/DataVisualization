@@ -88,7 +88,7 @@ def read_object(path, logger=None, label2id=None):
     for idx in range(len(objects)):
         objects[idx]["bbox"] = [objects[idx]["bbox"][1], objects[idx]["bbox"][3], objects[idx]["bbox"][0], objects[idx]["bbox"][2]]
         objects[idx]["bbox"] = BBox().corner2polyline(objects[idx]["bbox"])
-        
+
     return objects
 
 #   function ----------------------------------------------------------------
