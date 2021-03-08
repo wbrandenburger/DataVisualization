@@ -26,7 +26,7 @@ import numpy as np
 from tkinter import *
 from tkinter import ttk
 
-import rsvis.segmentation.unsegbp
+# import rsvis.segmentation.unsegbp
 import math
 
 from matplotlib import pyplot as plt
