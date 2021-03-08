@@ -37,19 +37,20 @@ setuptools.setup(
         "stevedore>=1.32.0",
         "configparser>=5.0.0",
         "pyyaml>=5.3.1",
-        "pandas>=1.0.3",
         "natsort>=7.0.0",
+        "pandas==1.2.3",
+        "seaborn==0.11.1",
+        "tqdm == 4.58.0"
+        "json5 == 0.9.5"
         # - python image processing packages -
-        "opencv-python>=4.2.0.34",
+        "opencv-contrib-python==4.5.1.48",
         # "opencv-contrib-python>=4.2.0.34",        
-        "pillow>=7.1.2",
+        "Pillow==8.1.1",
         "tifffile>=2020.2.16",
+        "scikit-image==0.18.1",
         # - python numerical analysis packages -
-        "matplotlib>=3.2.1",
-        "numpy>=1.18.3",
-        "scipy>=1.4.1",
-        "scikit-image>=0.17",
-        "scikit-learn>=0.23"
+        "matplotlib==3.3.4",
+        "scikit-learn==0.24.1"
     ],
     python_requires=">=3",
     classifiers=[
