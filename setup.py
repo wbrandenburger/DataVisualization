@@ -40,8 +40,8 @@ setuptools.setup(
         "natsort>=7.0.0",
         "pandas==1.2.3",
         "seaborn==0.11.1",
-        "tqdm == 4.58.0"
-        "json5 == 0.9.5"
+        "tqdm == 4.58.0",
+        "json5 == 0.9.5",
         # - python image processing packages -
         "opencv-contrib-python==4.5.1.48",
         # "opencv-contrib-python>=4.2.0.34",        
