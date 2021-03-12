@@ -65,8 +65,40 @@ class TWHFilter(twhist.TWHist):
         self._csbox_hough = csbox.CSBox(self, bbox=[["Hough Transform"], [self.get_hough_transform]], sbox=[["Threshold", "Minimum Line Length","Maximum Line Gap"], [40, 40, 40], ["int", "int", "int"]])
         self._csbox_hough.grid(row=14, column=0, rowspan=4, sticky=N+W+S+E)
 
+        # set combobox and settingsbox for hough transformation
+        self._csbox_gplot = csbox.CSBox(self, bbox=[["Laplacian Plot", "Gradient Plot"], [self.laplacian_plot, self.gradient_plot]], sbox=[["Threshold"], [0], ["int"]])
+        self._csbox_gplot.grid(row=11, column=1, rowspan=3, sticky=N+W+S+E)
+
         self._button_quit.grid(row=18, column=0, columnspan=3, sticky=W+E)
-  
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def laplacian_plot(self, event=None):
+        """Reset list of difference images
+        """
+        # get the currently displayed image
+        img = self.get_obj().get_img(show=True)
+        param = self._csbox_gplot.get_dict()
+        plot = imgtools.plot_laplacian(img, threshold=param["Threshold"])
+
+        # set image in canvas and update histogram
+        self.get_obj().set_img(plot, clear_mask=False)
+        self.set_img()
+
+    #   method --------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    def gradient_plot(self, event=None):
+        """Reset list of difference images
+        """
+        # get the currently displayed image
+        img = self.get_obj().get_img(show=True)
+        param = self._csbox_gplot.get_dict()
+        plot = imgtools.plot_gradient(img, threshold=param["Threshold"])
+
+        # set image in canvas and update histogram
+        self.get_obj().set_img(plot, clear_mask=False)
+        self.set_img()
+
     #   method --------------------------------------------------------------
     # -----------------------------------------------------------------------
     def reset_dimage(self, event=None):

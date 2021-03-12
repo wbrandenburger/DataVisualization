@@ -21,6 +21,118 @@ from PIL import Image
 from io import BytesIO
 from skimage import morphology, color
 
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def plot_image(w, h, plot_list):
+    dpi = 100
+    fig = Figure(figsize=(5, 5), dpi=dpi)
+    # A canvas must be manually attached to the figure (pyplot would automatically do it).  This is done by instantiating the canvas with the figure as argument https://matplotlib.org/gallery/user_interfaces/canvasagg.html#sphx-glr-gallery-user-interfaces-canvasagg-py
+    canvas = FigureCanvas(fig)
+    # fig.subplots_adjust(top = 1, bottom = 0, right = 1, left = 0, 
+    #             hspace = 0, wspace = 0)
+
+    ax = fig.add_subplot(111)
+    ax=fig.add_axes([0,0,1,1]) #position: left, bottom, width, height
+    ax.set_axis_off()
+
+    for pl in plot_list:
+        pl(ax)
+
+    canvas.draw()
+    s, (width, height) = canvas.print_to_buffer()
+
+    # Option 2a: Convert to a NumPy array.
+    plot = np.fromstring(s, np.uint8).reshape((height, width, 4))
+    return plot
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def plot_laplacian(img, threshold=0):
+
+    # convert gray image
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # define the colormap
+    cmap = plt.get_cmap('PuOr')
+
+    # extract all colors from the .jet map
+    cmaplist = [cmap(i) for i in range(cmap.N)]
+    cmaplist = cmaplist[::-1]
+    # create the new map
+    cmap = cmap.from_list('Custom cmap', cmaplist, cmap.N)
+
+    # Set color value depending on the Laplacian
+    C = cv2.Laplacian(img_gray, cv2.CV_16S)
+
+    # x, y are coordinates for the scatter plot and val represents the
+    # Laplacian value at the corresponding coordinates
+    x = []
+    y = []
+    val = []
+
+    for iy, col in enumerate(C):
+        for ix, row in enumerate(col):
+           if(abs(row) >= threshold):
+               x.append(ix)
+               y.append(iy)
+               val.append(row)
+
+    plot_list = []
+    # Generate scatter plot and show image
+    plot_list.append(lambda ax: ax.imshow(img_gray, cmap="gray"))
+    plot_list.append(lambda ax: ax.scatter(x, y, c=val, cmap=cmap, linewidths=2.5))
+
+    return plot_image(img.shape[0], img.shape[1], plot_list)
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+
+
+def plot_gradient(img, threshold=0):
+
+    # convert gray image
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Calculate gradients
+    # The gradient is computed using central differences in the interior and first differences
+    # at the boundaries.
+    dY, dX = np.gradient(img_gray)
+
+    C = []
+    X = []
+    Y = []
+    dXFiltered = []
+    dYFiltered = []
+
+    rowcount, colcount = dX.shape
+
+    # Filter gradients by grad_threshold
+    # Normalize gradients for equal arrow size in quiver plot
+    # Set C as the magnitude for color representation of grad strength
+    for irow in range(0, rowcount):
+        for icol in range(0, colcount):
+            gradx = dX[irow][icol]
+            grady = dY[irow][icol]
+            magnitude = math.sqrt(gradx**2 + grady**2)
+
+            if magnitude >= threshold:
+                X.append(icol)
+                Y.append(irow)
+                dXFiltered.append(gradx / magnitude)
+                dYFiltered.append(grady / magnitude)
+                C.append(magnitude)
+
+    # Generate plot
+    q = plt.quiver(X, Y, dXFiltered, dYFiltered, C, cmap="Reds", units="dots")
+
+    plot_list = []
+    # Generate scatter plot and show image
+    plot_list.append(lambda ax: ax.imshow(img_gray, cmap="gray"))
+    plot_list.append(lambda ax: ax.quiver(X, Y, dXFiltered, dYFiltered, C, cmap="Reds", units="dots"))
+
+    return plot_image(img.shape[0], img.shape[1], plot_list)
+
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 def get_array_info(img, verbose=False):
