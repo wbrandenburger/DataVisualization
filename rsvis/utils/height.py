@@ -10,6 +10,7 @@ import rsvis.utils.logger
 
 import cv2
 import numpy as np
+import os
 import pandas
 import tempfile
 
@@ -193,7 +194,12 @@ class Height():
     def open(self, level, maps, opener="viewer", **kwargs):
         method = getattr(self, "set_{}".format(level), lambda: "Invalid method")
         method(maps, show=True, **kwargs)
-        self._opener(opener, self._path)
+
+        path = self._path
+        if not os.path.isabs(path):
+            path = os.path.abspath(path)   
+
+        self._opener(opener, path)
 
     #   method --------------------------------------------------------------
     # ----------------------------------------------------------------------- 
