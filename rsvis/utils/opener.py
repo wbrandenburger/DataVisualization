@@ -6,7 +6,7 @@
 # ---------------------------------------------------------------------------
 from rsvis.utils import imgio
 import rsvis.utils.logger
-
+import os
 import subprocess
 
 #   class -------------------------------------------------------------------
@@ -61,6 +61,11 @@ class GeneralOpener(Opener):
     # -----------------------------------------------------------------------
     def __call__(self, opener, path, wait=False):
         imgio.show_open_str(path, self._logger)
+
+        dir = os.path.dirname(__file__)
+        if not os.path.isabs(path):
+            path = os.path.join(dir, path)   
+            
         process = subprocess.Popen(self.get_args(self._opener[opener], path))
         if wait:
             process.wait()
