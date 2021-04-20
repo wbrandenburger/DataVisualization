@@ -116,10 +116,10 @@ def get_object(path, scale=100, default=list(), logger=None, **kwargs):
     if not pathlib.Path(path).exists():
         return default
     obj = read_object(path, logger=logger)
-
     if scale != 100 and obj is not None:
         for o in obj:
-            o["box"] = [int(box*(float(scale)/100.0)) for box in o["box"]]
+            o["bbox"] = (np.asarray(o["bbox"])*(float(scale)/100.0)).tolist()
+            # o["bbox"] = [int(box*(float(scale)/100.0)) for box in o["bbox"]]
     
     return obj if obj else default
 
@@ -128,7 +128,8 @@ def get_object(path, scale=100, default=list(), logger=None, **kwargs):
 def set_object(path, obj, scale=100, logger=None, **kwargs):
     if scale != 100:
         for o in obj:
-            o["box"] = [int(box/(float(scale)/100.0)) for box in o["box"]]
+            o["bbox"] = (np.asarray(o["bbox"])*(float(scale)/100.0)).tolist()
+            # o["bbox"] = [int(box/(float(scale)/100.0)) for box in o["bbox"]]
     
     write_object(path, obj, logger=logger)
 
