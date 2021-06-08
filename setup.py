@@ -45,7 +45,7 @@ setuptools.setup(
         # - python image processing packages -
         "opencv-contrib-python==4.5.1.48",
         # "opencv-contrib-python>=4.2.0.34",        
-        "Pillow==8.1.1",
+        "Pillow==8.2.0",
         "tifffile>=2020.2.16",
         "scikit-image==0.18.1",
         # - python numerical analysis packages -
